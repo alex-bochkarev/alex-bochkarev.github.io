@@ -1,0 +1,463 @@
+/* Color scheme */
+:root {
+    --main-accent: #000080; /* navy blue */
+    --light-shadow: #f5f5f5;
+    --shadow: #d3d3d3;
+    --dark-shadow: #7e7e7e;
+    --main-bg: #FFFFF0; /* ivory */
+    --main-bg-accent: #FFBF00;
+    --code: #006400; /* dark green */
+    --nothing: #FFFFFF;
+}
+
+/* Elements' parameters */
+
+.text-center {
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 0;
+}
+h1, h2, h3, h4, h5 {
+    text-align: left;
+}
+
+h2 {
+    border-bottom: 1px solid var(--shadow);
+}
+
+h3 {
+    color: var(--main-accent);
+}
+
+p {
+    margin-bottom: 0;
+}
+/* Styling horizontal lines */
+hr.topline {
+    border: 5px solid var(--main-accent);
+    /* border-radius: 2px; */
+    margin: 0 0 0 0;
+}
+
+/* Some general parameters */
+
+div.site-footer {
+    border-top-color: var(--dark-shadow);
+    border-top-style: solid;
+    border-top-width: 1px;
+    color: var(--dark-shadow);
+}
+
+.footer-text {
+    margin-left: 10%;
+}
+
+/* navigation top panel */
+a.nav-link {
+    padding: 5px;
+    /* padding-left: 5px; */
+    /* padding-right: 5px; */
+    /* border-radius: 2px; */
+    color: var(--main-accent);
+    text-decoration: none;
+    margin: 0 0 0 0;
+}
+
+a.nav-link:hover {
+    color: var(--main-bg);
+    background-color: var(--main-accent);
+    padding-top: 8px;
+}
+
+/* list stickers */
+.sticker {
+    color: inherit;
+    border: 1px solid var(--main-accent);
+    border-radius: 15px;
+    border-color: inherit;
+    text-decoration: none;
+    padding: 2px;
+}
+
+.sticker:hover {
+    color: var(--main-bg);
+    background-color: var(--main-accent);
+    border-color: var(--main-accent);
+    border-radius: 15px;
+    padding: 2px;
+}
+/* normal links */
+
+a:not(.nav-link):not(.sticker):not(.not-a-text-link) {
+    color: var(--main-accent);
+    border-top: 1px dashed var(--main-accent);
+    border-bottom: 1px dashed var(--main-accent);
+    text-decoration: none;
+    padding: 2px;
+}
+a:hover:not(.nav-link):not(.sticker):not(not-a-text-link) {
+    color: var(--main-bg);
+    background-color: var(--main-accent);
+    border-radius: 5px;
+    padding: 2px;
+}
+
+/* special links type */
+a[href*="github.com"]:not(.nav-link):not(.sticker)::before {
+    content: url('/gh.svg');
+    vertical-align: -30%;
+}
+
+a[href*="wikipedia.org"]:not(.nav-link):not(.sticker)::before {
+    content: url('/wiki.svg');
+    vertical-align: -30%;
+}
+
+a:not(not-a-text-link):not(.nav-link):not([href^="mailto"])::before,
+a[href^="/"]:not(.nav-link)::before,
+a[href^="#"]:not( < #table-of-contents):not(not-a-text-link):not(a) > not-a-text-link:not(.nav-link):not(.footnote-backref):not(.footnote-ref):not(.sticker)::before
+{
+    content: '§';
+    padding-right: 2px;
+}
+
+a[href^="mailto:"]:not(.nav-link)::before {
+    content: url('/email.svg');
+    padding: 5px;
+}
+
+a:not([href^='#']):not([href^='/']):not([href*="github.com"]):not([href*="wikipedia.org"]):not(.nav-link):not(.sticker):not([href^="mailto:"])::before {
+    content: url('/outside.svg');
+    padding: 5px;
+}
+
+a:hover::before
+{
+    filter: invert(100%);
+    color: var(--main-accent);
+}
+
+
+/* menu style */
+ul#nav-menu {
+    margin: 0;
+    padding-top: 0;
+    padding-left: 0;
+}
+
+.menu-item {
+    margin-left: 1ch;
+}
+
+/* version for a narrow screen */
+nav#nav-menu {
+    display: inline-block;
+    padding: 0;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* version for a wider screen */
+@media (min-width: 768px) {
+    nav#nav-menu {
+        background-color: transparent;
+    }
+
+    ul#nav-menu {
+        padding-top: 0;
+        display: inline;
+        text-align: center;
+    }
+
+    ul#nav-menu li{
+        display: inline-block;
+    }
+}
+
+/* common styling */
+ul#nav-menu{
+    list-style-type: none;
+}
+
+#checkbox {
+    display: none;
+}
+
+#checkbox:not(checked) ~ nav ul{
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.1s;
+}
+
+#checkbox:checked ~ nav ul {
+    max-height: 300px;
+    padding: 15px 0;
+    transition: all 0.5s;
+}
+
+/* sticky top menu */
+.row {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 0;
+    background-color: var(--nothing);
+    border-bottom: 1px solid var(--shadow);
+    text-align: center;
+}
+
+.nav-icon-link {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    font-size: inherit;
+    color: inherit;
+    vertical-align: -0.125em;
+    fill: currentColor;
+    padding: 5px;
+}
+
+.menu-toggle{
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    font-size: inherit;
+    color: inherit;
+    vertical-align: -0.125em;
+    fill: var(--main-accent);
+    padding-top: 5px;
+    padding-left: 10px;
+    /* padding-right: 5px; */
+    /* border-radius: 2px; */
+}
+
+.menu-toggle-text {
+    color: var(--main-accent);
+    margin-left: 1ch;
+}
+@media (min-width: 768px){
+    .menu-toggle{
+        display: none;
+    }
+    .menu-toggle-text{
+        display: none;
+    }
+}
+
+/* lists styling */
+ul:not(#nav-menu) {
+    list-style-type: none; /* Remove list bullets */
+    text-indent: -20px;
+    padding: 1ch;
+    margin: 0;
+}
+
+li:not(.menu-item) {
+    padding-left: 16px;
+}
+
+li:not(.menu-item):not([role="doc-endnote"]):before {
+    content: "‒"; /* Insert content that looks like bullets */
+    padding-right: 8px;
+    color: var(--main-accent); /* Or a color you prefer */
+}
+
+ul li li:not(.menu-item):not([role="doc-endnote"]):before {
+    content: "‣"; /* Insert content that looks like bullets */
+    padding-right: 8px;
+    color: var(--main-accent); /* Or a color you prefer */
+}
+
+a.nav-icon-link:hover {
+    /* padding-top: 2px; */
+    padding: 5px;
+}
+
+/* note block (metadata) */
+.note-block {
+    border-left-color: var(--shadow);
+    border-left-style: solid;
+    border-left-width: 3px;
+    padding-left: 10px;
+}
+
+.metadata {
+    font-size: 70%;
+}
+
+/* general parameters */
+.main-text {
+    margin: auto;
+    width: 60%;
+    max-width: 60ch;
+    background: var(--main-bg);
+    border: 1px solid var(--main-bg-accent);
+	  box-shadow: 4px 4px 2px 0px rgba(0,0,0,0.3); /* outer shadow */
+    padding-left: 10ch;
+    padding-right: 10ch;
+    padding-bottom: 2em;
+    text-align: justify;
+}
+
+@media screen and (max-width: 80ch){
+    .main-text {
+        width: 90%;
+        padding-left: 0;
+        padding-right: 0;
+        padding-left: 1ch;
+        padding-right: 1ch;
+    }
+}
+
+body {
+    margin: 0;
+    line-height: 1.6;
+    font-size: 18px;
+    color: #444;
+    display: flex;
+    flex-direction: column;
+}
+
+/* sticky footer */
+html, body {
+    height: 100%;
+    scroll-padding-top: 100px;
+}
+.container {
+    flex: 1 0 auto;
+}
+
+.footer {
+    flex-shrink: 0;
+}
+
+/* some image classes */
+img[src*="#half-shadow"] {
+    max-width: 50%;
+    margin: 0px auto;
+	  box-shadow: 8px 8px 5px 0px rgba(0,0,0,0.3); /* outer shadow */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+img[src*="#full-shadow"] {
+    max-width: 100%;
+    margin: 0px auto;
+	  box-shadow: 8px 8px 5px 0px rgba(0,0,0,0.3); /* outer shadow */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* syntax highlighting and code */
+code:not([class*=language]) {
+    color: var(--code);
+    padding: 5px;
+    font-family: monospace, monospace;
+}
+
+div.highlight > pre {
+    padding: 10px;
+    overflow-x: auto;
+}
+
+@media screen and (min-width: 80ch){
+    div.highlight:hover {
+        width: 80vw;
+        margin-right: calc(-50vw + 50%);
+    }
+}
+/* table styling */
+table {
+    border-collapse: collapse;
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+table th {
+    background: var(--main-bg-accent);
+    /* color: var(--main-bg); */
+    padding: 10px;
+    border: 1px solid var(--main-bg-accent);
+}
+
+table td {
+    padding: 10px;
+    border: 1px solid var(--main-bg-accent);
+}
+
+/* Table of Contents */
+/* Inspired by: https://alhassy.github.io/AlBasmala#org9da168d */
+/*TOC inspired by https://orgmode.org/worg/ */
+#table-of-contents {
+    /* Place the toc in the top right corner */
+    position: fixed; left: 1em; top: 0em;
+    margin-top: 50px; /* offset from the top of the screen */
+    background-color: var(--main-bg);
+
+    /* It shrinks and grows as necessary */
+    padding: 0em  !important;
+    width: auto !important;
+    min-width: auto !important;
+
+    box-shadow: 0 0 1em var(--shadow);
+
+    /* Ensure doesn't flow off the screen when expanded */
+    max-height: 80%;
+    overflow: auto;
+}
+
+/* How big is the text “Table of Contents” and space around it */
+#table-of-contents h2 {
+    font-size: 13pt;
+    max-width: 9em;
+    border: 0;
+    font-weight: normal;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    padding-top: 0.05em;
+    padding-bottom: 0.05em; }
+
+/* Intially have the TOC folded up; show it if the mouse hovers it */
+#table-of-contents #text-table-of-contents {
+    display: none;
+    text-align: left;
+}
+
+#table-of-contents:hover #text-table-of-contents {
+    display: block;
+    padding: 0.5em;
+    margin-top: -1.5em;
+}
+
+/* home page with a photo */
+.col-left {
+    width: 35%;
+    float: left;
+}
+
+.col-right {
+    width: 65%;
+    float: right;
+}
+
+/* the responsiveness magic :) */
+@media screen and (max-width: 767px){
+    .col-left, .col-right {
+        width: 100%;
+        float: none;
+    }
+
+    .col-left{
+        padding-bottom: 30px;
+    }
+}
+
+/* Avatar image style */
+.img-av {
+    border-radius: 50%;
+    max-width: 90%;
+}

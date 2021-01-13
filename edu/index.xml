@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Studying and Teaching on A.B.</title>
+    <link>https://www.bochkarev.io/edu/</link>
+    <description>Recent content in Studying and Teaching on A.B.</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>web@bochkarev.io (Alexey A. Bochkarev)</managingEditor>
+    <webMaster>web@bochkarev.io (Alexey A. Bochkarev)</webMaster>
+    <lastBuildDate>Mon, 27 May 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://www.bochkarev.io/edu/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>A mind-map for (some) basic OR topics</title>
+      <link>https://www.bochkarev.io/edu/quals-mm/</link>
+      <pubDate>Mon, 27 May 2019 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/edu/quals-mm/</guid>
+      <description>An attempt to summarize some key OR concepts, inspired by the IE/OR Qualifying exams scope in 2019. Designed as an easy-to-overview mindmap.</description>
+    </item>
+    
+    <item>
+      <title>An Euler diagram for convexity generalizations</title>
+      <link>https://www.bochkarev.io/edu/convexity-gen/</link>
+      <pubDate>Wed, 22 May 2019 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/edu/convexity-gen/</guid>
+      <description>On convexity generalization concepts (quasiconvexity and such) &amp;ndash; a one-pager with examples.</description>
+    </item>
+    
+    <item>
+      <title>Dotplot sample generation utility</title>
+      <link>https://www.bochkarev.io/edu/dotplotgen/</link>
+      <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/edu/dotplotgen/</guid>
+      <description>A tiny &lt;a href=&#34;https://en.wikipedia.org/wiki/Dot_plot_(bioinformatics)&#34;&gt;dot-plot&lt;/a&gt; generation utility in R</description>
+    </item>
+    
+  </channel>
+</rss>
