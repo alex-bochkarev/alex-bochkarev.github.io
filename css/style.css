@@ -257,7 +257,7 @@ li:not(.menu-item) {
     padding-left: 16px;
 }
 
-li:not(.menu-item):not([role="doc-endnote"]):before {
+ul li:not(.menu-item):not([role="doc-endnote"]):before {
     content: "‒"; /* Insert content that looks like bullets */
     padding-right: 8px;
     color: var(--main-accent); /* Or a color you prefer */

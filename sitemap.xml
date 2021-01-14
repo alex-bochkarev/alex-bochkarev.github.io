@@ -3,12 +3,37 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://www.bochkarev.io/edu/smtb-2020-algo/</loc>
-    <lastmod>2021-01-14T10:52:36+01:00</lastmod>
+    <loc>https://www.bochkarev.io/categories/</loc>
+    <lastmod>2021-01-14T12:41:06+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.bochkarev.io/categories/</loc>
+    <loc>https://www.bochkarev.io/tags/</loc>
+    <lastmod>2021-01-14T12:41:06+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.bochkarev.io/tags/tech-seminar/</loc>
+    <lastmod>2021-01-14T12:41:06+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.bochkarev.io/tools/</loc>
+    <lastmod>2021-01-14T12:41:06+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.bochkarev.io/categories/tools/</loc>
+    <lastmod>2021-01-14T12:41:06+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.bochkarev.io/tools/or-tech-seminar/</loc>
+    <lastmod>2021-01-14T12:41:06+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.bochkarev.io/edu/smtb-2020-algo/</loc>
     <lastmod>2021-01-14T10:52:36+01:00</lastmod>
   </url>
   
@@ -24,11 +49,6 @@
   
   <url>
     <loc>https://www.bochkarev.io/edu/</loc>
-    <lastmod>2021-01-14T10:52:36+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.bochkarev.io/tags/</loc>
     <lastmod>2021-01-14T10:52:36+01:00</lastmod>
   </url>
   
@@ -59,16 +79,6 @@
   
   <url>
     <loc>https://www.bochkarev.io/tools/2019-09-23-cluster_messages/</loc>
-    <lastmod>2020-08-04T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.bochkarev.io/tools/</loc>
-    <lastmod>2020-08-04T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.bochkarev.io/categories/tools/</loc>
     <lastmod>2020-08-04T00:00:00+00:00</lastmod>
   </url>
   

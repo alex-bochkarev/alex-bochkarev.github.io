@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="preload" href="icons.svg" as="image">
+    
+    
+    <title>A.B. | 💬 OR Tech Seminar: scope and logistics.</title>
+</head>
+<body>
+        <div class="container"><div id="nav-panel" class="row">
+    <hr class="topline"/>
+        <input type="checkbox" id="checkbox">
+        <label for="checkbox" class="menu-toggle">
+            <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#hamburger"></use></svg>
+        </label>
+        <label for="checkbox" class="menu-toggle-text">
+            A.B. &mdash; Site menu
+        </label>
+        <nav>
+            <ul id="nav-menu">
+                
+                <li class="menu-item"><a class="nav-link" href="/">
+                    
+                    Me
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/tools/">
+                    
+                    Tools
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/edu/">
+                    
+                    Edu
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/contact/">
+                    
+                    Contact
+                </a></li>
+                
+                <li class="menu-item"> ~ </li>
+            <li class="menu-item">
+            <a class="nav-link nav-icon-link" href="mailto:web@bochkarev.io">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-envelope"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="/abochkarev-pubkey.asc">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-key"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="https://twitter.com/a_bochka">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-twitter"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="https://github.com/alex-bochkarev">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
+            </a>
+            </li></ul>
+        </nav>
+</div>
+<br/>
+
+                
+                    <div id="table-of-contents">
+                        <h2> Index, <a href="#" class="nav-link">top</a> </h2> 
+                        <div id="text-table-of-contents" class="not-a-text-link">
+                            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#general-notes-logistics-dot">General notes / logistics.</a></li>
+    <li><a href="#tentative-list-of-topics-dot">Tentative list of topics.</a></li>
+    <li><a href="#other-topics-tbd">Other topics TBD:</a></li>
+  </ul>
+</nav>
+                        </div>
+                    </div>
+                
+            
+            <div id="content">
+
+
+<div class="main-text">
+    <h1>💬 OR Tech Seminar: scope and logistics.</h1>
+    <span class="metadata">
+    
+
+    
+        <div class="nav-icon-link">
+            <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
+        </div>
+        Last update: <time datetime="2021-01-14">2021-01-14</time>.
+    
+
+    
+        Tags: 
+        
+            
+            <a class="nav-link" href="https://www.bochkarev.io/tags/tech-seminar">#tech-seminar</a>
+        
+    
+    </span>
+    <p>This is a (perhaps, temporary) note to discuss topics for &ldquo;OR Tech Seminar&rdquo;
+organized being organized by <a href="https://cecas.clemson.edu/informs/">Clemson INFORMS Student Chapter</a> (discussion within CU / Chapter,
+but I guess the materials can be made available in public&hellip;).</p>
+<h2 id="general-notes-logistics-dot">General notes / logistics.</h2>
+<p>I propose to discuss various tools (in a very broad sense) we, as researchers,
+use &ndash; to share experience, configs, and ideas. Ideally, we&rsquo;d like to discuss
+specific setups people use. I believe, lists of links/bookmarks should be
+preferred to re-inventing the materials, unless we might significantly benefit
+from some detailed consideration.</p>
+<p>I would propose to agree on time around the first half of the day (Clemson
+time), to hold a weekly or bi-weekly seminars via Zoom. I think it will be
+completely okay if a seminar will be short (like, half an hour, plus-minus &ndash;
+but depending on what we want from it). <em>(an announcement regarding specific
+time will be here)</em>.</p>
+<p>I will do my best to upload all the materials here. If you&rsquo;d want anything
+included, or have any other suggestions, please <a href="mailto:tech-seminar@bochkarev.io">let</a> me know.</p>
+<h2 id="tentative-list-of-topics-dot">Tentative list of topics.</h2>
+<ol>
+<li>📰 <strong>Working with the literature: tools and approaches.</strong>
+<ul>
+<li>Mostly discuss relevant software (Zotero, JabRef, Mendeley and friends, who
+uses what).</li>
+<li>some quick notes on latex/bibtex things.</li>
+<li>discuss monitoring the literature, etc.</li>
+<li>maybe discuss reading / journal club?..</li>
+<li>note-taking?</li>
+</ul>
+</li>
+<li>💻 <strong>A quick intro to Git</strong>. Actually, <strong>all things version-control</strong>.
+<ul>
+<li>Git, github, and the team.</li>
+<li>remote and local repos, commits, merge and conflicts, branches, etc.</li>
+<li>(There is a lot of materials out there, the purpose is to try to find a
+balance between &ldquo;long-and-comprehensive&rdquo; and &ldquo;quick-basics-for-a-developer&rdquo;)</li>
+</ul>
+</li>
+<li>🌧 <strong>Surviving on the cloud-1:</strong> surviving yourself.
+<ul>
+<li>Moving around, editing stuff, saving preferences; command aliases, where to
+save preferences, pipes (<code>stdout</code> vs. <code>stderr</code>), maybe key utils (like <code>tar</code>) etc.</li>
+<li>Automating things: files, scripts, access rights (<code>chmod</code>). Very intro bash
+scripting.</li>
+</ul>
+</li>
+<li>🌩 <strong>Surviving on the cloud-2:</strong> making it work for you.
+<ul>
+<li>Logging into the cluster. Login shell vs. comp node.</li>
+<li>Moving things between remote and local machines (<code>scp</code>, <code>rsync</code>, <code>github</code>, what else?).</li>
+<li>Running jobs on the cluster: PBS basics; modules, file systems.</li>
+<li>Running things in parallel (a quick <a href="https://www.gnu.org/software/parallel/">GNU parallel</a> demo).</li>
+<li><a href="https://en.wikipedia.org/wiki/Makefile">Makefiles</a>, maybe? And how one can use these in research&hellip;</li>
+</ul>
+</li>
+</ol>
+<h2 id="other-topics-tbd">Other topics TBD:</h2>
+<ol>
+<li>💻 <strong>Couple of things about Python</strong>: this is something I really do <strong>not</strong> want to
+discuss, unless there are specific people who would be interested.
+There is a lot of materials available out there on the Internet. I could make
+a list, though. Tentative topics might include:
+<ul>
+<li><strong>Day 1: A quick intro to Python.</strong> (Meet Jupyter notebook.) A demo of the
+syntax, vars/loops/comments (that’s important)/ maybe classes, etc. When to
+use (as opposed to C++, for example). Links to online courses.</li>
+<li><strong>Day 2: Solving optimization problems with Python.</strong> Just a couple of
+examples. Language – package – solver. (try something really simple with
+Gurobi and/or CBC solver, I guess). Links to Gurobi manuals. Alternative
+(give an example in C++, if time permits).</li>
+</ul>
+</li>
+<li>👓 <strong>Selected topics on programming.</strong> This is something I do not quite
+understand a structure for, but we could try to design a list of interesting
+topics:
+<ul>
+<li>speeding up code: vectorized computations vs. loops, <code>map</code>, and such
+things. (I guess, might be a topic in Python, a lot of this would work out
+of the box in Julia&hellip; we&rsquo;d need to decide which language(s) to focus on)</li>
+<li>recording runtimes (<code>time</code> package in Python, <code>%time</code> in Jupyter&hellip;)</li>
+<li>all things Jupyter? Extracting code, presenting from within Jupyter,
+publishing a notebook, &hellip; I don&rsquo;t really like it, but if anyone is
+interested / has a lot to say, it might be interesting.</li>
+<li>maybe parallel computations in Julia? (or include this into the &ldquo;cloud&rdquo; topic above?)</li>
+<li>what else? Is it worth a separate discussion?</li>
+</ul>
+</li>
+</ol>
+
+</div>
+<br/>
+
+            </div>
+        </div>
+        <footer class="footer"><div class="site-footer">
+    <p class="footer-text nav-link">© 2018&mdash;2021 <b><a class="nav-link" href="/">Alexey A. Bochkarev</a></b> All rights reserved
+        ⬩ <a class="nav-link" href="/privacy">Privacy Policy</a>
+        ⬩ <a class="nav-link" href="/disclaimer">Disclaimer</a>
+        | Made with a <a href="https://github.com/alex-bochkarev/hugo-desk-theme">custom theme</a> for <a href="https://gohugo.io/">Hugo</a>.
+    </p>
+</div>
+</footer>
+    </body>
+</html>
