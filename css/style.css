@@ -90,14 +90,14 @@ a.nav-link:hover {
 }
 /* normal links */
 
-a:not(.nav-link):not(.sticker):not(.not-a-text-link) {
+a:not(.nav-link):not(.sticker):not(.not-a-text-link):not([href*="#notalink"]) {
     color: var(--main-accent);
     border-top: 1px dashed var(--main-accent);
     border-bottom: 1px dashed var(--main-accent);
     text-decoration: none;
     padding: 2px;
 }
-a:hover:not(.nav-link):not(.sticker):not(not-a-text-link) {
+a:hover:not(.nav-link):not(.sticker):not(not-a-text-link):not([href*="#notalink"]) {
     color: var(--main-bg);
     background-color: var(--main-accent);
     border-radius: 5px;

@@ -6,7 +6,7 @@
     <link rel="preload" href="icons.svg" as="image">
     
     
-    <title>A.B. | An Euler diagram for convexity generalizations</title>
+    <title>A.B. | (Talk) Glimpse into Algorithms</title>
 </head>
 <body>
         <div class="container"><div id="nav-panel" class="row">
@@ -64,21 +64,41 @@
 <br/>
 
                 
+                    <div id="table-of-contents">
+                        <h2> Index, <a href="#" class="nav-link">top</a> </h2> 
+                        <div id="text-table-of-contents" class="not-a-text-link">
+                            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#on-the-content">On the content</a></li>
+    <li><a href="#on-the-tech">On the tech</a></li>
+  </ul>
+</nav>
+                        </div>
+                    </div>
+                
             
             <div id="content">
 
 
 <div class="main-text">
-    <h1>An Euler diagram for convexity generalizations</h1>
+    <h1>(Talk) Glimpse into Algorithms</h1>
     <span class="metadata">
     
         
-        <a class="sticker" href="/edu/convexity-gen/convexity_generalizations.pdf">
+        <a class="sticker" href="https://github.com/alex-bochkarev/SMTB-Algo">
             
                 <span class="nav-icon-link">
-                    <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-pdf"></use></svg>
+                    <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
                 </span>
-             PDF
+             Repo
+        </a> &nbsp;
+        
+        <a class="sticker" href="https://nbviewer.jupyter.org/github/alex-bochkarev/SMTB-Algo/blob/master/2020-07_SMTB_Algo_AB.ipynb">
+            
+                <span class="nav-icon-link">
+                    <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-ipynb"></use></svg>
+                </span>
+             View notebook
         </a> &nbsp;
         
     
@@ -87,21 +107,29 @@
         <div class="nav-icon-link">
             <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
         </div>
-        Last update: <time datetime="2019-05-22">2021-01-14</time>.
+        Last update: <time datetime="2020-07-29">2021-01-14</time>.
     
 
     </span>
-    <p><a href="/edu/convexity-gen/convexity_generalizations.pdf#notalink"><img src="/images/conv-gen-pic.png#full-shadow" alt="Convexity generalizations"></a></p>
-<p>The textbook by <a href="https://www.wiley.com/en-us/Nonlinear+Programming%3A+Theory+and+Algorithms%2C+3rd+Edition-p-9780471486008">Bazaraa et
-al</a>
-provided a summary diagram describing connections between different classes of
-functions (generalizing the concept convexity) in terms of &ldquo;implications&rdquo; (like
-&ldquo;strict convexity ⟶ convexity&rdquo;) as well as detailed notes with examples.
-However, I wanted to have a one-pager with the key information for quick
-reference - definitions + short notes on intuition; preferably, with relations
-being depicted as an <a href="https://en.wikipedia.org/wiki/Euler_diagram">Euler
-diagram</a>. So, I tried to compile
-everything together on one US Letter page.</p>
+    <p>This was a (slightly more than) one-hour lecture for high-school students during
+the wonderful <a href="https://molbioschool.org/en">School of Molecular and Theoretical Biology</a> in 2020. I wanted to
+experiment with a couple of things, both in terms of content and the tech.</p>
+<h2 id="on-the-content">On the content</h2>
+<p>I wanted to take some simple, easy-to-present example of an algorithm
+(sorting! what else?..) and illustrate the notion of asymptotic runtime
+<em>numerically</em>. It turned out to be pretty fun to do with Python, as I (humbly)
+think. It was pretty close to pseudocode, I suppose. Along the way we
+discussed <em>correctness</em> and ways to test an implementation against a set of
+random instances. It already barely fit into an hour timeframe.</p>
+<p>The second part of the talk was devoted to a brief discussion of data
+structures &ndash; also with numerical illustrations of lists and linked lists (and
+insertion time).</p>
+<p>As usual, comments are very <a href="/contact">welcome</a>.</p>
+<h2 id="on-the-tech">On the tech</h2>
+<p>I tried to present from <a href="https://jupyter.org/">Jupyter notebook</a> with <a href="https://rise.readthedocs.io/en/stable/">RISE</a> plugin, which produced
+pretty fancy <a href="https://revealjs.com/">Reveal.js</a> slides. But the most important part is that this setting
+allowed me to run code interactively and tweak things interactively, which
+of course was very useful in a talk devoted to algorithms.</p>
 
 </div>
 <br/>

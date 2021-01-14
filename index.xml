@@ -14,6 +14,15 @@
     
     
     <item>
+      <title>(Talk) Glimpse into Algorithms</title>
+      <link>https://www.bochkarev.io/edu/smtb-2020-algo/</link>
+      <pubDate>Wed, 29 Jul 2020 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/edu/smtb-2020-algo/</guid>
+      <description>This is a talk presented to high-school students during &lt;a href=&#34;https://molbioschool.org/en/&#34;&gt;SMTB&lt;/a&gt;-2020. Quick numerical illustrations for runtime, correctness and such fun things.</description>
+    </item>
+    
+    <item>
       <title>Text and derive - getting notifications from the cluster</title>
       <link>https://www.bochkarev.io/tools/2019-09-23-cluster_messages/</link>
       <pubDate>Mon, 23 Sep 2019 00:00:00 +0000</pubDate>

@@ -8,10 +8,19 @@
     <language>en-us</language>
     <managingEditor>web@bochkarev.io (Alexey A. Bochkarev)</managingEditor>
     <webMaster>web@bochkarev.io (Alexey A. Bochkarev)</webMaster>
-    <lastBuildDate>Mon, 27 May 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 29 Jul 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.bochkarev.io/categories/edu/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>(Talk) Glimpse into Algorithms</title>
+      <link>https://www.bochkarev.io/edu/smtb-2020-algo/</link>
+      <pubDate>Wed, 29 Jul 2020 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/edu/smtb-2020-algo/</guid>
+      <description>This is a talk presented to high-school students during &lt;a href=&#34;https://molbioschool.org/en/&#34;&gt;SMTB&lt;/a&gt;-2020. Quick numerical illustrations for runtime, correctness and such fun things.</description>
+    </item>
     
     <item>
       <title>A mind-map for (some) basic OR topics</title>
