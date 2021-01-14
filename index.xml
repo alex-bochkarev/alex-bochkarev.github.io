@@ -33,10 +33,10 @@
     
     <item>
       <title>Text and derive - getting notifications from the cluster</title>
-      <link>https://www.bochkarev.io/tools/2019-09-23-cluster_messages/</link>
+      <link>https://www.bochkarev.io/tools/cluster-msg/</link>
       <pubDate>Mon, 23 Sep 2019 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/tools/2019-09-23-cluster_messages/</guid>
+      <guid>https://www.bochkarev.io/tools/cluster-msg/</guid>
       <description>How to get notifications from a remote machine with Telegram. A really simple and universal approach.</description>
     </item>
     
