@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="preload" href="icons.svg" as="image">
+    
+    
+    <title>A.B. | 💬 OR Tech Seminar: outline</title>
+</head>
+<body>
+        <div class="container"><div id="nav-panel" class="row">
+    <hr class="topline"/>
+        <input type="checkbox" id="checkbox">
+        <label for="checkbox" class="menu-toggle">
+            <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#hamburger"></use></svg>
+        </label>
+        <label for="checkbox" class="menu-toggle-text">
+            A.B. &mdash; Site menu
+        </label>
+        <nav>
+            <ul id="nav-menu">
+                
+                <li class="menu-item"><a class="nav-link" href="/">
+                    
+                    Me
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/tools/">
+                    
+                    Tools
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/edu/">
+                    
+                    Edu
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/contact/">
+                    
+                    Contact
+                </a></li>
+                
+                <li class="menu-item"> ~ </li>
+            <li class="menu-item">
+            <a class="nav-link nav-icon-link" href="mailto:web@bochkarev.io">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-envelope"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="/abochkarev-pubkey.asc">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-key"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="https://twitter.com/a_bochka">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-twitter"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="https://github.com/alex-bochkarev">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
+            </a>
+            </li></ul>
+        </nav>
+</div>
+<br/>
+
+                
+                    <div id="table-of-contents">
+                        <h2> Index, <a href="#" class="nav-link">top</a> </h2> 
+                        <div id="text-table-of-contents" class="not-a-text-link">
+                            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#the-format">The format</a></li>
+    <li><a href="#core-discussion">Core discussion</a></li>
+    <li><a href="#additional-topics--work-in-progress">Additional topics (work in progress)</a></li>
+  </ul>
+</nav>
+                        </div>
+                    </div>
+                
+            
+            <div id="content">
+
+
+<div class="main-text">
+    <h1>💬 OR Tech Seminar: outline</h1>
+    <span class="metadata">
+    
+
+    
+        <div class="nav-icon-link">
+            <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
+        </div>
+        Last update: <time datetime="2021-01-14">2021-01-15</time>.
+    
+
+    
+        Tags: 
+        
+            
+            <a class="nav-link" href="https://www.bochkarev.io/tags/tech-seminar">#tech-seminar</a>
+        
+    
+    </span>
+    <p>This is an overview page for &ldquo;OR Tech Seminar&rdquo; organized with support from
+<a href="https://cecas.clemson.edu/informs/">Clemson INFORMS Student Chapter</a>. Dates for specific events will be posted here
+once agreed upon. All materials will be also linked from the seminar descriptions
+below. Everything is subject to change. Comments and
+suggestions are very <a href="mailto:tech%5Fseminar@bochkarev.io">welcome</a>.</p>
+<br/>
+<table>
+<thead>
+<tr>
+<th>Where</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Online</td>
+<td>Weekly, Mondays, 10-00 AM EST</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-format">The format</h2>
+<p>We will be discussing various tools (in a very broad sense) we, as
+researchers, use &ndash; to share experience, configs, and ideas. Each seminar will
+consist of a speaker presentation with a discussion along the way, at most
+one hour in total.</p>
+<h2 id="core-discussion">Core discussion</h2>
+<ol>
+<li>📰 <strong>Working with the literature:</strong> tools and approaches.
+<ul>
+<li>Managing references: relevant software (<strong>Zotero</strong>, JabRef, Mendeley and friends).</li>
+<li>Using the literature: latex/bibtex, editor integrations, etc. (very brief)</li>
+<li>Discovering the literature: how to? (feeds, mailing lists, reading club, etc.)</li>
+<li>A note on notes.</li>
+</ul>
+</li>
+<li>💻 <strong>All things version-control:</strong> a quick intro to Git.
+<ul>
+<li>Version control, backups, when to use (always!)</li>
+<li>Git, github, and the team.</li>
+<li>Repositories (remote, local). Create, fork, clone, and other spells.</li>
+<li>Keeping track of your code/text-1: stage, commit, push, pull.</li>
+<li>Keeping track of your code/text-2: branches &ndash; branch, merge, rebase, resolving conflicts.</li>
+<li>General tips and further reading.</li>
+</ul>
+</li>
+<li>🌧 <strong>(Cloud) The Command Line - 1:</strong> Surviving on the cloud.
+<ul>
+<li>Logging in to the cluster. Login shell vs. comp node. Bash-related basics
+(moving around, editing, installing things, etc.).</li>
+<li>Running things: commands, aliases, pipes, <code>stdout/stderr</code>, scripts,
+access rights (<code>chmod</code>). Very intro bash scripting.</li>
+<li>Some utils (<code>tar</code>, <code>head</code>, <code>tail</code>, <code>split</code>, <code>shuf</code>, etc.)</li>
+</ul>
+</li>
+<li>🌩 <strong>(Cloud) The Command Line - 2:</strong> making it work for you.
+<ul>
+<li>Moving things between remote and local machines (<code>scp</code>, <code>rsync</code>, <code>github</code>, etc.).</li>
+<li>Running jobs on the cluster: PBS basics; modules, file systems.</li>
+<li>Running things in parallel (a quick <a href="https://www.gnu.org/software/parallel/">GNU parallel</a> demo, etc.).</li>
+<li>Possibly, <a href="https://en.wikipedia.org/wiki/Makefile">Makefiles</a>.</li>
+</ul>
+</li>
+</ol>
+<h2 id="additional-topics--work-in-progress">Additional topics (work in progress)</h2>
+<ol>
+<li>💻 <strong>Introductory materials on Python</strong>:
+<ul>
+<li>Syntax basics / learning resources.</li>
+<li>Versions, environments, managing packages (<code>conda</code>, <code>pip</code>)</li>
+<li>Jupyter notebooks (extracting code, presenting, exporting, JupyterHub,
+etc. A word on alternatives)</li>
+<li>Optimization in Python (with <a href="https://www.gurobi.com/">Gurobi</a> solver and <code>gurobipy</code>) &ndash; a quick example.</li>
+<li>A word on scripting in Python (maybe a quick example).</li>
+<li>Further reading.</li>
+</ul>
+</li>
+<li>👓 <strong>Selected topics on programming.</strong>
+<ul>
+<li>Speeding up code in Python: special libraries, loops, vectorized computations, <code>map</code>,
+etc.</li>
+<li>&ldquo;Profiling&rdquo; python code (&ldquo;what&rsquo;s so slow?&quot;)</li>
+<li>&hellip; and in Julia: very brief notes on parallel computations and precompiling.</li>
+</ul>
+</li>
+</ol>
+
+</div>
+<br/>
+
+            </div>
+        </div>
+        <footer class="footer"><div class="site-footer">
+    <p class="footer-text nav-link">© 2018&mdash;2021 <b><a class="nav-link" href="/">Alexey A. Bochkarev</a></b> All rights reserved
+        ⬩ <a class="nav-link" href="/privacy">Privacy Policy</a>
+        ⬩ <a class="nav-link" href="/disclaimer">Disclaimer</a>
+        | Made with a <a href="https://github.com/alex-bochkarev/hugo-desk-theme">custom theme</a> for <a href="https://gohugo.io/">Hugo</a>.
+    </p>
+</div>
+</footer>
+    </body>
+</html>
