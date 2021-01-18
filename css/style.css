@@ -461,3 +461,9 @@ table td {
     border-radius: 50%;
     max-width: 90%;
 }
+
+.timestamp {
+    background-color: var(--main-bg-accent);
+    padding: 5px;
+    margin: 0;
+}
