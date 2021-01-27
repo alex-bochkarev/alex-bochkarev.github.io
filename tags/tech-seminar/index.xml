@@ -8,10 +8,19 @@
     <language>en-us</language>
     <managingEditor>web@bochkarev.io (Alexey A. Bochkarev)</managingEditor>
     <webMaster>web@bochkarev.io (Alexey A. Bochkarev)</webMaster>
-    <lastBuildDate>Thu, 14 Jan 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 15 Jan 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.bochkarev.io/tags/tech-seminar/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>📰 Working with the literature: tools and approaches</title>
+      <link>https://www.bochkarev.io/tools/ts-literature/</link>
+      <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/tools/ts-literature/</guid>
+      <description>A collection of notes on literature: discovery, reading, keeping track of references, and using them in writing.</description>
+    </item>
     
     <item>
       <title>💬 OR Tech Seminar: outline</title>

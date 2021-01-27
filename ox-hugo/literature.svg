@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="466px" preserveAspectRatio="none" style="width:266px;height:466px;" version="1.1" viewBox="0 0 266 466" width="266px" zoomAndPan="magnify"><defs><filter height="300%" id="fuuk46zh6r5s" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[c293bfa34ab96f1045c0340bd83f772e]
+cluster PIM--><polygon fill="#FFFFFF" filter="url(#fuuk46zh6r5s)" points="16,246.8624,49,246.8624,56,269.1593,249,269.1593,249,359.8624,16,359.8624,16,246.8624" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="16" x2="56" y1="269.1593" y2="269.1593"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="27" x="20" y="261.8575">PIM</text><!--MD5=[f9ba5bf973e7832d2ce5ed59077b93f7]
+entity DB--><path d="M32,291.8624 C32,281.8624 82,281.8624 82,281.8624 C82,281.8624 132,281.8624 132,291.8624 L132,333.4562 C132,343.4562 82,343.4562 82,343.4562 C82,343.4562 32,343.4562 32,333.4562 L32,291.8624 " fill="#FEFECE" filter="url(#fuuk46zh6r5s)" style="stroke:#000000;stroke-width:1.5;"/><path d="M32,291.8624 C32,301.8624 82,301.8624 82,301.8624 C82,301.8624 132,301.8624 132,291.8624 " fill="none" style="stroke:#000000;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="80" x="42" y="318.8575">References</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="53" x="42" y="335.1544">storage</text><!--MD5=[6a72a9d6eab8eb0e9eb98a2e45641f4f]
+entity note--><polygon fill="#FEFECE" filter="url(#fuuk46zh6r5s)" points="167.5,294.8624,167.5,331.1593,232.5,331.1593,232.5,304.8624,222.5,294.8624,167.5,294.8624" style="stroke:#000000;stroke-width:1.5;"/><path d="M222.5,294.8624 L222.5,304.8624 L232.5,304.8624 " fill="#FEFECE" style="stroke:#000000;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="41" x="177.5" y="317.8575">Notes</text><!--MD5=[2832a4d1166dee436afe675046c32528]
+entity Literature--><path d="M102.1578,16.1592 C105.9925,11.1576 111.0542,11.136 114.4525,16.6686 C116.7371,9.9473 122.5836,7.9216 127.6054,13.8145 C131.8183,7.931 137.455,6 141.9244,13.541 C146.1165,9.293 151,9.6389 153.4284,15.5401 C158.722,9.0079 162.9585,8.8074 167.05,16.6771 C171.1868,11.2096 176.8373,11.1195 180.2951,17.44 C189.3107,18.562 191.2104,26.2278 186.2569,32.7791 C191.555,40.0014 188.4043,45.2721 180.0585,46.1867 C177.1193,52.7552 172.5236,54.7899 166.8943,49.0681 C163.4799,54.5314 159.9713,55.1563 155.1452,50.7483 C151.3772,57.8034 146.2172,59.2897 140.3834,53.0403 C136.172,58.8859 131.7977,58.0633 128.8661,51.8209 C123.0782,57.8673 117.4756,57.9303 114.1119,49.3719 C109.9894,54.1917 104.8004,52.473 102.5548,47.2187 C93.7785,45.7727 92.9558,38.9667 97.8983,33.0212 C92.0174,26.0485 93.6609,19.4999 102.1578,16.1592 " fill="#FEFECE" filter="url(#fuuk46zh6r5s)" style="stroke:#000000;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="65" x="107.5" y="35.8575">Literature</text><!--MD5=[338d9538a27e435ad52389899150f967]
+entity papers--><rect fill="#FEFECE" filter="url(#fuuk46zh6r5s)" height="48.5938" style="stroke:#000000;stroke-width:1.5;" width="77" x="103.5" y="134.8624"/><rect fill="#FEFECE" height="48.5938" style="stroke:#000000;stroke-width:1.5;" width="77" x="99.5" y="130.8624"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="61" x="107.5" y="151.8575">Selected</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="48" x="107.5" y="168.1544">papers</text><!--MD5=[352ef287b9f0ec53b7305306ae20b7fa]
+entity doc--><polygon fill="#FEFECE" filter="url(#fuuk46zh6r5s)" points="93,422.8624,93,459.1593,189,459.1593,189,432.8624,179,422.8624,93,422.8624" style="stroke:#000000;stroke-width:1.5;"/><path d="M179,422.8624 L179,432.8624 L189,432.8624 " fill="#FEFECE" style="stroke:#000000;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="76" x="103" y="445.8575">Manuscript</text><!--MD5=[7a9e2738a0f8b7498d953a6b1340f551]
+link Literature to papers--><path d="M140,54.1224 C140,73.9324 140,103.1224 140,125.2424 " fill="none" id="Literature-to-papers" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="140,130.4224,144,121.4224,140,125.4224,136,121.4224,140,130.4224" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="77" x="141" y="96.9293">(1) Discover</text><!--MD5=[834ca22e0ab94bf5aa9d781ac0d8dc12]
+link papers to DB--><path d="M112.76,184.0924 C105.13,192.8124 97.65,203.0824 93,213.8624 C84.57,233.4024 81.73,257.0724 81.05,276.2624 " fill="none" id="papers-to-DB" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="80.91,281.5424,85.14,272.6482,81.0385,276.5441,77.1427,272.4426,80.91,281.5424" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="57" x="94" y="226.9293">(2) Store</text><!--MD5=[752d2daa035b8035f9055c1580721d0d]
+link papers to note--><path d="M150.04,184.0524 C161.6,213.6224 180.39,261.6924 191.33,289.6924 " fill="none" id="papers-to-note" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="193.28,294.6724,193.7402,284.8343,191.465,290.0135,186.2859,287.7383,193.28,294.6724" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="54" x="170" y="226.9293">(3) Read</text><!--MD5=[2eaebe72f1a4e712dfb09ee4bc70cb70]
+link DB to doc--><path d="M71.34,343.8724 C67.69,359.3024 66.24,377.9424 74,392.8624 C79.74,403.8924 89.38,412.8724 99.59,419.9124 " fill="none" id="DB-to-doc" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="103.99,422.8224,98.6676,414.5355,99.8122,420.0754,94.2724,421.22,103.99,422.8224" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="86" x="75" y="388.9293">(4) Reference</text><!--MD5=[7caf7cbf02a97d5f738ce7eedb72c9b2]
+link note to doc--><path d="M193.1,330.9924 C186.5,347.1224 176.08,371.8624 166,392.8624 C162.02,401.1424 157.37,410.0724 153.16,417.9124 " fill="none" id="note-to-doc" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="150.61,422.6224,158.4244,416.6278,152.9992,418.2302,151.3969,412.805,150.61,422.6224" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="47" x="174" y="388.9293">(5) Use</text><!--MD5=[ee2e57d35b67cbef5f9f78124d4270eb]
+@startuml
+cloud Literature
+collections papers [
+Selected
+papers
+]
+
+folder PIM {
+        database DB [
+        References
+        storage
+        ]
+
+        file note [
+        Notes ]
+}
+
+file doc [
+Manuscript
+]
+skinparam SequenceMessageAlign first
+
+Literature - -> papers: (1) Discover
+papers - -> DB: (2) Store
+papers - -> note: (3) Read
+DB - -> doc: (4) Reference
+note - -> doc : (5) Use
+@enduml
+
+PlantUML version 1.2021.00(Sun Jan 10 11:25:05 CET 2021)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

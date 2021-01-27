@@ -351,6 +351,46 @@ img[src*="#full-shadow"] {
     margin-right: auto;
 }
 
+/* styling figures (for orgmode export, incl. plantUML) */
+
+figure {
+    max-width: 100%;
+    margin: 0px auto;
+	  box-shadow: 8px 8px 5px 1px rgba(0,0,0,0.3); /* outer shadow */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: var(--nothing);
+    border: 1px solid var(--shadow);
+    border-left: 5px solid var(--main-bg-accent);
+    text-align: center;
+}
+
+.note {
+    max-width: 100%;
+    margin: 0px auto;
+	  box-shadow: 8px 8px 5px 1px rgba(0,0,0,0.3); /* outer shadow */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: var(--nothing);
+    border: 1px solid var(--shadow);
+    border-left: 5px solid var(--main-bg-accent);
+    padding-left: 10px;
+    padding-bottom: 10px;
+    text-align: left;
+}
+
+figure img{
+    max-width: 100%;
+    background-size: contain;
+}
+
+figcaption {
+    padding: 5px;
+    text-align: left;
+}
+
 /* syntax highlighting and code */
 code:not([class*=language]) {
     color: var(--code);
