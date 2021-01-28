@@ -92,27 +92,35 @@ a.nav-link:hover {
 
 a:not(.nav-link):not(.sticker):not(.not-a-text-link):not([href*="#notalink"]) {
     color: var(--main-accent);
-    border-top: 1px dashed var(--main-accent);
-    border-bottom: 1px dashed var(--main-accent);
+    border-top: 1px dotted var(--main-accent);
+    border-bottom: 1px dotted var(--main-accent);
     text-decoration: none;
-    padding: 2px;
+    /* padding: 1px; */
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 2px;
 }
 a:hover:not(.nav-link):not(.sticker):not(not-a-text-link):not([href*="#notalink"]) {
     color: var(--main-bg);
     background-color: var(--main-accent);
     border-radius: 5px;
-    padding: 2px;
 }
 
 /* special links type */
-a[href*="github.com"]:not(.nav-link):not(.sticker)::before {
+a[href*="github.com"]:not(.nav-link):not(.sticker)::after {
     content: url('/gh.svg');
-    vertical-align: -30%;
+    padding-left: 5px;
+    vertical-align: 10%;
+    margin-right: 0px;
+    white-space: nowrap;
 }
 
-a[href*="wikipedia.org"]:not(.nav-link):not(.sticker)::before {
+a[href*="wikipedia.org"]:not(.nav-link):not(.sticker)::after {
     content: url('/wiki.svg');
-    vertical-align: -30%;
+    vertical-align: 10%;
+    padding-left: 0px;
+    margin-right: 0px;
+    white-space: nowrap;
 }
 
 a:not(not-a-text-link):not(.nav-link):not([href^="mailto"])::before,
@@ -123,17 +131,20 @@ a[href^="#"]:not( < #table-of-contents):not(not-a-text-link):not(a) > not-a-text
     padding-right: 2px;
 }
 
-a[href^="mailto:"]:not(.nav-link)::before {
+a[href^="mailto:"]:not(.nav-link):after {
     content: url('/email.svg');
     padding: 5px;
+    white-space: nowrap;
 }
 
-a:not([href^='#']):not([href^='/']):not([href*="github.com"]):not([href*="wikipedia.org"]):not(.nav-link):not(.sticker):not([href^="mailto:"])::before {
+a:not([href^='#']):not([href^='/']):not([href*="github.com"]):not([href*="wikipedia.org"]):not(.nav-link):not(.sticker):not([href^="mailto:"])::after {
     content: url('/outside.svg');
+    vertical-align: 15%;
     padding: 5px;
+    white-space: nowrap;
 }
 
-a:hover::before
+a:hover::after
 {
     filter: invert(100%);
     color: var(--main-accent);
