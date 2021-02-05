@@ -14,6 +14,15 @@
     
     
     <item>
+      <title>🔀 Version control with git.</title>
+      <link>https://www.bochkarev.io/tools/ts-git/</link>
+      <pubDate>Sat, 30 Jan 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/tools/ts-git/</guid>
+      <description>A quick intro to version control with git.</description>
+    </item>
+    
+    <item>
       <title>📰 Working with the literature: tools and approaches</title>
       <link>https://www.bochkarev.io/tools/ts-literature/</link>
       <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>

@@ -8,15 +8,24 @@
     <language>en-us</language>
     <managingEditor>web@bochkarev.io (Alexey A. Bochkarev)</managingEditor>
     <webMaster>web@bochkarev.io (Alexey A. Bochkarev)</webMaster>
-    <lastBuildDate>Fri, 15 Jan 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 30 Jan 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.bochkarev.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>talk</title>
+      <link>https://www.bochkarev.io/tags/talk/</link>
+      <pubDate>Sat, 30 Jan 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/tags/talk/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>tech-seminar</title>
       <link>https://www.bochkarev.io/tags/tech-seminar/</link>
-      <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 30 Jan 2021 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
       <guid>https://www.bochkarev.io/tags/tech-seminar/</guid>
       <description></description>
@@ -28,15 +37,6 @@
       <pubDate>Wed, 29 Jul 2020 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
       <guid>https://www.bochkarev.io/tags/smtb/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>talk</title>
-      <link>https://www.bochkarev.io/tags/talk/</link>
-      <pubDate>Wed, 29 Jul 2020 00:00:00 +0000</pubDate>
-      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/tags/talk/</guid>
       <description></description>
     </item>
     
@@ -100,15 +100,6 @@
       <pubDate>Mon, 27 May 2019 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
       <guid>https://www.bochkarev.io/tags/stochastic/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>short</title>
-      <link>https://www.bochkarev.io/tags/short/</link>
-      <pubDate>Wed, 22 May 2019 00:00:00 +0000</pubDate>
-      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/tags/short/</guid>
       <description></description>
     </item>
     

@@ -71,6 +71,16 @@ a.nav-link:hover {
     padding-top: 8px;
 }
 
+/* summary element */
+details summary {
+    color: var(--code)
+}
+details p {
+    border-left: 3px solid var(--shadow);
+    margin-left: 3px;
+    padding-left: 7px;
+}
+
 /* list stickers */
 .sticker {
     color: inherit;
@@ -388,10 +398,14 @@ figure {
     border: 1px solid var(--shadow);
     border-left: 5px solid var(--main-bg-accent);
     padding-left: 10px;
+    padding-right: 5px;
     padding-bottom: 10px;
     text-align: left;
 }
 
+left-accent {
+    border-left: 5px solid var(--main-bg-accent);
+}
 figure img{
     max-width: 100%;
     background-size: contain;
