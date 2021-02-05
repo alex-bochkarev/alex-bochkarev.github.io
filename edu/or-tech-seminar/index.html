@@ -81,7 +81,7 @@
         <div class="nav-icon-link">
             <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
         </div>
-        Last update: <time datetime="2021-01-14">2021-01-27</time>.
+        Last update: <time datetime="2021-01-14">2021-02-05</time>.
     
 
     
@@ -122,17 +122,20 @@ researchers, use &ndash; to share experience, configs, and ideas. Each seminar w
 consist of a speaker presentation with a discussion along the way, at most
 one hour in total. <br/> <br/></p>
 <div class="note">
-<h3 id="upcoming-seminar">Upcoming seminar: <span class="timestamp-wrapper"><span class="timestamp">[2021-02-01 Mon 10:00]</span></span></h3>
-<p>💻 <strong>All things version-control:</strong> a quick intro to Git.</p>
+<h3 id="upcoming-seminar">Upcoming seminar: <span class="timestamp-wrapper"><span class="timestamp">[2021-02-08 Mon 10:00]</span></span></h3>
+<p>🌧 <strong>(Cloud) Intro to the Command Line. (1/2)</strong></p>
 <hr/>
-<p><strong>Suggestion:</strong> come with git <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">installed</a>, and a <a href="https://github.com">Github</a> account.<br>
-(check that <code>git --version</code> gives you something in the terminal)</p>
+Notes on the cluster / working in the shell (topics for two seminars):
 <ul>
-<li>Version control, backups, when to use (always!)</li>
-<li>Git, github, and the team.</li>
-<li>Repositories (remote, local). Create, fork, <code>clone</code>, and other spells.</li>
-<li>Keeping track of your code/text: <code>add</code>, <code>commit</code>, <code>push/pull</code>.</li>
-<li>Workflow / branches &ndash; <code>checkout, merge</code>, rebasing, conflicts.</li>
+<li>logging in / comp nodes vs. login shell, a note on file systems.</li>
+<li>Moving things between remote and local machines (<code>scp</code>, <code>rsync</code>, <code>github</code>, etc.).</li>
+<li>Shell-related basics (moving around, editing, installing things, etc.).</li>
+<li>Running things: commands, aliases, pipes, <code>stdout/stderr</code>, scripts,
+access rights (<code>chmod</code>). Very intro bash scripting.</li>
+<li>Some utils (<code>tar</code>, <code>head</code>, <code>tail</code>, <code>split</code>, <code>shuf</code>, etc.)</li>
+<li>Running jobs on the cluster: PBS basics; modules.</li>
+<li>Running things in parallel (a quick <a href="https://www.gnu.org/software/parallel/">GNU parallel</a> demo, etc.).</li>
+<li>Possibly, <a href="https://en.wikipedia.org/wiki/Makefile">Makefiles</a>.</li>
 </ul>
 </div>
 <h2 id="core-discussion">Core discussion</h2>
@@ -146,25 +149,17 @@ one hour in total. <br/> <br/></p>
 <li>A note on notes.</li>
 </ul>
 </li>
-<li><strong>💻 All things version-control:</strong> a quick intro to Git. <em>(next seminar &ndash; see
-above)</em></li>
-<li>🌧 <strong>(Cloud) The Command Line - 1:</strong> Surviving on the cloud.
+<li><strong>🔀 All things version-control:</strong> a quick intro to Git. (2020-02-01; summary: coming soon!)
 <ul>
-<li>Logging in to the cluster. Login shell vs. comp node. Bash-related basics
-(moving around, editing, installing things, etc.).</li>
-<li>Running things: commands, aliases, pipes, <code>stdout/stderr</code>, scripts,
-access rights (<code>chmod</code>). Very intro bash scripting.</li>
-<li>Some utils (<code>tar</code>, <code>head</code>, <code>tail</code>, <code>split</code>, <code>shuf</code>, etc.)</li>
+<li>Version control, backups, when to use (always!)</li>
+<li>Git, github, and the team.</li>
+<li>Repositories (remote, local). Create, fork, <code>clone</code>, and other spells.</li>
+<li>Keeping track of your code/text: <code>add</code>, <code>commit</code>, <code>push/pull</code>.</li>
+<li>Workflow / branches &ndash; <code>checkout, merge</code>, rebasing, conflicts.</li>
 </ul>
 </li>
-<li>🌩 <strong>(Cloud) The Command Line - 2:</strong> making it work for you.
-<ul>
-<li>Moving things between remote and local machines (<code>scp</code>, <code>rsync</code>, <code>github</code>, etc.).</li>
-<li>Running jobs on the cluster: PBS basics; modules, file systems.</li>
-<li>Running things in parallel (a quick <a href="https://www.gnu.org/software/parallel/">GNU parallel</a> demo, etc.).</li>
-<li>Possibly, <a href="https://en.wikipedia.org/wiki/Makefile">Makefiles</a>.</li>
-</ul>
-</li>
+<li>🌧 <strong>(Cloud) The Command Line - 1:</strong> Surviving on the cloud. <em>(Next seminar)</em></li>
+<li>🌩 <strong>(Cloud) The Command Line - 2:</strong> making it work for you.</li>
 </ol>
 <h2 id="additional-topics--work-in-progress">Additional topics (work in progress)</h2>
 <ol>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="333px" preserveAspectRatio="none" style="width:998px;height:333px;" version="1.1" viewBox="0 0 998 333" width="998px" zoomAndPan="magnify"><defs><filter height="300%" id="f16iu5rjemvqm2" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><path d="M172.5,20 L172.5,70.2656 L352.5,70.2656 L352.5,30 L342.5,20 L172.5,20 " fill="#FBFB77" filter="url(#f16iu5rjemvqm2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M342.5,20 L342.5,30 L352.5,30 L342.5,20 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="99" x="178.5" y="37.0669">Working area</text><line style="stroke:#A80036;stroke-width:1.0;" x1="172.5" x2="352.5" y1="45.1328" y2="45.1328"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="159" x="178.5" y="62.1997">where the work happens.</text><path d="M567.5,32.5664 L567.5,57.6992 L780.5,57.6992 L780.5,42.5664 L770.5,32.5664 L567.5,32.5664 " fill="#FBFB77" filter="url(#f16iu5rjemvqm2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M770.5,32.5664 L770.5,42.5664 L780.5,42.5664 L770.5,32.5664 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="108" x="573.5" y="49.6333">Changes on your</text><text fill="#000000" font-family="sans-serif" font-size="13" font-style="italic" lengthAdjust="spacing" textLength="29" x="685.5" y="49.6333">local</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="47" x="718.5" y="49.6333">system</text><rect fill="#FEFECE" filter="url(#f16iu5rjemvqm2)" height="47.9375" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="195" x="362.5" y="21.1641"/><text fill="#000000" font-family="sans-serif" font-size="12" font-weight="bold" lengthAdjust="spacing" textLength="27" x="372.5" y="42.3027">Edit</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="175" x="372.5" y="56.2715">Add (or change) some code</text><path d="M20,100.2656 L20,150.5313 L356,150.5313 L356,110.2656 L346,100.2656 L20,100.2656 " fill="#FBFB77" filter="url(#f16iu5rjemvqm2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M346,100.2656 L346,110.2656 L356,110.2656 L346,100.2656 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="95" x="26" y="117.3325">Staging area</text><line style="stroke:#A80036;stroke-width:1.0;" x1="20" x2="356" y1="125.3984" y2="125.3984"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="315" x="26" y="142.4653">where the "commit" is cooked -- a "history atom".</text><path d="M564,112.832 L564,137.9648 L866,137.9648 L866,122.832 L856,112.832 L564,112.832 " fill="#FBFB77" filter="url(#f16iu5rjemvqm2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M856,112.832 L856,122.832 L866,122.832 L856,112.832 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="281" x="570" y="129.8989">Prepares a change into the versions history.</text><rect fill="#FEFECE" filter="url(#f16iu5rjemvqm2)" height="47.9375" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="188" x="366" y="101.4297"/><text fill="#000000" font-family="sans-serif" font-size="12" font-weight="bold" lengthAdjust="spacing" textLength="103" x="376" y="122.5684">Add to "stage"</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="168" x="376" y="136.5371">Mark changes for "commit"</text><path d="M198.5,180.5313 L198.5,230.7969 L379.5,230.7969 L379.5,190.5313 L369.5,180.5313 L198.5,180.5313 " fill="#FBFB77" filter="url(#f16iu5rjemvqm2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M369.5,180.5313 L369.5,190.5313 L379.5,190.5313 L369.5,180.5313 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="77" x="204.5" y="197.5981">Local repo</text><line style="stroke:#A80036;stroke-width:1.0;" x1="198.5" x2="379.5" y1="205.6641" y2="205.6641"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="160" x="204.5" y="222.731">where the history is kept;</text><path d="M540.5,193.0977 L540.5,218.2305 L976.5,218.2305 L976.5,203.0977 L966.5,193.0977 L540.5,193.0977 " fill="#FBFB77" filter="url(#f16iu5rjemvqm2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M966.5,193.0977 L966.5,203.0977 L976.5,203.0977 L966.5,193.0977 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="316" x="546.5" y="210.1646">Adds an "atomic change" to your version history (</text><text fill="#000000" font-family="sans-serif" font-size="13" font-style="italic" lengthAdjust="spacing" textLength="29" x="862.5" y="210.1646">local</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="66" x="895.5" y="210.1646">operation)</text><rect fill="#FEFECE" filter="url(#f16iu5rjemvqm2)" height="47.9375" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="141" x="389.5" y="181.6953"/><text fill="#000000" font-family="sans-serif" font-size="12" font-weight="bold" lengthAdjust="spacing" textLength="52" x="399.5" y="202.834">Commit</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="121" x="399.5" y="216.8027">Commit to the repo</text><path d="M137,260.7969 L137,311.0625 L382,311.0625 L382,270.7969 L372,260.7969 L137,260.7969 " fill="#FBFB77" filter="url(#f16iu5rjemvqm2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M372,260.7969 L372,270.7969 L382,270.7969 L372,260.7969 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="96" x="143" y="277.8638">Remote repo</text><line style="stroke:#A80036;stroke-width:1.0;" x1="137" x2="382" y1="285.9297" y2="285.9297"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="224" x="143" y="302.9966">where the history is kept ("off-site")</text><path d="M538,273.3633 L538,298.4961 L824,298.4961 L824,283.3633 L814,273.3633 L538,273.3633 " fill="#FBFB77" filter="url(#f16iu5rjemvqm2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M814,273.3633 L814,283.3633 L824,283.3633 L814,273.3633 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="146" x="544" y="290.4302">Pushes changes to the</text><text fill="#000000" font-family="sans-serif" font-size="13" font-style="italic" lengthAdjust="spacing" textLength="47" x="694" y="290.4302">remote</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="64" x="745" y="290.4302">repository</text><rect fill="#FEFECE" filter="url(#f16iu5rjemvqm2)" height="47.9375" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="136" x="392" y="261.9609"/><text fill="#000000" font-family="sans-serif" font-size="12" font-weight="bold" lengthAdjust="spacing" textLength="35" x="402" y="283.0996">Push</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="116" x="402" y="297.0684">Push to the server</text><line style="stroke:#A80036;stroke-width:1.5;" x1="460" x2="460" y1="69.1016" y2="101.4297"/><polygon fill="#A80036" points="456,91.4297,460,101.4297,464,91.4297,460,95.4297" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="460" x2="460" y1="149.3672" y2="181.6953"/><polygon fill="#A80036" points="456,171.6953,460,181.6953,464,171.6953,460,175.6953" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="460" x2="460" y1="229.6328" y2="261.9609"/><polygon fill="#A80036" points="456,251.9609,460,261.9609,464,251.9609,460,255.9609" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[c146ce4dff1e043b20034ca748b44293]
+@startuml
+:**Edit**
+Add (or change) some code;
+note right
+        Changes on your <i>local</i> system
+end note
+floating note left
+        **Working area**
+        - - - -
+        where the work happens.
+end note
+:**Add to "stage"**
+Mark changes for "commit";
+note right
+        Prepares a change into the versions history.
+end note       
+floating note left
+        **Staging area**
+        - - - -
+        where the "commit" is cooked - - a "history atom".
+end note
+
+:**Commit**
+Commit to the repo;
+note right
+        Adds an "atomic change" to your version history (<i>local</i> operation)
+end note
+floating note left
+        **Local repo**
+        - - - -
+        where the history is kept;
+end note
+
+:**Push**
+Push to the server;
+note right
+        Pushes changes to the <i>remote</i> repository
+end note
+floating note left
+        **Remote repo**
+        - - - -
+        where the history is kept ("off-site")
+end note
+@enduml
+
+PlantUML version 1.2021.00(Sun Jan 10 11:25:05 CET 2021)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>
