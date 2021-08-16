@@ -223,8 +223,7 @@ standard at the moment.</p>
 <p>A project lives in a repository (<em>&ldquo;repo&rdquo;</em>). In fact, it is just a folder with a
 special <code>.git</code> subfolder, where the magic happens. There is something called
 &ldquo;working area&rdquo;, &ldquo;staging area&rdquo;, and repositories:</p>
-<figure><a href="/images/ts-git/workflow.svg#notalink">
-    <img src="/images/ts-git/workflow.svg#notalink"/> </a>
+<figure><a href="/images/ts-git/workflow.svg#notalink"><img src="/images/ts-git/workflow.svg#notalink"/></a>
 </figure>
 
 <h2 id="key-concepts-with-a-running-example">Key concepts with a running example</h2>
@@ -237,10 +236,10 @@ example). So, we create a folder and immediately initialize a repo:</p>
 </code></pre></div><p>It has created a special directory, <code>.git</code>, that will contain
 the information concerning the history. Now, let us add some code and
 save it as <code>new_doc.py</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
 
 <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
-	<span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;i=&#34;</span> <span style="color:#f92672">+</span> str(i))
+	print(<span style="color:#e6db74">&#34;i=&#34;</span> <span style="color:#f92672">+</span> str(i))
 </code></pre></div><p>Assume we have implemented some basic functionality, and would like to save a
 snapshot of this state in the repo. Note that git &ldquo;knows&rdquo; that we have some
 changes now:</p>
@@ -276,11 +275,11 @@ Changes to be committed:
  1 file changed, 4 insertions(+)
  create mode 100644 new_doc.py
 </code></pre></div><p>Let&rsquo;s say, we continue the development, and add more code, so that <code>new_doc.py</code> now reads:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
 
 <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
 	<span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
-		<span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;i=&#34;</span> <span style="color:#f92672">+</span> str(i)<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;, j=&#34;</span> <span style="color:#f92672">+</span> str(j))
+		print(<span style="color:#e6db74">&#34;i=&#34;</span> <span style="color:#f92672">+</span> str(i)<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;, j=&#34;</span> <span style="color:#f92672">+</span> str(j))
 </code></pre></div><p>Note that git is aware of specific changes. We can highlight them by saying:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git diff
 </code></pre></div><p>Output:</p>
@@ -351,11 +350,11 @@ branch, like this:</p>
 <p>Our previous state of the tracked files (one file in this case) was left in a
 <code>master</code> branch, and we jumped into a separate code &ldquo;spin-off&rdquo;. Let me
 rename a variable, so <code>new_doc.py</code> now would look like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
 
-<span style="color:#66d9ef">for</span> <span style="color:#960050;background-color:#1e0010">ɑ</span> <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
+<span style="color:#66d9ef">for</span> ɑ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
     <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
-        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;ɑ=&#34;</span> <span style="color:#f92672">+</span> str(<span style="color:#960050;background-color:#1e0010">ɑ</span>)<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;, j=&#34;</span> <span style="color:#f92672">+</span> str(j))
+        print(<span style="color:#e6db74">&#34;ɑ=&#34;</span> <span style="color:#f92672">+</span> str(ɑ)<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;, j=&#34;</span> <span style="color:#f92672">+</span> str(j))
 
 </code></pre></div><p>After we save the file, VSCode (or <code>git diff</code>) will highlight for us, what has
 changed:</p>
@@ -373,11 +372,11 @@ the file:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git checkout master
 </code></pre></div><p>We are immediately back to the state we left when we made a spin-off, so we
 change the file to become:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
 
 <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
     <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
-        <span style="color:#66d9ef">print</span>(f<span style="color:#e6db74">&#34;i={i}, j={j}&#34;</span>)
+        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;i=</span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">, j=</span><span style="color:#e6db74">{</span>j<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
 
 </code></pre></div><p>That&rsquo;s way more readable, so we &ldquo;save&rdquo; it into the master branch:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git diff <span style="color:#75715e"># let&#39;s see the changes</span>
@@ -411,15 +410,15 @@ Automatic merge failed; fix conflicts and then commit the result.
 </code></pre></div><p>We have created a <em>conflict</em>: edited the same line in both branches, and there
 is no way to resolve it automatically. This is a normal situation, and the
 source file now looks as follows:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
 
-<span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#66d9ef">for</span> <span style="color:#960050;background-color:#1e0010">ɑ</span> <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
+<span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#66d9ef">for</span> ɑ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
 </span>    <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
 <span style="color:#f92672">&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span> HEAD
-        <span style="color:#66d9ef">print</span>(f<span style="color:#e6db74">&#34;i={i}, j={j}&#34;</span>)
+        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;i=</span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">, j=</span><span style="color:#e6db74">{</span>j<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
 
 <span style="color:#f92672">=======</span>
-        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;ɑ=&#34;</span> <span style="color:#f92672">+</span> str(<span style="color:#960050;background-color:#1e0010">ɑ</span>)<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;, j=&#34;</span> <span style="color:#f92672">+</span> str(j))
+        print(<span style="color:#e6db74">&#34;ɑ=&#34;</span> <span style="color:#f92672">+</span> str(ɑ)<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;, j=&#34;</span> <span style="color:#f92672">+</span> str(j))
 <span style="color:#f92672">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</span> unicode_vars</code></pre></div>
 <p>This is pretty self-explanatory, but notice what has just happened. A change in
 the highlighted line was straightforward to make, so git did it for us
@@ -429,11 +428,11 @@ allows convenience of &ldquo;Accept Change&rdquo;-like buttons (which we wouldn&
 this case, though):</p>
 <p><img src="/images/ts-git/2021-02-05_17-10-50_screenshot.png#full-shadow" alt="Changes highlighted"></p>
 <p>After the edits, the resulting file is:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
 
-<span style="color:#66d9ef">for</span> <span style="color:#960050;background-color:#1e0010">ɑ</span> <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
+<span style="color:#66d9ef">for</span> ɑ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
     <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
-        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;ɑ={ɑ}, j={j}&#34;</span>)
+        print(<span style="color:#e6db74">&#34;ɑ=</span><span style="color:#e6db74">{ɑ}</span><span style="color:#e6db74">, j=</span><span style="color:#e6db74">{j}</span><span style="color:#e6db74">&#34;</span>)
 
 </code></pre></div><p>Following the instructions, we add and commit the changes initiated by <code>merge</code>
 as usual:</p>
@@ -607,13 +606,13 @@ contributions back); a simple <a href="https://guides.github.com/activities/hell
 <hr>
 <ol>
 <li id="fn:1" role="doc-endnote">
-<p>Note that you do not need a Github account to work with git. I have several repos completely offline &ndash; just to track versions locally. You do not loose anything this way, except collaboration features and an off-site backup. <a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>Note that you do not need a Github account to work with git. I have several repos completely offline &ndash; just to track versions locally. You do not loose anything this way, except collaboration features and an off-site backup.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:2" role="doc-endnote">
-<p>Note that you can make a repo &ldquo;private&rdquo;, so no one by default will have access, besides you. (see the <a href="https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-repository-visibility">docs</a>) <a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>Note that you can make a repo &ldquo;private&rdquo;, so no one by default will have access, besides you. (see the <a href="https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-repository-visibility">docs</a>)&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:3" role="doc-endnote">
-<p>Note that you can edit files directly on Github, via a web interface. It will just create commits on the respective branch of the <em>remote</em> repo. <a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>Note that you can edit files directly on Github, via a web interface. It will just create commits on the respective branch of the <em>remote</em> repo.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 </ol>
 </section>

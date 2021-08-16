@@ -8,20 +8,16 @@
     <language>en-us</language>
     <managingEditor>web@bochkarev.io (Alexey A. Bochkarev)</managingEditor>
     <webMaster>web@bochkarev.io (Alexey A. Bochkarev)</webMaster>
-    <lastBuildDate>Sun, 26 Jan 2020 23:11:13 +0000</lastBuildDate>
-    
-	<atom:link href="https://www.bochkarev.io/tags/bar/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 26 Jan 2020 23:11:13 +0000</lastBuildDate><atom:link href="https://www.bochkarev.io/tags/bar/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Main page here</title>
       <link>https://www.bochkarev.io/</link>
       <pubDate>Sun, 26 Jan 2020 23:11:13 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
       <guid>https://www.bochkarev.io/</guid>
-      <description>Alexey Bochkarev   PhD student: research in Industrial Engineering / OR, optimization (with Dr. J.Cole Smith).
+      <description>Alexey Bochkarev   PhD candidate: research in Industrial Engineering / OR, optimization (with Dr. J.Cole Smith).
 Research interests: Combinatorial optimization, Binary decision diagrams, Network optimization and interdiction.
-Education: PhD OR/IE (exp. 2023), MSc Appl. Maths &amp;amp; Physics (2010), MA Economics (2010).
+Education: PhD OR/IE (exp. 2021), MSc Appl. Maths &amp;amp; Physics (2010), MA Economics (2010).
 Before the academia: strategic consulting and electric energy industry, with focus on strategy and efficiency in grids, mostly electricity transmission (several years of experience in Russia &amp;ndash; see details).</description>
     </item>
     

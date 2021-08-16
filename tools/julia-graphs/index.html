@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="preload" href="/icons.svg" as="image">
+    <meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://www.bochkarev.io/images/jl-graphviz/graph-fancy.png"/>
+
+<meta name="twitter:title" content="On visualizing network graphs and Julia"/>
+<meta name="twitter:description" content="How to invoke Graphviz or TikZ from Julia to produce nice graph plots."/>
+
+    
+    
+    <title>A.B. | On visualizing network graphs and Julia</title>
+</head>
+<body>
+        <div class="container"><div id="nav-panel" class="row">
+    <hr class="topline"/>
+        <input type="checkbox" id="checkbox">
+        <label for="checkbox" class="menu-toggle">
+            <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#hamburger"></use></svg>
+        </label>
+        <label for="checkbox" class="menu-toggle-text">
+            A.B. &mdash; Site menu
+        </label>
+        <nav>
+            <ul id="nav-menu">
+                
+                <li class="menu-item"><a class="nav-link" href="/">
+                    
+                    Me
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/tools/">
+                    
+                    Tools
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/edu/">
+                    
+                    Edu
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/contact/">
+                    
+                    Contact
+                </a></li>
+                
+                <li class="menu-item"> ~ </li>
+            <li class="menu-item">
+            <a class="nav-link nav-icon-link" href="mailto:web@bochkarev.io">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-envelope"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="/abochkarev-pubkey.asc">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-key"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="https://twitter.com/a_bochka">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-twitter"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="https://github.com/alex-bochkarev">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
+            </a>
+            </li></ul>
+        </nav>
+</div>
+<br/>
+
+                
+                    <div id="table-of-contents">
+                        <h2> Index, <a href="#" class="nav-link">top</a> </h2> 
+                        <div id="text-table-of-contents" class="not-a-text-link">
+                            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#use-case-and-the-problem">Use-case and the problem</a></li>
+    <li><a href="#a-quick-but-efficient-hack">A quick, but efficient hack</a></li>
+    <li><a href="#further-improvement">Further improvement</a>
+      <ul>
+        <li><a href="#go-tikz">Go TikZ!</a></li>
+      </ul>
+    </li>
+    <li><a href="#in-conclusion">In conclusion</a></li>
+  </ul>
+</nav>
+                        </div>
+                    </div>
+                
+            
+            <div id="content">
+
+
+<div class="main-text">
+    <h1>On visualizing network graphs and Julia</h1>
+    <span class="metadata">
+    
+        
+        <a class="sticker" href="/assets/julia-graphs/gv_jl_example.zip">
+            
+                <span class="nav-icon-link">
+                    <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-download"></use></svg>
+                </span>
+             .zip
+        </a> &nbsp;
+        
+        <a class="sticker" href="/assets/julia-graphs/gv_jl_example.tar.gz">
+            
+                <span class="nav-icon-link">
+                    <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-download"></use></svg>
+                </span>
+             .tar.gz
+        </a> &nbsp;
+        
+    
+
+    
+        <div class="nav-icon-link">
+            <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
+        </div>
+        Last update: <time datetime="2021-08-15">2021-08-15</time>.
+    
+
+    
+        Tags: 
+        
+            
+            <a class="nav-link" href="https://www.bochkarev.io/tags/julia">#julia</a>
+        
+    
+    </span>
+    <div class="note">
+<p><strong>Summary:</strong> Sometimes using specialized tools proves to be very convenient. To quickly visualize network graphs, I tried to use <a href="https://graphviz.org/">Graphviz</a> program (invoking a stand-alone app from within Julia). It worked pretty well, both in terms of &ldquo;UI&rdquo; and the figures' quality. Here I provide the minimal code I used and a couple complications, such as plugging in TeX with its PGF/TikZ instead of Graphviz (see also buttons below the title for source code files).</p>
+<p><strong>Discussion:</strong> I&rsquo;d appreciate any comments / suggestions! Pls reach out via <a href="/contact">email</a>.</p>
+</div>
+<h2 id="use-case-and-the-problem">Use-case and the problem</h2>
+<p>I have been working with networks in Julia and needed to quickly examine them visually. In particular, <strong>my use-case</strong> is that I am developing a graph-based algorithm and need:</p>
+<ul>
+<li>to look at an example instance graph. Usually, it is relatively small, up to several dozens of nodes.</li>
+<li>to visualize certain graphs decorated with additional data, such as a branch-and-bound search tree or Monte-Carlo search tree.</li>
+</ul>
+<p>The package I am working with, <a href="https://juliagraphs.org/LightGraphs.jl/latest/">LightGraphs.jl</a>, does <a href="https://juliagraphs.org/LightGraphs.jl/latest/plotting/">provide different ways</a> to plot graphs by integrating with other packages, and this, of course, is a good starting point. However, for my specific (REPL-based) setup<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> it just did not work nicely out of the box. Also, it perhaps required learning another domain-specific language (within Julia) for customizations. For example, I am doing Interdiction, and I want <em>source</em> and <em>destination</em> nodes filled with different colors. I might want even more freedom in formatting of a branch-and-bound tree. This is not bad per se, but I want to be sure that this new language is <strong>pretty good</strong> before learning it.</p>
+</details>
+<p>But then I thought, if I use R with (totally amazing) <a href="https://ggplot2.tidyverse.org/">ggplot2</a> to visualize the data from <code>csv</code> files generated elsewhere &mdash; why not to do the same with graphs? <a href="https://en.wikipedia.org/wiki/Unix%5Fphilosophy#Do%5FOne%5FThing%5Fand%5FDo%5FIt%5FWell">Unix way</a> and all&hellip; Apparently, this is both very easy to do and capable of producing nice output.</p>
+<h2 id="a-quick-but-efficient-hack">A quick, but efficient hack</h2>
+<p>My tool of choice for visualizing graphs from the previous project was a stand-alone program<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup> called <em>Graphviz</em> (<code>dot</code> command). To use it, I would just need to form and compile a plain-text <code>.dot</code> file written in <a href="https://graphviz.org/gallery/">DOT language</a>. This is straightforward to do automatically. Assuming I have a <code>SimpleDiGraph</code> named <code>G</code> that I&rsquo;d like to visualize, I can do:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">open(<span style="color:#e6db74">&#34;./graph.tmp.dot&#34;</span>, <span style="color:#e6db74">&#34;w&#34;</span>) <span style="color:#66d9ef">do</span> file
+    write(file, <span style="color:#e6db74">&#34;digraph {</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+
+    <span style="color:#66d9ef">for</span> n <span style="color:#66d9ef">in</span> vertices(G)  <span style="color:#75715e"># add nodes</span>
+        write(file,
+              <span style="color:#e6db74">&#34;    </span><span style="color:#e6db74">$n</span><span style="color:#e6db74">;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+    <span style="color:#66d9ef">end</span>
+
+    <span style="color:#66d9ef">for</span> e <span style="color:#66d9ef">in</span> edges(G)  <span style="color:#75715e"># add edges</span>
+        i<span style="color:#f92672">=</span>src(e); j<span style="color:#f92672">=</span>dst(e)
+        write(file,
+              <span style="color:#e6db74">&#34;    </span><span style="color:#e6db74">$i</span><span style="color:#e6db74"> -&gt; </span><span style="color:#e6db74">$j</span><span style="color:#e6db74">;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+    <span style="color:#66d9ef">end</span>
+
+    write(file, <span style="color:#e6db74">&#34;}&#34;</span>)
+<span style="color:#66d9ef">end</span>
+</code></pre></div><details> <summary> [What does this code produce?]</summary>
+<p>A resulting <code>.dot</code> file might look like this, for a five-nodes graph:</p>
+<pre><code class="language-dot" data-lang="dot">digraph {
+    1;
+    2;
+    3;
+    4;
+    5;
+    1 -&gt; 2;
+    1 -&gt; 3;
+    1 -&gt; 4;
+    1 -&gt; 5;
+    2 -&gt; 3;
+    2 -&gt; 4;
+    3 -&gt; 4;
+}
+</code></pre></details>
+<p>Now, this totally works, but I would need to compile it manually, that&rsquo;s not user-friendly. Luckily, this is trivial to fix by adding:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">run(pipeline(<span style="color:#e6db74">`dot -Tpdf ./graph.tmp.dot`</span>,
+             stdout<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./graph.tmp.pdf&#34;</span>))
+run(<span style="color:#e6db74">`xdg-open </span><span style="color:#e6db74">$filename</span><span style="color:#e6db74">.pdf`</span>, wait<span style="color:#f92672">=</span>false)
+</code></pre></div><p>(Note that these are backticks, <code>`</code>, not quotes <code>'</code>!)</p>
+<p>So, it will produce <code>./graph.tmp.dot</code>, compile it with the program <code>dot</code>, and open<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup> the resulting PDF with the default viewer in a separate window! (The REPL will not be blocked since we asked it not to with this <code>wait = false</code>.)</p>
+<p>But wait, there&rsquo;s more. It immediately gives us all the power of DOT language directly (which was, ehm, designed specifically to draw graphs!). Say, if I want to mark <em>source</em> and <em>dest</em> nodes with different colors, and show arc costs as well, I can modify the code above as follows:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#e6db74">&#34;&#34;&#34;Shows the graph with source node `s`,
+</span><span style="color:#e6db74">dest `t`, and arc costs `W`.&#34;&#34;&#34;</span>
+<span style="color:#66d9ef">function</span> showgraph(G, s, t, W,
+                   filename<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./graph.dot&#34;</span>,
+                   display<span style="color:#f92672">=</span>true)
+
+    open(filename, <span style="color:#e6db74">&#34;w&#34;</span>) <span style="color:#66d9ef">do</span> file
+        write(file, <span style="color:#e6db74">&#34;digraph {</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+        <span style="color:#66d9ef">for</span> n <span style="color:#66d9ef">in</span> vertices(G)  <span style="color:#75715e"># add nodes</span>
+            <span style="color:#66d9ef">if</span> n <span style="color:#f92672">==</span> s
+                style <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;[style=filled, fillcolor=red]&#34;</span>
+            <span style="color:#66d9ef">elseif</span> n<span style="color:#f92672">==</span>t
+                style <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;[style=filled, fillcolor=green]&#34;</span>
+            <span style="color:#66d9ef">else</span>
+                style <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>
+            <span style="color:#66d9ef">end</span>
+            write(file,
+                  <span style="color:#e6db74">&#34;    </span><span style="color:#e6db74">$n</span><span style="color:#e6db74"> </span><span style="color:#e6db74">$style</span><span style="color:#e6db74">;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+        <span style="color:#66d9ef">end</span>
+
+        <span style="color:#66d9ef">for</span> e <span style="color:#66d9ef">in</span> edges(G)  <span style="color:#75715e"># add edges</span>
+            i<span style="color:#f92672">=</span>src(e); j<span style="color:#f92672">=</span>dst(e); cost<span style="color:#f92672">=</span>W[(i,j)]
+            write(file,
+                  <span style="color:#e6db74">&#34;    </span><span style="color:#e6db74">$i</span><span style="color:#e6db74"> -&gt; </span><span style="color:#e6db74">$j</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">*</span>
+                      <span style="color:#e6db74">&#34; [label=</span><span style="color:#e6db74">$</span>(cost)<span style="color:#e6db74">];</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+        <span style="color:#66d9ef">end</span>
+        write(file, <span style="color:#e6db74">&#34;}&#34;</span>)
+    <span style="color:#66d9ef">end</span>
+
+    run(pipeline(<span style="color:#e6db74">`dot -Tpng </span><span style="color:#e6db74">$filename</span><span style="color:#e6db74">`</span>,
+                 stdout<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">$filename</span><span style="color:#e6db74">.png&#34;</span>))
+    <span style="color:#66d9ef">if</span> display
+        run(<span style="color:#e6db74">`xdg-open </span><span style="color:#e6db74">$filename</span><span style="color:#e6db74">.png`</span>,
+            wait<span style="color:#f92672">=</span>false)
+    <span style="color:#66d9ef">end</span>
+<span style="color:#66d9ef">end</span>
+</code></pre></div><p>So, if I want to quickly look at graph <code>G</code> with source <code>s</code>, terminal <code>t</code>, and costs <code>W</code>, I just do <code>showgraph(G,s,t,W)</code> and a new window pops up:</p>
+<p><img src="/images/jl-graphviz/graph-ex.png#full-shadow" alt="Graph example"></p>
+<p>Now, if I want to examine <em>two</em> graphs (and save them as different files), I can call <code>showgraph(G,s,t,W, &quot;file1&quot;)</code> and <code>showgraph(G2,s2,t2,W2, &quot;file2&quot;)</code>. If I just want to update the file, without opening another window (e.g., if it is already open), I can ask to <code>showgraph(G,s,t,W, &quot;file&quot;, false)</code>.</p>
+<h2 id="further-improvement">Further improvement</h2>
+<p>Since we have just hacked the function together ourselves, it is really easy to modify. Assume I am drawing some more complicated things, and want to show more details about my nodes, which I have in <code>names</code> and <code>info</code> (indexed by the node number). Maybe, also format edge labels in some special way. It does not require any new ideas:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> showgraph_more(G, s, t, W,
+                   names,
+                   info,
+                   filename<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./graph.dot&#34;</span>,
+                   display<span style="color:#f92672">=</span>true)
+
+    open(filename, <span style="color:#e6db74">&#34;w&#34;</span>) <span style="color:#66d9ef">do</span> file
+        write(file, <span style="color:#e6db74">&#34;digraph {</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+        <span style="color:#66d9ef">for</span> n <span style="color:#66d9ef">in</span> vertices(G)  <span style="color:#75715e"># add nodes</span>
+            <span style="color:#66d9ef">if</span> n <span style="color:#f92672">==</span> s
+                style <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;style=filled, fillcolor=red,&#34;</span>
+            <span style="color:#66d9ef">elseif</span> n<span style="color:#f92672">==</span>t
+                style <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;style=filled, fillcolor=green,&#34;</span>
+            <span style="color:#66d9ef">else</span>
+                style <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>
+            <span style="color:#66d9ef">end</span>
+
+            label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;&lt;B&gt;Name:&lt;/B&gt; </span><span style="color:#e6db74">$</span>(names[n])<span style="color:#e6db74">&lt;BR/&gt;&#34;</span> <span style="color:#f92672">*</span>
+                <span style="color:#e6db74">&#34;&lt;B&gt;Info:&lt;/B&gt; </span><span style="color:#e6db74">$</span>(info[n])<span style="color:#e6db74">&lt;BR/&gt;&#34;</span> <span style="color:#f92672">*</span>
+                <span style="color:#e6db74">&#34;&lt;B&gt;Node number:&lt;/B&gt; </span><span style="color:#e6db74">$n</span><span style="color:#e6db74">&gt;&#34;</span>
+
+            write(file,
+                  <span style="color:#e6db74">&#34;    </span><span style="color:#e6db74">$n</span><span style="color:#e6db74">[</span><span style="color:#e6db74">$style</span><span style="color:#e6db74"> label=</span><span style="color:#e6db74">$label</span><span style="color:#e6db74">]</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+        <span style="color:#66d9ef">end</span>
+
+        <span style="color:#66d9ef">for</span> e <span style="color:#66d9ef">in</span> edges(G)  <span style="color:#75715e"># add edges</span>
+            i<span style="color:#f92672">=</span>src(e); j<span style="color:#f92672">=</span>dst(e); cost<span style="color:#f92672">=</span>W[(i,j)]
+            write(file,
+                  <span style="color:#e6db74">&#34;    </span><span style="color:#e6db74">$i</span><span style="color:#e6db74"> -&gt; </span><span style="color:#e6db74">$j</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">*</span>
+                      <span style="color:#e6db74">&#34; [label=</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">added cost </span><span style="color:#e6db74">$</span>(cost)<span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">];</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+        <span style="color:#66d9ef">end</span>
+        write(file, <span style="color:#e6db74">&#34;}&#34;</span>)
+    <span style="color:#66d9ef">end</span>
+
+    run(pipeline(<span style="color:#e6db74">`dot -Tpng </span><span style="color:#e6db74">$filename</span><span style="color:#e6db74">`</span>,
+                 stdout<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">$filename</span><span style="color:#e6db74">.png&#34;</span>))
+    <span style="color:#66d9ef">if</span> display
+        run(<span style="color:#e6db74">`xdg-open </span><span style="color:#e6db74">$filename</span><span style="color:#e6db74">.png`</span>, wait<span style="color:#f92672">=</span>false)
+    <span style="color:#66d9ef">end</span>
+<span style="color:#66d9ef">end</span>
+</code></pre></div><p>So, <code>showgraph_more(G, s, t, W, names, info)</code> again gives a picture in a new window:</p>
+<p><img src="/images/jl-graphviz/graph-fancy.png#full-shadow" alt="Graph example"></p>
+<p>(Here I used DOT markup: <code>&lt;B&gt;...&lt;/B&gt;</code> for Bold, <code>&lt;SUB&gt;...&lt;/SUB&gt;</code> for subscripts, and <a href="https://graphviz.org/doc/info/shapes.html#html">so on</a>).</p>
+<p>No doubt, DOT language is still somewhat limited, but again, it is a stand-alone, easy-to-plug tool. Also, we don&rsquo;t discuss super-fancy publication-ready figures. Unless you want to&hellip;</p>
+<h3 id="go-tikz">Go TikZ!</h3>
+<p>Well, at this point nothing prevents us from employing even more complex tools, should we need some formatting heavy-lifting. There is basically no difference for us which &ldquo;backend&rdquo; to choose, even TeX-based! So, rewriting the simpler version of the function above for <a href="https://github.com/pgf-tikz/pgf">PGF/TikZ</a>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#e6db74">&#34;&#34;&#34;Draws a graph using TikZ.&#34;&#34;&#34;</span>
+<span style="color:#66d9ef">function</span> showgraph_tikz(G, s, t, W,
+                   filename<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./graph&#34;</span>,
+                   display<span style="color:#f92672">=</span>true)
+
+    <span style="color:#75715e"># Let&#39;s insert some boilerplate styling</span>
+    <span style="color:#75715e"># and necessary preamble/postamble</span>
+    preamble <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;&#34;</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">documentclass{standalone}
+</span><span style="color:#e6db74"></span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">usepackage{tikz}
+</span><span style="color:#e6db74"></span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">usetikzlibrary{graphs,graphdrawing,quotes}
+</span><span style="color:#e6db74"></span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">usegdlibrary{force}
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">begin{document}
+</span><span style="color:#e6db74"></span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">begin{tikzpicture}
+</span><span style="color:#e6db74">  </span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">graph [spring layout, node distance=20mm,
+</span><span style="color:#e6db74"> nodes={draw, circle, fill=blue, text=white},
+</span><span style="color:#e6db74">  edge quotes={fill=yellow, inner sep=2pt}]
+</span><span style="color:#e6db74">  {</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+
+    postamble <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;&#34;};
+</span><span style="color:#e6db74"></span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">end{tikzpicture}
+</span><span style="color:#e6db74"></span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">end{document}&#34;&#34;&#34;</span>
+
+    open(filename <span style="color:#f92672">*</span> <span style="color:#e6db74">&#34;.tex&#34;</span>, <span style="color:#e6db74">&#34;w&#34;</span>) <span style="color:#66d9ef">do</span> file
+        write(file, preamble)
+        <span style="color:#66d9ef">for</span> n <span style="color:#66d9ef">in</span> vertices(G)
+            <span style="color:#66d9ef">if</span> n <span style="color:#f92672">==</span> s
+                style <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;fill=red, text=white&#34;</span>
+            <span style="color:#66d9ef">elseif</span> n<span style="color:#f92672">==</span>t
+                style <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;fill=green, text=black&#34;</span>
+            <span style="color:#66d9ef">else</span>
+                style <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;fill=white, text=black&#34;</span>
+            <span style="color:#66d9ef">end</span>
+
+            write(file,
+                  <span style="color:#e6db74">&#34;    </span><span style="color:#e6db74">$n</span><span style="color:#e6db74"> [as={</span><span style="color:#ae81ff">\$</span><span style="color:#e6db74">n_{</span><span style="color:#e6db74">$n</span><span style="color:#e6db74">}</span><span style="color:#ae81ff">\$</span><span style="color:#e6db74">}, </span><span style="color:#e6db74">$</span>(style)<span style="color:#e6db74">];</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+        <span style="color:#66d9ef">end</span>
+
+        <span style="color:#66d9ef">for</span> e <span style="color:#66d9ef">in</span> edges(G)
+            i <span style="color:#f92672">=</span> src(e); j <span style="color:#f92672">=</span> dst(e)
+            cost <span style="color:#f92672">=</span> W[(i, j)]
+            write(file,
+                  <span style="color:#e6db74">&#34;    </span><span style="color:#e6db74">$i</span><span style="color:#e6db74"> -&gt;[</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">$</span>(cost)<span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">] </span><span style="color:#e6db74">$j</span><span style="color:#e6db74">;&#34;</span>)
+        <span style="color:#66d9ef">end</span>
+        write(file, postamble)
+    <span style="color:#66d9ef">end</span>
+
+    run(pipeline(<span style="color:#e6db74">`lualatex </span><span style="color:#e6db74">$filename</span><span style="color:#e6db74">`</span>))
+    <span style="color:#66d9ef">if</span> display
+        run(<span style="color:#e6db74">`xdg-open </span><span style="color:#e6db74">$filename</span><span style="color:#e6db74">.pdf`</span>, wait<span style="color:#f92672">=</span>false)
+    <span style="color:#66d9ef">end</span>
+<span style="color:#66d9ef">end</span>
+</code></pre></div><details> <summary> [What does this code produce?]</summary>
+<p>That&rsquo;s just a good old <code>.tex</code> file:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-latex" data-lang="latex"><span style="color:#66d9ef">\documentclass</span>{standalone}
+<span style="color:#66d9ef">\usepackage</span>{tikz}
+<span style="color:#66d9ef">\usetikzlibrary</span>{graphs,graphdrawing,quotes}
+<span style="color:#66d9ef">\usegdlibrary</span>{force}
+
+<span style="color:#66d9ef">\begin</span>{document}
+<span style="color:#66d9ef">\begin</span>{tikzpicture}
+  <span style="color:#66d9ef">\graph</span> [spring layout, node distance=20mm, nodes={draw, circle, fill=blue, text=white},
+  edge quotes={fill=yellow, inner sep=2pt}]
+  {
+    1 [as={<span style="color:#e6db74">$</span>n_{<span style="color:#ae81ff">1</span>}<span style="color:#e6db74">$</span>}, fill=green, text=black];
+    2 [as={<span style="color:#e6db74">$</span>n_{<span style="color:#ae81ff">2</span>}<span style="color:#e6db74">$</span>}, fill=white, text=black];
+    3 [as={<span style="color:#e6db74">$</span>n_{<span style="color:#ae81ff">3</span>}<span style="color:#e6db74">$</span>}, fill=white, text=black];
+    4 [as={<span style="color:#e6db74">$</span>n_{<span style="color:#ae81ff">4</span>}<span style="color:#e6db74">$</span>}, fill=red, text=white];
+    5 [as={<span style="color:#e6db74">$</span>n_{<span style="color:#ae81ff">5</span>}<span style="color:#e6db74">$</span>}, fill=white, text=black];
+    1 -&gt;[&#34;1&#34;] 2;    1 -&gt;[&#34;9&#34;] 3;    1 -&gt;[&#34;1&#34;] 4;    1 -&gt;[&#34;6&#34;] 5;    2 -&gt;[&#34;7&#34;] 3;    2 -&gt;[&#34;5&#34;] 4;    3 -&gt;[&#34;5&#34;] 4;};
+<span style="color:#66d9ef">\end</span>{tikzpicture}
+<span style="color:#66d9ef">\end</span>{document}
+</code></pre></div></details>
+<p>A call to <code>showgraph_tikz(G,s,t,W)</code> summons the unlimited power of TeX, so we spend some time looking at <code>lualatex</code> compilation log, but then indeed see a formatted digraph, as a PDF in a new window:</p>
+<p><img src="/images/jl-graphviz/graph-tikz-ex.png#full-shadow" alt="Graph example"></p>
+<p>Of course, here we have <a href="https://pgf-tikz.github.io/pgf/pgfmanual.pdf">all the tools</a> (that was a link to a manual of more than 1,000 pages) of TikZ/PGF. We just generate and then compile a <code>.tex</code> file under the hood, nothing fancy.</p>
+<h2 id="in-conclusion">In conclusion</h2>
+<p>So, while using <em>TikZ</em> seems like a little overkill for daily use, I really like the balance of simplicity and results with <em>Graphviz</em>. However, I might consider the former for producing the final versions of some figures and publication-ready supplemental materials next time.</p>
+<p>Finally, while it seems really efficient as a quick and flexible tool, note that there are more general and, perhaps, tidy solutions that interface Julia and other systems &mdash; see, e.g., <a href="https://github.com/JuliaTeX">JuliaTeX</a> with its PGFPlots, TikzGraphs / TikzPictures, and such. But hopefully this note illustrates the fact that sometimes using tools from seemingly different ecosystems might be pretty handy and simple.</p>
+<p><em>Please, feel free to drop me an <a href="/contact">email</a> if you&rsquo;ll have any comments or suggestions!</em></p>
+<section class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1" role="doc-endnote">
+<p>My setup comprises my editor, Emacs, and Julia REPL running in a terminal side by side, with a decent degree of interactivity provided by <a href="https://timholy.github.io/Revise.jl/stable/">Revise.jl</a>. Many problems might be nonexistent, say, in <a href="https://jupyter.org/">Jupyter</a> or <a href="https://www.julia-vscode.org/">VSCode</a>. But that&rsquo;s not the way I was ready to pursue at the moment, since I find the whole setting pretty convenient.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2" role="doc-endnote">
+<p>Which I installed with <code>sudo apt install graphviz</code> on my Debian system. (Would work the same way on Ubuntu, but you&rsquo;d need to <code>brew install graphviz</code> on Mac. There are <a href="https://graphviz.org/download/">options</a>.)&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3" role="doc-endnote">
+<p>Technically speaking, this code will run on most Linuxes only, since I am using the program <code>xdg-open</code>, which opens stuff in the default app. As far as I know, the Mac equivalent is <code>open</code>.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</section>
+
+</div>
+<br/>
+
+            </div>
+        </div>
+        <footer class="footer"><div class="site-footer">
+    <p class="footer-text nav-link">© 2018&mdash;2021 <b><a class="nav-link" href="/">Alexey A. Bochkarev</a></b> All rights reserved
+        ⬩ <a class="nav-link" href="/privacy">Privacy Policy</a>
+        ⬩ <a class="nav-link" href="/disclaimer">Disclaimer</a>
+        | Made with a <a href="https://github.com/alex-bochkarev/hugo-desk-theme">custom theme</a> for <a href="https://gohugo.io/">Hugo</a>.
+    </p> <br>
+</div>
+</footer>
+    </body>
+</html>

@@ -8,11 +8,7 @@
     <language>en-us</language>
     <managingEditor>web@bochkarev.io (Alexey A. Bochkarev)</managingEditor>
     <webMaster>web@bochkarev.io (Alexey A. Bochkarev)</webMaster>
-    <lastBuildDate>Mon, 23 Sep 2019 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://www.bochkarev.io/tags/linux/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Mon, 23 Sep 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bochkarev.io/tags/linux/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Text and derive - getting notifications from the cluster</title>
       <link>https://www.bochkarev.io/tools/cluster-msg/</link>

@@ -1,147 +1,95 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
   <url>
     <loc>https://www.bochkarev.io/categories/</loc>
-    <lastmod>2021-02-15T23:43:02+01:00</lastmod>
-  </url>
-  
-  <url>
+    <lastmod>2021-08-15T20:48:42-04:00</lastmod>
+  </url><url>
+    <loc>https://www.bochkarev.io/tags/julia/</loc>
+    <lastmod>2021-08-15T20:48:42-04:00</lastmod>
+  </url><url>
+    <loc>https://www.bochkarev.io/tools/julia-graphs/</loc>
+    <lastmod>2021-08-15T20:48:42-04:00</lastmod>
+  </url><url>
     <loc>https://www.bochkarev.io/tags/</loc>
-    <lastmod>2021-02-15T23:43:02+01:00</lastmod>
-  </url>
-  
-  <url>
+    <lastmod>2021-08-15T20:48:42-04:00</lastmod>
+  </url><url>
+    <loc>https://www.bochkarev.io/tools/</loc>
+    <lastmod>2021-08-15T20:48:42-04:00</lastmod>
+  </url><url>
+    <loc>https://www.bochkarev.io/categories/tools/</loc>
+    <lastmod>2021-08-15T20:48:42-04:00</lastmod>
+  </url><url>
     <loc>https://www.bochkarev.io/tags/talk/</loc>
     <lastmod>2021-02-06T17:05:45+01:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/tags/tech-seminar/</loc>
     <lastmod>2021-02-15T23:43:02+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.bochkarev.io/tools/</loc>
-    <lastmod>2021-02-06T17:05:45+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.bochkarev.io/categories/tools/</loc>
-    <lastmod>2021-02-15T23:43:02+01:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/tools/ts-git/</loc>
     <lastmod>2021-02-06T17:05:45+01:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/tools/ts-literature/</loc>
     <lastmod>2021-02-05T23:08:51+01:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/categories/edu/</loc>
     <lastmod>2021-02-15T23:43:02+01:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/edu/</loc>
     <lastmod>2021-02-15T23:43:02+01:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/edu/or-tech-seminar/</loc>
     <lastmod>2021-02-15T23:43:02+01:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/edu/smtb-2020-algo/</loc>
     <lastmod>2021-01-28T15:06:45+01:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/tags/smtb/</loc>
     <lastmod>2021-01-28T15:06:45+01:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/tags/bar/</loc>
     <lastmod>2020-01-26T23:11:13+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/tags/foo/</loc>
     <lastmod>2020-01-26T23:11:13+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/</loc>
     <lastmod>2020-01-26T23:11:13+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/tags/cluster/</loc>
     <lastmod>2021-01-14T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/tags/linux/</loc>
     <lastmod>2021-01-14T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/tools/cluster-msg/</loc>
     <lastmod>2021-01-14T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/edu/quals-mm/</loc>
     <lastmod>2020-01-18T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/tags/deterministic/</loc>
     <lastmod>2021-01-14T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/tags/quals/</loc>
     <lastmod>2021-01-14T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/tags/stochastic/</loc>
     <lastmod>2020-01-18T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/edu/convexity-gen/</loc>
     <lastmod>2021-01-14T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/tags/bioinformatics/</loc>
     <lastmod>2019-05-20T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/edu/dotplotgen/</loc>
     <lastmod>2019-05-20T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/disclaimer/</loc>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/contact/</loc>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.bochkarev.io/privacy/</loc>
   </url>
-  
 </urlset>

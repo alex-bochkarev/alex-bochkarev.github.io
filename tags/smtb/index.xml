@@ -8,11 +8,7 @@
     <language>en-us</language>
     <managingEditor>web@bochkarev.io (Alexey A. Bochkarev)</managingEditor>
     <webMaster>web@bochkarev.io (Alexey A. Bochkarev)</webMaster>
-    <lastBuildDate>Wed, 29 Jul 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://www.bochkarev.io/tags/smtb/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Wed, 29 Jul 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bochkarev.io/tags/smtb/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>(Talk) A Glimpse into Algorithms</title>
       <link>https://www.bochkarev.io/edu/smtb-2020-algo/</link>

@@ -8,10 +8,15 @@
     <language>en-us</language>
     <managingEditor>web@bochkarev.io (Alexey A. Bochkarev)</managingEditor>
     <webMaster>web@bochkarev.io (Alexey A. Bochkarev)</webMaster>
-    <lastBuildDate>Sat, 30 Jan 2021 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://www.bochkarev.io/tags/index.xml" rel="self" type="application/rss+xml" />
-    
+    <lastBuildDate>Sun, 15 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bochkarev.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>julia</title>
+      <link>https://www.bochkarev.io/tags/julia/</link>
+      <pubDate>Sun, 15 Aug 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/tags/julia/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>talk</title>
