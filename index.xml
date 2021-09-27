@@ -10,6 +10,42 @@
     <webMaster>web@bochkarev.io (Alexey A. Bochkarev)</webMaster>
     <lastBuildDate>Sun, 26 Jan 2020 23:11:13 +0000</lastBuildDate><atom:link href="https://www.bochkarev.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>My programming stack</title>
+      <link>https://www.bochkarev.io/notes/stack/</link>
+      <pubDate>Mon, 27 Sep 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/notes/stack/</guid>
+      <description>A brief summary of the core software stack I use for research.</description>
+    </item>
+    
+    <item>
+      <title>A Practical Introduction to Probability Theory (minicourse)</title>
+      <link>https://www.bochkarev.io/teaching/smtb-prob/</link>
+      <pubDate>Sat, 25 Sep 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/teaching/smtb-prob/</guid>
+      <description>This is a quick numerical intro to probability theory in the form of a mini-course, four one-hour sessions. Designed for &lt;a href=&#34;https://molbioschool.org/en/&#34;&gt;SMTB&lt;/a&gt; and Puschino Winter School in 2021. Discussing mathematical models for random things from the perspective of numerical examples in Python.</description>
+    </item>
+    
+    <item>
+      <title>On visualizing network graphs and Julia</title>
+      <link>https://www.bochkarev.io/notes/jl-graphviz/</link>
+      <pubDate>Sun, 15 Aug 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/notes/jl-graphviz/</guid>
+      <description>How to invoke Graphviz or TikZ from Julia to produce nice network plots.</description>
+    </item>
+    
+    <item>
+      <title>On visualizing network graphs and Julia</title>
+      <link>https://www.bochkarev.io/tools/jl-graphviz/</link>
+      <pubDate>Sun, 15 Aug 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/tools/jl-graphviz/</guid>
+      <description>How to invoke Graphviz or TikZ from Julia to produce nice network plots.</description>
+    </item>
+    
+    <item>
       <title>On visualizing network graphs and Julia</title>
       <link>https://www.bochkarev.io/tools/julia-graphs/</link>
       <pubDate>Sun, 15 Aug 2021 00:00:00 +0000</pubDate>
@@ -20,38 +56,38 @@
     
     <item>
       <title>🔀 Version control with git.</title>
-      <link>https://www.bochkarev.io/tools/ts-git/</link>
+      <link>https://www.bochkarev.io/notes/ts-git/</link>
       <pubDate>Sat, 30 Jan 2021 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/tools/ts-git/</guid>
+      <guid>https://www.bochkarev.io/notes/ts-git/</guid>
       <description>A quick intro to version control with git.</description>
     </item>
     
     <item>
       <title>📰 Working with the literature: tools and approaches</title>
-      <link>https://www.bochkarev.io/tools/ts-literature/</link>
+      <link>https://www.bochkarev.io/notes/ts-literature/</link>
       <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/tools/ts-literature/</guid>
+      <guid>https://www.bochkarev.io/notes/ts-literature/</guid>
       <description>A collection of notes on literature: discovery, reading, keeping track of references, and using them in writing.</description>
     </item>
     
     <item>
       <title>💬 OR Tech Seminar: outline</title>
-      <link>https://www.bochkarev.io/edu/or-tech-seminar/</link>
+      <link>https://www.bochkarev.io/teaching/or-tech-seminar/</link>
       <pubDate>Thu, 14 Jan 2021 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/edu/or-tech-seminar/</guid>
+      <guid>https://www.bochkarev.io/teaching/or-tech-seminar/</guid>
       <description>A quick note on OR Tech Seminar topics and logistics.</description>
     </item>
     
     <item>
-      <title>(Talk) A Glimpse into Algorithms</title>
-      <link>https://www.bochkarev.io/edu/smtb-2020-algo/</link>
+      <title>A Glimpse into Algorithms (minicourse)</title>
+      <link>https://www.bochkarev.io/teaching/smtb-algo/</link>
       <pubDate>Wed, 29 Jul 2020 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/edu/smtb-2020-algo/</guid>
-      <description>This is a talk presented to high-school students during &lt;a href=&#34;https://molbioschool.org/en/&#34;&gt;SMTB&lt;/a&gt;-2020. Quick numerical illustrations for runtime, correctness and such fun things.</description>
+      <guid>https://www.bochkarev.io/teaching/smtb-algo/</guid>
+      <description>This is a quick computational intro to algorithms and data structures in the form of a mini-course, four one-hour sessions. Designed and presented for &lt;a href=&#34;https://molbioschool.org/en/&#34;&gt;SMTB&lt;/a&gt; in 2020 and 2021. Quick numerical illustrations for runtime, correctness, and other such fun things.</description>
     </item>
     
     <item>
@@ -65,28 +101,28 @@
     
     <item>
       <title>A mind-map for (some) basic OR topics</title>
-      <link>https://www.bochkarev.io/edu/quals-mm/</link>
+      <link>https://www.bochkarev.io/teaching/quals-mm/</link>
       <pubDate>Mon, 27 May 2019 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/edu/quals-mm/</guid>
+      <guid>https://www.bochkarev.io/teaching/quals-mm/</guid>
       <description>An attempt to summarize some key OR concepts, inspired by the IE/OR Qualifying exams scope in 2019. Designed as an easy-to-overview mindmap.</description>
     </item>
     
     <item>
       <title>An Euler diagram for convexity generalizations</title>
-      <link>https://www.bochkarev.io/edu/convexity-gen/</link>
+      <link>https://www.bochkarev.io/teaching/convexity-gen/</link>
       <pubDate>Wed, 22 May 2019 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/edu/convexity-gen/</guid>
+      <guid>https://www.bochkarev.io/teaching/convexity-gen/</guid>
       <description>On convexity generalization concepts (quasiconvexity and such) &amp;ndash; a one-pager with examples.</description>
     </item>
     
     <item>
       <title>Dotplot sample generation utility</title>
-      <link>https://www.bochkarev.io/edu/dotplotgen/</link>
+      <link>https://www.bochkarev.io/teaching/dotplotgen/</link>
       <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/edu/dotplotgen/</guid>
+      <guid>https://www.bochkarev.io/teaching/dotplotgen/</guid>
       <description>A tiny &lt;a href=&#34;https://en.wikipedia.org/wiki/Dot_plot_(bioinformatics)&#34;&gt;dot-plot&lt;/a&gt; generation utility in R</description>
     </item>
     
@@ -106,7 +142,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
       <guid>https://www.bochkarev.io/contact/</guid>
-      <description>email (preferred)  private: a (one letter) followed by &amp;ldquo;at&amp;rdquo; symbol and domain &amp;ldquo;bochkarev dot io&amp;rdquo; [🔑]; CU-related: abochka@g.clemson.edu [🔑];   office: Freeman Hall, 278. twitter: @a_bochka for urgent matters: please consider Signal, or:  @abochka on Telegram a at bochkarev.io on XMPP/&amp;ldquo;Jabber&amp;rdquo;.   other social media: I mostly use LinkedIn to keep my general public CV. (Not active on Facebook or VK.)  Secure comm / Encryption If you decide to use encryption, please consider:</description>
+      <description>email (preferred)  private: a (one letter) &amp;ldquo;at&amp;rdquo; bochkarev dot io [🔑]; CU-related: abochka@g.clemson.edu [🔑];   office: Freeman Hall, 278. twitter: @a_bochka for urgent matters: please consider Signal, or:  @abochka on Telegram a at bochkarev.io on XMPP/&amp;ldquo;Jabber&amp;rdquo;.   other social media: I used LinkedIn to keep my general public CV. (Not active elsewhere.)  Secure comm / Encryption If you decide to use encryption, please consider:</description>
     </item>
     
     <item>

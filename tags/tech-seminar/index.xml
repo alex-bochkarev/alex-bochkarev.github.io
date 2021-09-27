@@ -11,28 +11,28 @@
     <lastBuildDate>Sat, 30 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bochkarev.io/tags/tech-seminar/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>🔀 Version control with git.</title>
-      <link>https://www.bochkarev.io/tools/ts-git/</link>
+      <link>https://www.bochkarev.io/notes/ts-git/</link>
       <pubDate>Sat, 30 Jan 2021 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/tools/ts-git/</guid>
+      <guid>https://www.bochkarev.io/notes/ts-git/</guid>
       <description>A quick intro to version control with git.</description>
     </item>
     
     <item>
       <title>📰 Working with the literature: tools and approaches</title>
-      <link>https://www.bochkarev.io/tools/ts-literature/</link>
+      <link>https://www.bochkarev.io/notes/ts-literature/</link>
       <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/tools/ts-literature/</guid>
+      <guid>https://www.bochkarev.io/notes/ts-literature/</guid>
       <description>A collection of notes on literature: discovery, reading, keeping track of references, and using them in writing.</description>
     </item>
     
     <item>
       <title>💬 OR Tech Seminar: outline</title>
-      <link>https://www.bochkarev.io/edu/or-tech-seminar/</link>
+      <link>https://www.bochkarev.io/teaching/or-tech-seminar/</link>
       <pubDate>Thu, 14 Jan 2021 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/edu/or-tech-seminar/</guid>
+      <guid>https://www.bochkarev.io/teaching/or-tech-seminar/</guid>
       <description>A quick note on OR Tech Seminar topics and logistics.</description>
     </item>
     

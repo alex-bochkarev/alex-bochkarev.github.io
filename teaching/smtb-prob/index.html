@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="preload" href="/icons.svg" as="image">
+    <meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://www.bochkarev.io/home/AB.JPG"/>
+
+<meta name="twitter:title" content="A Practical Introduction to Probability Theory (minicourse)"/>
+<meta name="twitter:description" content="This is a quick numerical intro to probability theory in the form of a mini-course, four one-hour sessions. Designed for SMTB and Puschino Winter School in 2021. Discussing mathematical models for random things from the perspective of numerical examples in Python."/>
+
+    
+    
+    <title>A.B. | A Practical Introduction to Probability Theory (minicourse)</title>
+</head>
+<body>
+        <div class="container"><div id="nav-panel" class="row">
+    <hr class="topline"/>
+        <input type="checkbox" id="checkbox">
+        <label for="checkbox" class="menu-toggle">
+            <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#hamburger"></use></svg>
+        </label>
+        <label for="checkbox" class="menu-toggle-text">
+            A.B. &mdash; Site menu
+        </label>
+        <nav>
+            <ul id="nav-menu">
+                
+                <li class="menu-item"><a class="nav-link" href="/">
+                    
+                    Me
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/research/">
+                    
+                    Research
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/teaching/">
+                    
+                    Teaching
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/notes/">
+                    
+                    Misc notes
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/contact/">
+                    
+                    Contact
+                </a></li>
+                
+                <li class="menu-item"> ~ </li>
+            <li class="menu-item">
+            <a class="nav-link nav-icon-link" href="/bochkarev_cv.pdf">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-CV"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="mailto:web@bochkarev.io">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-envelope"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="/abochkarev-pubkey.asc">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-key"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="https://twitter.com/a_bochka">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-twitter"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="https://github.com/alex-bochkarev">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
+            </a>
+            </li></ul>
+        </nav>
+</div>
+<br/>
+
+                
+                    <div id="table-of-contents">
+                        <h2> Index, <a href="#" class="nav-link">top</a> </h2> 
+                        <div id="text-table-of-contents" class="not-a-text-link">
+                            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#revisions">Revisions</a></li>
+    <li><a href="#background">Background</a></li>
+    <li><a href="#prerequisites-and-learning-objectives">Prerequisites and learning objectives</a></li>
+    <li><a href="#course-organization">Course organization</a></li>
+    <li><a href="#technical-details">Technical details</a></li>
+  </ul>
+</nav>
+                        </div>
+                    </div>
+                
+            
+            <div id="content">
+
+
+<div class="main-text">
+    <h1>A Practical Introduction to Probability Theory (minicourse)</h1>
+    <span class="metadata">
+    
+        
+        <a class="sticker" href="https://github.com/alex-bochkarev/Probs-SMTB-2021">
+            
+                <span class="nav-icon-link">
+                    <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
+                </span>
+             Syllabus (ENG)
+        </a> &nbsp;
+        
+        <a class="sticker" href="https://github.com/alex-bochkarev/zpsh-21-probs">
+            
+                <span class="nav-icon-link">
+                    <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
+                </span>
+             Syllabus (RUS)
+        </a> &nbsp;
+        
+    
+
+    
+        <div class="nav-icon-link">
+            <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
+        </div>
+        Last update: <time datetime="2021-09-25">2021-09-27</time>.
+    
+
+    
+        Tags: 
+        
+            
+            <a class="nav-link" href="https://www.bochkarev.io/tags/smtb">#SMTB</a>
+        
+            
+            <a class="nav-link" href="https://www.bochkarev.io/tags/talk">#talk</a>
+        
+            
+            <a class="nav-link" href="https://www.bochkarev.io/tags/course">#course</a>
+        
+    
+    </span>
+    <div class="note">
+<p>Course materials for <a href="https://molbioschool.org/en">School of Molecular and Theoretical Biology</a> and Puschino Winter School 2021.</p>
+<p><strong>Key idea:</strong> build a very brief introduction to probability theory by modeling random events in Python, trying to analyze them empirically, and introduce theoretical concepts when they become necessary as we proceed.</p>
+<p>This note describes the general logic and background of the course, teaching
+materials are available via the links above. Comments / questions / suggestions are very welcome!</p>
+</div>
+<h2 id="revisions">Revisions</h2>
+<ul>
+<li><code>Version 1:</code> Russian, for Puschino Winter School (2021)</li>
+<li><code>Version 2:</code> English and Russian, for SMTB (2021)</li>
+</ul>
+<h2 id="background">Background</h2>
+<p>The idea of using numerical experiments to illustrate the concepts of
+probability is certainly not new (see, e.g., a great introduction <a href="https://seeing-theory.brown.edu/index.html#firstPage">&ldquo;Seeing
+Theory&rdquo;</a> by the team from Brown University). However, I wanted to <em>model</em> the
+events explicitly in Python, in a more &ldquo;Industrial Engineering&rdquo; way, if you
+will. I still had to resort to many pretty standard &ldquo;blackboard&rdquo; discussions,
+but I am satisfied with the amount of Python code I was able to introduce into
+the discusson 😄.</p>
+<p>Another cornerstone of the course was that it was focused on <em>theory</em>. So, the key objective was not to teach how to solve simple problems, but to give some intuition on the key concepts from probability theory, how and &ldquo;why&rdquo; they work like this.</p>
+<h2 id="prerequisites-and-learning-objectives">Prerequisites and learning objectives</h2>
+<p>The course was designed for students comfortable with the basic school math,
+and curious to learn more. Ability to <em>write</em> code in Python seemed not
+strictly necessary, but of course they were assumed not to be afraid of the
+programming per se.</p>
+<p>The objective was to mention, and give some intuition stemming from the numerical illustrations on the concepts of: random events/experiments, probability (from a frequentist perspective) and probability space, dependent and independent events, conditional probability, (discrete) random variables, excpectation and variance.</p>
+<p>As a separate point, I wanted to introduce a concept of Probability Space: of course, without diving into <em>all</em> the details of sigma-algebras and such, but at least explaining <em>why we need it</em> at all.</p>
+<p>While it is obviously impossible to establish a solid command of the material during such short time (and without &ldquo;proper&rdquo; home assignments), I hope that the students walked away with intuitive understanding of some of the key concepts, interested and pretty well prepared to learn more in a standard university course.</p>
+<h2 id="course-organization">Course organization</h2>
+<p>The course was organized into three key topics and an additional, last one:</p>
+<ul>
+<li>A model for random events.</li>
+<li>Independence, tests, and Co.</li>
+<li>Discrete random variables.</li>
+<li>Continuous random variables (*)</li>
+</ul>
+<p>(*) We did succeed discussing some new concepts, but the exposition would objectively benefit from at least another hour.</p>
+<p>See the full <a href="https://github.com/alex-bochkarev/Probs-SMTB-2021">course outline</a> for details.</p>
+<h2 id="technical-details">Technical details</h2>
+<p>The course was delivered online. We worked with the
+code for a noticeable share of the time, so I presented the material
+directly from <a href="https://jupyter.org/">Jupyter notebook</a> with <a href="https://rise.readthedocs.io/en/stable/">RISE</a> plugin (which produced <a href="https://revealjs.com/">Reveal.js</a>
+slides on the fly). Running code interactively and changing parameters allowed to make
+some nice illustrations on the concept of probability as a &ldquo;long-term
+frequency&rdquo;, &ldquo;two/three-sigmas&rdquo;, and such.</p>
+<p>I used the built-in &ldquo;chalkbord&rdquo; within Jupyter most of the time: sometimes it
+was really handy to write on top of the slides, such as during the discussion
+of the &ldquo;histogram&rdquo; concept. For some worked examples I switched to another
+program, <a href="https://github.com/xournalpp/xournalpp">Xournal++</a>: a cross-platform, FOSS (GPLv2), and just very convenient
+one. Allowed for a lot of flexibility in drawing using a simple graphical
+tablet (page backgrounds, sizes, colors, etc.) and saved the resulting pages
+as PDFs.</p>
+
+</div>
+<br/>
+
+            </div>
+        </div>
+        <footer class="footer"><br>
+<div class="site-footer">
+    <p class="footer-text nav-link">© 2018&mdash;2021 <b><a class="nav-link" href="/">Alexey A. Bochkarev</a></b> All rights reserved
+        ⬩ <a class="nav-link" href="/privacy">Privacy Policy</a>
+        ⬩ <a class="nav-link" href="/disclaimer">Disclaimer</a>
+        | Made with a <a href="https://github.com/alex-bochkarev/hugo-desk-theme">custom theme</a> for <a href="https://gohugo.io/">Hugo</a>.
+    </p> <br>
+</div>
+</footer>
+    </body>
+</html>

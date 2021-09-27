@@ -8,7 +8,34 @@
     <language>en-us</language>
     <managingEditor>web@bochkarev.io (Alexey A. Bochkarev)</managingEditor>
     <webMaster>web@bochkarev.io (Alexey A. Bochkarev)</webMaster>
-    <lastBuildDate>Sun, 15 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bochkarev.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 25 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bochkarev.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>course</title>
+      <link>https://www.bochkarev.io/tags/course/</link>
+      <pubDate>Sat, 25 Sep 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/tags/course/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>SMTB</title>
+      <link>https://www.bochkarev.io/tags/smtb/</link>
+      <pubDate>Sat, 25 Sep 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/tags/smtb/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>talk</title>
+      <link>https://www.bochkarev.io/tags/talk/</link>
+      <pubDate>Sat, 25 Sep 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/tags/talk/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>julia</title>
       <link>https://www.bochkarev.io/tags/julia/</link>
@@ -19,29 +46,11 @@
     </item>
     
     <item>
-      <title>talk</title>
-      <link>https://www.bochkarev.io/tags/talk/</link>
-      <pubDate>Sat, 30 Jan 2021 00:00:00 +0000</pubDate>
-      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/tags/talk/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>tech-seminar</title>
       <link>https://www.bochkarev.io/tags/tech-seminar/</link>
       <pubDate>Sat, 30 Jan 2021 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
       <guid>https://www.bochkarev.io/tags/tech-seminar/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>SMTB</title>
-      <link>https://www.bochkarev.io/tags/smtb/</link>
-      <pubDate>Wed, 29 Jul 2020 00:00:00 +0000</pubDate>
-      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/tags/smtb/</guid>
       <description></description>
     </item>
     

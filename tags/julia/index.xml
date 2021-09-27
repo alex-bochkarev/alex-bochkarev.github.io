@@ -11,6 +11,24 @@
     <lastBuildDate>Sun, 15 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bochkarev.io/tags/julia/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>On visualizing network graphs and Julia</title>
+      <link>https://www.bochkarev.io/notes/jl-graphviz/</link>
+      <pubDate>Sun, 15 Aug 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/notes/jl-graphviz/</guid>
+      <description>How to invoke Graphviz or TikZ from Julia to produce nice network plots.</description>
+    </item>
+    
+    <item>
+      <title>On visualizing network graphs and Julia</title>
+      <link>https://www.bochkarev.io/tools/jl-graphviz/</link>
+      <pubDate>Sun, 15 Aug 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/tools/jl-graphviz/</guid>
+      <description>How to invoke Graphviz or TikZ from Julia to produce nice network plots.</description>
+    </item>
+    
+    <item>
+      <title>On visualizing network graphs and Julia</title>
       <link>https://www.bochkarev.io/tools/julia-graphs/</link>
       <pubDate>Sun, 15 Aug 2021 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>

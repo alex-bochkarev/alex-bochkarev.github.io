@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="preload" href="/icons.svg" as="image">
+    <meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://www.bochkarev.io/home/AB.JPG"/>
+
+<meta name="twitter:title" content="Current work"/>
+<meta name="twitter:description" content="Alexey Bochkarev: personal website"/>
+
+    
+    
+    <title>A.B. | Current work</title>
+</head>
+<body>
+        <div class="container"><div id="nav-panel" class="row">
+    <hr class="topline"/>
+        <input type="checkbox" id="checkbox">
+        <label for="checkbox" class="menu-toggle">
+            <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#hamburger"></use></svg>
+        </label>
+        <label for="checkbox" class="menu-toggle-text">
+            A.B. &mdash; Site menu
+        </label>
+        <nav>
+            <ul id="nav-menu">
+                
+                <li class="menu-item"><a class="nav-link" href="/">
+                    
+                    Me
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/research/">
+                    
+                    Research
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/teaching/">
+                    
+                    Teaching
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/notes/">
+                    
+                    Misc notes
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/contact/">
+                    
+                    Contact
+                </a></li>
+                
+                <li class="menu-item"> ~ </li>
+            <li class="menu-item">
+            <a class="nav-link nav-icon-link" href="/bochkarev_cv.pdf">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-CV"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="mailto:web@bochkarev.io">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-envelope"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="/abochkarev-pubkey.asc">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-key"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="https://twitter.com/a_bochka">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-twitter"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="https://github.com/alex-bochkarev">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
+            </a>
+            </li></ul>
+        </nav>
+</div>
+<br/>
+
+            <div id="content">
+
+
+    <div class="main-text">
+        <h1>Current work</h1>
+        <p>Here is a brief summary of my current research projects. Please feel free to
+reach out if you are interested in details.</p>
+<h3 id="1-on-collections-of-bdds-and-order-associated-diagrams">1) On collections of BDDs and &ldquo;order-associated&rdquo; diagrams.</h3>
+<p><img src="./siftup.png#full-shadow" alt="Branch and Bound tree"></p>
+<p><strong>Summary:</strong> Designing a heuristic to find a &ldquo;good&rdquo; shared order
+of layers for a pair of Binary Decision Diagrams (<a href="https://en.wikipedia.org/wiki/Binary_decision_diagram">BDDs</a>) and applying
+it to build an exact solution to a hard optimization problem: a variant of facility location.</p>
+<details> <summary> [ More details ]</summary>
+<p>The project focuses on Binary Decision Diagrams and their applications in
+optimization. This data structure was developed to efficiently manipulate
+Boolean functions, and sometimes it seems handy to represent a &ldquo;logical&rdquo;
+(binary) constraint as a diagram. So, some optimization problems can be
+naturally reformulated as linked network flows through a collection of diagrams
+(and we are looking for a <a href="https://doi.org/10.1287/opre.2020.1979">&ldquo;Consistent
+path&rdquo;</a> through several diagrams).
+Informally speaking, the latter can be solved relatively easily if the diagrams
+have their layers in the same order. Good order of layers may make a diagram
+small, but in a bad case the size of the diagram grows exponentially. Finding a
+best order of layers is NP-hard, even for a single diagram. The project is structured into
+two large, more or less independent parts.</p>
+<p>First, we build a heuristic to &ldquo;align&rdquo; the diagrams. The
+central idea is simple: when we swap two adjacent layers in
+a diagram, their size change. But instead of working with
+the original diagrams, which can be computationally
+expensive, we can just keep track of the upper bounds on the
+layer sizes. This gives rise to a smaller auxiliary problem
+that sometimes does allow to find good shared order of
+layers in reasonable time.</p>
+<p>In the second part of the project we actually use this idea
+to attack a hard combinatorial problem, a variant of the facility
+location. We demonstrate how to parameterize the problem
+using a collection of BDDs and compare several ways to
+obtain an (exact) optimal solution, revealing that
+Consistent Path representation along with the proposed
+&ldquo;alignment&rdquo; heuristic might allow to obtain some performance
+benefits (especially when we&rsquo;d need to re-solve the problem
+with different numerical data) and sensitivity information.</p>
+</details>
+<p>🖊️ <strong>Working paper:</strong> Bochkarev, Alexey, and J. Cole Smith. “On Aligning Non-Order-Associated Binary Decision Diagrams.” Revision submitted to <em>INFORMS Journal on Computing</em>.</p>
+<p>💬 <strong>Presentation:</strong> at INFORMS Annual Meeting 2020.</p>
+<p>💻 <strong>Software stack:</strong> Python, R/ggplot, graphviz (dot), Gurobi solver, PBS, GNU parallel, bash, make, sphinx.</p>
+<h3 id="2-an-rl-powered-heuristic-for-dynamic-shortest-path-interdiction">2) An RL-powered heuristic for Dynamic Shortest-Path Interdiction</h3>
+<p><img src="./dspi_tree.png#full-shadow" alt="Tree picture"></p>
+<p><strong>Summary:</strong> Designing algorithms to &ldquo;play the game&rdquo; of <a href="https://doi.org/10.1002/net.21712">Dynamic Shortest-Path
+Interdiction</a> (which is
+NP-hard). We are trying to explore the problem state space using the techniques
+involving random simulations and reinforcement learning.</p>
+<details> <summary>[ More details ]</summary>
+<p>We are considering a dynamic game between two agents,
+&ldquo;Evader&rdquo; and &ldquo;Interdictor&rdquo;, over a directed weighted graph.
+The purpose of the Evader is to traverse a graph between
+&ldquo;source&rdquo; and &ldquo;terminal&rdquo; nodes at the minimum possible cost,
+given the other player&rsquo;s actions. The &ldquo;Interdictor&rdquo; is
+seeking to maximize the Evader&rsquo;s cost by &ldquo;attacking&rdquo; certain
+number of edges of the graph (which results in the arc cost
+increasing by a pre-defined amount). The players take turns,
+where the Evader&rsquo;s turn implies traversal of an arc, and the
+Interdictor&rsquo;s turn is either an attack or a pass. This
+variant of the game is known to be NP-hard, and an exact
+algorithm boils down to enumerating all the relevant states in a
+dynamic programming fashion.</p>
+<p>While existing research discusses bounds for
+the optimal game cost, the literature on heuristics
+(algorithms that would actually play that game, or propose a
+<em>policy</em> for the players) has been generally lacking. We
+look to fill in this gap by leveraging some ideas from the
+realm of simulations and game playing research. </details></p>
+<p>🖊️ <strong>Working paper:</strong>
+in preparation, with Dr. J. Cole Smith.</p>
+<p>💻 <strong>Software stack:</strong> Julia, graphviz (dot), R/ggplot, PBS (so far).</p>
+
+        <br/>
+        
+    </div>
+
+            </div>
+        </div>
+        <footer class="footer"><br>
+<div class="site-footer">
+    <p class="footer-text nav-link">© 2018&mdash;2021 <b><a class="nav-link" href="/">Alexey A. Bochkarev</a></b> All rights reserved
+        ⬩ <a class="nav-link" href="/privacy">Privacy Policy</a>
+        ⬩ <a class="nav-link" href="/disclaimer">Disclaimer</a>
+        | Made with a <a href="https://github.com/alex-bochkarev/hugo-desk-theme">custom theme</a> for <a href="https://gohugo.io/">Hugo</a>.
+    </p> <br>
+</div>
+</footer>
+    </body>
+</html>

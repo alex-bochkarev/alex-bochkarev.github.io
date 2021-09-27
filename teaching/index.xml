@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Teaching on A.B.</title>
+    <link>https://www.bochkarev.io/teaching/</link>
+    <description>Recent content in Teaching on A.B.</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>web@bochkarev.io (Alexey A. Bochkarev)</managingEditor>
+    <webMaster>web@bochkarev.io (Alexey A. Bochkarev)</webMaster>
+    <lastBuildDate>Sat, 25 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bochkarev.io/teaching/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>A Practical Introduction to Probability Theory (minicourse)</title>
+      <link>https://www.bochkarev.io/teaching/smtb-prob/</link>
+      <pubDate>Sat, 25 Sep 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/teaching/smtb-prob/</guid>
+      <description>This is a quick numerical intro to probability theory in the form of a mini-course, four one-hour sessions. Designed for &lt;a href=&#34;https://molbioschool.org/en/&#34;&gt;SMTB&lt;/a&gt; and Puschino Winter School in 2021. Discussing mathematical models for random things from the perspective of numerical examples in Python.</description>
+    </item>
+    
+    <item>
+      <title>💬 OR Tech Seminar: outline</title>
+      <link>https://www.bochkarev.io/teaching/or-tech-seminar/</link>
+      <pubDate>Thu, 14 Jan 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/teaching/or-tech-seminar/</guid>
+      <description>A quick note on OR Tech Seminar topics and logistics.</description>
+    </item>
+    
+    <item>
+      <title>A Glimpse into Algorithms (minicourse)</title>
+      <link>https://www.bochkarev.io/teaching/smtb-algo/</link>
+      <pubDate>Wed, 29 Jul 2020 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/teaching/smtb-algo/</guid>
+      <description>This is a quick computational intro to algorithms and data structures in the form of a mini-course, four one-hour sessions. Designed and presented for &lt;a href=&#34;https://molbioschool.org/en/&#34;&gt;SMTB&lt;/a&gt; in 2020 and 2021. Quick numerical illustrations for runtime, correctness, and other such fun things.</description>
+    </item>
+    
+    <item>
+      <title>A mind-map for (some) basic OR topics</title>
+      <link>https://www.bochkarev.io/teaching/quals-mm/</link>
+      <pubDate>Mon, 27 May 2019 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/teaching/quals-mm/</guid>
+      <description>An attempt to summarize some key OR concepts, inspired by the IE/OR Qualifying exams scope in 2019. Designed as an easy-to-overview mindmap.</description>
+    </item>
+    
+    <item>
+      <title>An Euler diagram for convexity generalizations</title>
+      <link>https://www.bochkarev.io/teaching/convexity-gen/</link>
+      <pubDate>Wed, 22 May 2019 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/teaching/convexity-gen/</guid>
+      <description>On convexity generalization concepts (quasiconvexity and such) &amp;ndash; a one-pager with examples.</description>
+    </item>
+    
+    <item>
+      <title>Dotplot sample generation utility</title>
+      <link>https://www.bochkarev.io/teaching/dotplotgen/</link>
+      <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/teaching/dotplotgen/</guid>
+      <description>A tiny &lt;a href=&#34;https://en.wikipedia.org/wiki/Dot_plot_(bioinformatics)&#34;&gt;dot-plot&lt;/a&gt; generation utility in R</description>
+    </item>
+    
+  </channel>
+</rss>

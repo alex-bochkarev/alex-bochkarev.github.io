@@ -313,8 +313,9 @@ a.nav-icon-link:hover {
     width: 60%;
     max-width: 60ch;
     background: var(--main-bg);
-    border: 1px solid var(--main-bg-accent);
+    border: 1px solid var(--light-shadow);
 	  box-shadow: 4px 4px 2px 0px rgba(0,0,0,0.3); /* outer shadow */
+    padding-top: 1px;
     padding-left: 10ch;
     padding-right: 10ch;
     padding-bottom: 2em;
@@ -358,6 +359,14 @@ img[src*="#half-shadow"] {
     max-width: 50%;
     margin: 0px auto;
 	  box-shadow: 8px 8px 5px 0px rgba(0,0,0,0.3); /* outer shadow */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+img[src*="#half-flat"] {
+    max-width: 80%;
+    margin: 0px auto;
     display: block;
     margin-left: auto;
     margin-right: auto;

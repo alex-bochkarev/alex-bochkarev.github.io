@@ -11,19 +11,19 @@
     <lastBuildDate>Mon, 27 May 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bochkarev.io/tags/deterministic/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>A mind-map for (some) basic OR topics</title>
-      <link>https://www.bochkarev.io/edu/quals-mm/</link>
+      <link>https://www.bochkarev.io/teaching/quals-mm/</link>
       <pubDate>Mon, 27 May 2019 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/edu/quals-mm/</guid>
+      <guid>https://www.bochkarev.io/teaching/quals-mm/</guid>
       <description>An attempt to summarize some key OR concepts, inspired by the IE/OR Qualifying exams scope in 2019. Designed as an easy-to-overview mindmap.</description>
     </item>
     
     <item>
       <title>An Euler diagram for convexity generalizations</title>
-      <link>https://www.bochkarev.io/edu/convexity-gen/</link>
+      <link>https://www.bochkarev.io/teaching/convexity-gen/</link>
       <pubDate>Wed, 22 May 2019 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/edu/convexity-gen/</guid>
+      <guid>https://www.bochkarev.io/teaching/convexity-gen/</guid>
       <description>On convexity generalization concepts (quasiconvexity and such) &amp;ndash; a one-pager with examples.</description>
     </item>
     

@@ -11,10 +11,10 @@
     <lastBuildDate>Mon, 20 May 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bochkarev.io/tags/bioinformatics/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Dotplot sample generation utility</title>
-      <link>https://www.bochkarev.io/edu/dotplotgen/</link>
+      <link>https://www.bochkarev.io/teaching/dotplotgen/</link>
       <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/edu/dotplotgen/</guid>
+      <guid>https://www.bochkarev.io/teaching/dotplotgen/</guid>
       <description>A tiny &lt;a href=&#34;https://en.wikipedia.org/wiki/Dot_plot_(bioinformatics)&#34;&gt;dot-plot&lt;/a&gt; generation utility in R</description>
     </item>
     

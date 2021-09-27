@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>notes on A.B.</title>
+    <link>https://www.bochkarev.io/categories/notes/</link>
+    <description>Recent content in notes on A.B.</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>web@bochkarev.io (Alexey A. Bochkarev)</managingEditor>
+    <webMaster>web@bochkarev.io (Alexey A. Bochkarev)</webMaster>
+    <lastBuildDate>Mon, 27 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bochkarev.io/categories/notes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>My programming stack</title>
+      <link>https://www.bochkarev.io/notes/stack/</link>
+      <pubDate>Mon, 27 Sep 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/notes/stack/</guid>
+      <description>A brief summary of the core software stack I use for research.</description>
+    </item>
+    
+    <item>
+      <title>On visualizing network graphs and Julia</title>
+      <link>https://www.bochkarev.io/notes/jl-graphviz/</link>
+      <pubDate>Sun, 15 Aug 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/notes/jl-graphviz/</guid>
+      <description>How to invoke Graphviz or TikZ from Julia to produce nice network plots.</description>
+    </item>
+    
+    <item>
+      <title>On visualizing network graphs and Julia</title>
+      <link>https://www.bochkarev.io/tools/jl-graphviz/</link>
+      <pubDate>Sun, 15 Aug 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/tools/jl-graphviz/</guid>
+      <description>How to invoke Graphviz or TikZ from Julia to produce nice network plots.</description>
+    </item>
+    
+    <item>
+      <title>🔀 Version control with git.</title>
+      <link>https://www.bochkarev.io/notes/ts-git/</link>
+      <pubDate>Sat, 30 Jan 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/notes/ts-git/</guid>
+      <description>A quick intro to version control with git.</description>
+    </item>
+    
+    <item>
+      <title>📰 Working with the literature: tools and approaches</title>
+      <link>https://www.bochkarev.io/notes/ts-literature/</link>
+      <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/notes/ts-literature/</guid>
+      <description>A collection of notes on literature: discovery, reading, keeping track of references, and using them in writing.</description>
+    </item>
+    
+  </channel>
+</rss>

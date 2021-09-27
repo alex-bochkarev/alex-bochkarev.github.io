@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>teaching on A.B.</title>
+    <link>https://www.bochkarev.io/categories/teaching/</link>
+    <description>Recent content in teaching on A.B.</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>web@bochkarev.io (Alexey A. Bochkarev)</managingEditor>
+    <webMaster>web@bochkarev.io (Alexey A. Bochkarev)</webMaster>
+    <lastBuildDate>Sat, 25 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bochkarev.io/categories/teaching/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>A Practical Introduction to Probability Theory (minicourse)</title>
+      <link>https://www.bochkarev.io/teaching/smtb-prob/</link>
+      <pubDate>Sat, 25 Sep 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/teaching/smtb-prob/</guid>
+      <description>This is a quick numerical intro to probability theory in the form of a mini-course, four one-hour sessions. Designed for &lt;a href=&#34;https://molbioschool.org/en/&#34;&gt;SMTB&lt;/a&gt; and Puschino Winter School in 2021. Discussing mathematical models for random things from the perspective of numerical examples in Python.</description>
+    </item>
+    
+    <item>
+      <title>💬 OR Tech Seminar: outline</title>
+      <link>https://www.bochkarev.io/teaching/or-tech-seminar/</link>
+      <pubDate>Thu, 14 Jan 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/teaching/or-tech-seminar/</guid>
+      <description>A quick note on OR Tech Seminar topics and logistics.</description>
+    </item>
+    
+    <item>
+      <title>A Glimpse into Algorithms (minicourse)</title>
+      <link>https://www.bochkarev.io/teaching/smtb-algo/</link>
+      <pubDate>Wed, 29 Jul 2020 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/teaching/smtb-algo/</guid>
+      <description>This is a quick computational intro to algorithms and data structures in the form of a mini-course, four one-hour sessions. Designed and presented for &lt;a href=&#34;https://molbioschool.org/en/&#34;&gt;SMTB&lt;/a&gt; in 2020 and 2021. Quick numerical illustrations for runtime, correctness, and other such fun things.</description>
+    </item>
+    
+  </channel>
+</rss>

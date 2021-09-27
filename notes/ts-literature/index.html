@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="preload" href="/icons.svg" as="image">
+    <meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://www.bochkarev.io/images/notes.png"/>
+
+<meta name="twitter:title" content="📰 Working with the literature: tools and approaches"/>
+<meta name="twitter:description" content="Tech Seminar summary on working with literature: managing references, notes, etc."/>
+
+    
+    
+    <title>A.B. | 📰 Working with the literature: tools and approaches</title>
+</head>
+<body>
+        <div class="container"><div id="nav-panel" class="row">
+    <hr class="topline"/>
+        <input type="checkbox" id="checkbox">
+        <label for="checkbox" class="menu-toggle">
+            <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#hamburger"></use></svg>
+        </label>
+        <label for="checkbox" class="menu-toggle-text">
+            A.B. &mdash; Site menu
+        </label>
+        <nav>
+            <ul id="nav-menu">
+                
+                <li class="menu-item"><a class="nav-link" href="/">
+                    
+                    Me
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/research/">
+                    
+                    Research
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/teaching/">
+                    
+                    Teaching
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/notes/">
+                    
+                    Misc notes
+                </a></li>
+                
+                <li class="menu-item"><a class="nav-link" href="/contact/">
+                    
+                    Contact
+                </a></li>
+                
+                <li class="menu-item"> ~ </li>
+            <li class="menu-item">
+            <a class="nav-link nav-icon-link" href="/bochkarev_cv.pdf">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-CV"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="mailto:web@bochkarev.io">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-envelope"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="/abochkarev-pubkey.asc">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-key"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="https://twitter.com/a_bochka">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-twitter"></use></svg>
+            </a>
+            
+            <a class="nav-link nav-icon-link" href="https://github.com/alex-bochkarev">
+                <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
+            </a>
+            </li></ul>
+        </nav>
+</div>
+<br/>
+
+                
+                    <div id="table-of-contents">
+                        <h2> Index, <a href="#" class="nav-link">top</a> </h2> 
+                        <div id="text-table-of-contents" class="not-a-text-link">
+                            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#on-references-and-bibliography">On references and bibliography</a>
+      <ul>
+        <li><a href="#reference-managers">Reference managers</a></li>
+        <li><a href="#my-zotero-based-system-dot">My Zotero-based system.</a></li>
+        <li><a href="#a-word-on-latex-ecosystem-dot">A word on LaTeX ecosystem.</a></li>
+      </ul>
+    </li>
+    <li><a href="#software">A note on notes.</a></li>
+    <li><a href="#discovering-the-literature">Discovering the literature</a>
+      <ul>
+        <li><a href="#proactive-search">🔎 Proactive search</a></li>
+        <li><a href="#feeds-rss-atom">📰 Feeds: RSS, atom</a></li>
+        <li><a href="#mailing-lists">📨 Mailing lists</a></li>
+        <li><a href="#journal-clubs-seminars">💬 Journal clubs / seminars</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+                        </div>
+                    </div>
+                
+            
+            <div id="content">
+
+
+<div class="main-text">
+    <h1>📰 Working with the literature: tools and approaches</h1>
+    <span class="metadata">
+    
+
+    
+        <div class="nav-icon-link">
+            <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
+        </div>
+        Last update: <time datetime="2021-01-15">2021-09-27</time>.
+    
+
+    
+        Tags: 
+        
+            
+            <a class="nav-link" href="https://www.bochkarev.io/tags/tech-seminar">#tech-seminar</a>
+        
+            
+            <a class="nav-link" href="https://www.bochkarev.io/tags/talk">#talk</a>
+        
+    
+    </span>
+    <div class="note">
+<p><strong>Summary</strong> <hr></p>
+<ul>
+<li>Ref management is a part of <a href="https://en.wikipedia.org/wiki/Personal%5Finformation%5Fmanagement">PIM</a>: helps to capture,
+search, manage, and use your collection of sources.</li>
+<li>I use a system based on <a href="https://www.zotero.org/">Zotero</a> as reference manager.</li>
+<li>Key alternatives are <a href="https://www.jabref.org/">JabRef</a>, <a href="https://www.mendeley.com">Mendeley</a>, <a href="https://refworks.proquest.com/researcher/">Refworks</a>, <a href="https://endnote.com/">EndNote</a> (there is more).</li>
+<li>Another crucial part is integration with the editor. I use (pure) black magic
+involving <a href="https://www.spacemacs.org/">(Space)Emacs</a> (<strong>not</strong> really beginner-friendly; there
+are alternatives).</li>
+<li>Keeping notes in a streamlined way is useful. There are several
+approaches, and several classes of tools &ndash; see <a href="#software">A note on notes.</a></li>
+<li>There are several ways to discover new literature, including proactive search
+in search engines and specialized databases, as well as receiving updates
+from web feeds, mailing lists, and seminars.</li>
+<li>No universal solutions: find out what works for you.</li>
+<li>Methods, habits, and content are more important than tools.</li>
+</ul>
+<p>Corrections, suggestions, and comments are very <a href="mailto:tech%5Fseminar@bochkarev.io">welcome</a>.</p>
+</div>
+<h2 id="introduction">Introduction</h2>
+<p>Here I am discussing the system supporting my workflow, mentioning some of
+alternative options. It may or may not work for you, of course, but hopefully
+will provide some inputs to design your own IT &ldquo;ecosystem&rdquo;. Here is a very
+general (and therefore, useless by itself) description of the relevant
+workflow:<br><br></p>
+<figure><img src="/ox-hugo/process.svg"/>
+</figure>
+
+<p>This is a large topic, but roughly speaking the system<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> has three
+key components:</p>
+<ul>
+<li>reference manager (works with bibliography data, such as <code>.bib</code> entries, along
+with PDF files);</li>
+<li>notes (that reflect your thinking process related to this paper/piece of
+information),</li>
+<li>editor integration(s) (that extracts the information from the other two as
+you write your manuscript).</li>
+</ul>
+<p>It can be organized in <strong>many</strong> ways (including some good old paper-based versions
+that were <a href="https://pub.uni-bielefeld.de/download/2942475/2942530/jschmidt%5F2016%5Fniklas%20luhmanns%20card%20index.pdf">reported</a> to be&hellip; very productive, to say the least<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>; a little
+more on this below). I had the following specific <strong>requirements</strong> in mind:</p>
+<ul>
+<li>The system must be <strong>future-proof</strong>. Research is (hopefully) a long-term
+endeavor, so lock-in with proprietary technologies is not acceptable. Storing
+data in plain text is best, open standards and free software are my friends.
+Oh yes, and I don&rsquo;t want to store my data in cloud all the time, I love tools
+that work offline.</li>
+<li>It must do the following things:
+<ul>
+<li><strong>capture</strong> a paper from a browser easily, retrieving bibliographical info
+automatically when possible (including metadata extraction from PDFs).</li>
+<li><strong>manage</strong> references efficiently (edit fields, etc.), categorize things, etc.</li>
+<li>play well with <strong>LaTeX</strong> (mostly, looking for and inserting citations).</li>
+</ul>
+</li>
+<li>(something that I hope you will ignore:) a large benefit for me had anything
+that worked well within <a href="https://xkcd.com/378/">Emacs</a>.</li>
+</ul>
+<p>The core component of such system is, of course, a (<em>bibliography-</em>,
+<em>citation-</em>, or) <em>reference-manager</em>.</p>
+<h2 id="on-references-and-bibliography">On references and bibliography</h2>
+<h3 id="reference-managers">Reference managers</h3>
+<p>A <a href="https://en.wikipedia.org/wiki/Reference%5Fmanagement%5Fsoftware">reference-management</a> software is a tool that lets you to (surprise!) manage
+references, i.e., bibliographical data: author, title, publisher data, etc.
+That is, it captures and stores the bibliographical <em>data</em> in some internal
+format (e.g., a <code>.bib</code> file, an <a href="https://sqlite.org">SQLite</a> database, etc.), and then can format it
+as you&rsquo;d like: using the chosen <a href="https://en.wikipedia.org/wiki/Citation#Styles">citation style</a> and producing outputs in plain
+text, word processor document, etc. It also usually helps to generate
+bibliographies automatically, so that it updates as you edit the manuscript.</p>
+<p>There are several key programs/services out there, and an infinite variety of
+their comparative analyses:</p>
+<ul>
+<li>Wikipedia has pretty large <a href="https://en.wikipedia.org/wiki/Comparison%5Fof%5Freference%5Fmanagement%5Fsoftware">comparison summary tables</a>. It might be a good
+place to start, but the number of options is overwhelming.</li>
+<li>Another detailed comparison was made in <a href="https://mediatum.ub.tum.de/doc/1320978/1320978.pdf">Technische Universität München</a>.</li>
+<li>University libraries usually have brief overviews of the software they
+recommend: e.g., a nice one from <a href="https://ucsd.libguides.com/howtocite/compare">UCSD</a>, <a href="https://guides.lib.berkeley.edu/publichealth/citations">UC Berkeley</a>, <a href="https://guides.library.upenn.edu/citationmgmt">U. of Pennsylvania</a>.
+Also: <a href="https://libguides.mit.edu/cite-write">MiT</a> (specifically on <a href="https://libguides.mit.edu/cite-write/citetools">citation management</a>), <a href="https://guides.library.harvard.edu/cite">Harvard</a>, <a href="https://library.stanford.edu/research/bibliography-management">Stanford</a>, <a href="https://guides.lib.uw.edu/research/citations/citation-tools">U. of
+Washington</a>,</li>
+<li>There are numerous Reddit discussions (such as: <a href="https://www.reddit.com/r/LaTeX/comments/iouswl/jabref%5Fvs%5Fzotero%5Fvs%5Forgref%5Fwhich%5Fone%5Fdo%5Fyou/">JabRef vs Zotero vs org-ref</a>)</li>
+<li>Of course, there is a paper <sup id="75f526c79b18bb5e78cde1133fd1c1f6"><a href="#ivey2018" title="Ivey \&amp; Crum, Choosing the {{Right Citation Management Tool}}: {{Endnote}}, {{Mendeley}}, {{Refworks}}, or {{Zotero}}, {Journal of the Medical Library Association : JMLA}, v(3), 399--403 (2018).">ivey2018</a></sup> on the topic<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>.</li>
+</ul>
+<p><em><strong>Note:</strong> it might be important what your colleagues are using. Using
+the &ldquo;lab-default&rdquo; tools might make the choice very simple and efficient.</em></p>
+<p>My personal short list would overlap with the Clemson Library&rsquo;s <a href="https://libraries.clemson.edu/research/citation-management/">one</a>
+(at the time of writing this):</p>
+<ul>
+<li><a href="https://www.zotero.org/">Zotero</a>, <a href="https://www.jabref.org/">JabRef </a>- free options (first prio).</li>
+<li>plus <a href="https://mendeley.com/">Mendeley</a>, <a href="https://refworks.proquest.com/researcher/">Refworks</a> (Clemson <a href="https://clemson.libguides.com/newrefworks">guide</a>), <a href="https://endnote.com/">EndNote</a> if I allow for commercial
+products (I have also read some good things about <a href="https://www.papersapp.com/">Papers</a> for Mac &ndash; but
+never had a chance to look myself).</li>
+</ul>
+<p>This list is not exhaustive, so please refer to more complete resources
+(including the ones mentioned above) if you&rsquo;d need. Despite the problem seems
+somewhat standard from the first sight, different people might want different
+things, so there is no &ldquo;universal&rdquo; solution. Instead of trying to discuss pros
+and cons, let me just try to sketch what works for me.</p>
+<h3 id="my-zotero-based-system-dot">My Zotero-based system.</h3>
+<p>Here is my system in a nutshell, from a technology perspective:</p>
+<figure><img src="/ox-hugo/system.svg"/>
+</figure>
+
+<p>So, basically, I use the following tools:</p>
+<ul>
+<li>Zotero desktop app</li>
+<li>Firefox plugin (<a href="https://www.zotero.org/download/connectors">&ldquo;Connector&rdquo;</a>) to fetch info from the web</li>
+<li>Zotero addons (there is a larger <a href="https://www.zotero.org/support/plugins">list</a> of these):
+<ul>
+<li>BetterBibTex to make the <code>.bib</code> related magic happen;</li>
+<li>LibreOffice integration (think MS Word);</li>
+<li>ZotFile to be able to manipulate PDFs easily, including sending them to the tablet.</li>
+</ul>
+</li>
+</ul>
+<p>Now, the &ldquo;manuscript&rdquo; part can be implemented, again, in several ways, and the
+purpose here is to supercharge your editor to get info from the <code>.bib</code> file. My
+<a href="https://www.spacemacs.org/">Emacs (Spacemacs)</a> handles this for me<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup>.</p>
+<p>I have a convenient (fuzzy) search / auto-completion when I insert the keys:</p>
+<figure><img src="/ox-hugo/org_insert_citation.gif"/>
+</figure>
+
+<p>And also I can easily pull out a PDF or my notes when I need to:</p>
+<figure><img src="/ox-hugo/org_open_pdf_notes.gif"/>
+</figure>
+
+<p>For these rare cases when I use MS Word-like environments, there are
+LibreOffice and Google Docs integration:</p>
+<figure><img src="/ox-hugo/gdoc_insert_citation.gif"/>
+</figure>
+
+<p>(It is also worth noting that you can just find a paper in Zotero and copy a
+citation in the necessary citation style, e.g., as a plain text &ndash; to insert it
+anywhere.)</p>
+<p>If you find it interesting, there are many demos and tutorials on Zotero on
+YouTube and other places. Most probably, including a dedicated training in your
+university library &ndash; at CU we have Clemson Libraries <a href="https://clemson.libcal.com/calendar/training?cid=3593&amp;t=d&amp;d=0000-00-00&amp;cal=3593&amp;inc=0">trainings/events</a>,
+including <a href="https://clemson.libcal.com/event/7336551">&ldquo;Zotero for Citation Management&rdquo;</a>.</p>
+<p>Finally, Emacs still feels very DIY-ish, to me. Good if you <em>like</em> to tinker with
+it, but if I were to look for alternatives &ndash; I would start with other popular
+&ldquo;mega-editors&rdquo;, such as <a href="https://code.visualstudio.com/">VSCode</a> (<a href="https://vscodium.com/">-ium</a>) or <a href="https://atom.io/">Atom</a>. There must be plugins for this
+(though, I have never tried these).</p>
+<h3 id="a-word-on-latex-ecosystem-dot">A word on LaTeX ecosystem.</h3>
+<p>I was somehow confused with the LaTeX-related systems, and found a relevant
+<a href="https://tex.stackexchange.com/questions/25701/bibtex-vs-biber-and-biblatex-vs-natbib">TeX.StackExchange</a> question. In a nutshell:<br><br></p>
+<figure><img src="/ox-hugo/latex.svg"/>
+</figure>
+
+<p>As far as I understand, one of the ideas behind <code>biblatex</code> was to move away from
+a separate style definition language, <code>BST</code> (see also a <a href="http://tug.ctan.org/info/bibtex/tamethebeast/ttb%5Fen.pdf">manual</a> on BibTeX). While
+the SE question mentioned above helped my understanding, but I believe this
+topic is better suited for another day. Eventually, everything is determined by
+the journal &ndash; style description format they provide.</p>
+<h2 id="software">A note on notes.</h2>
+<p>This is, actually, a separate topic. But if you feel the necessity to take
+notes on your research in general (like an extended lab journal), there are
+many options.</p>
+<p>Basically, we are talking about a collection of interlinked notes. There are
+several relevant &ldquo;keywords&rdquo; out there that I would like to mention.</p>
+<ul>
+<li>First, one might take a technological perspective and look for software that
+allows to manage notes. This is, of course, good old Evernote<sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup>,
+and newer, free and open source <a href="https://joplinapp.org/">Joplin</a>.</li>
+<li>There is a vast variety of <a href="https://en.wikipedia.org/wiki/List%5Fof%5Fwiki%5Fsoftware">wiki software</a> (such as <a href="https://www.dokuwiki.org/dokuwiki">DokuWiki</a> or <a href="https://www.mediawiki.org/wiki/MediaWiki">MediaWiki</a>,
+just to name a couple. But the list is huge.) Some of them are specifically
+positioned as a <a href="https://en.wikipedia.org/wiki/Personal%5Fwiki">Personal Wiki</a> (e.g., such as <a href="https://tiddlywiki.com/">TiddlyWiki</a> &ndash; see a nice 2.5
+minutes <a href="https://tiddlywiki.com/#Introduction%20Video">intro video</a>).</li>
+<li>There are specific solutions for working with an interconnected grid of
+&ldquo;evergreen&rdquo; notes, the ones you might edit every time when you visit
+them. I would like to mention:
+<ul>
+<li><a href="https://roamresearch.com/">Roam</a>. It looks totally exciting, but web-based (which
+is a big no-go for me);</li>
+<li><a href="https://obsidian.md/">Obsidian</a>. Comparable thing, uses local storage, as far as I can tell.
+Ironically, I am not sure how good is it with citations/references 😀.
+Never used it at all, but to me, it looks <strong>very</strong> promising (especially if
+it indeed keeps your information in <a href="https://en.wikipedia.org/wiki/Markdown">markdown</a>, which is essentially plain
+text, so you can open it in future no matter what).</li>
+<li><a href="https://www.orgroam.com/">Org-roam</a>. This is a part of <a href="https://www.gnu.org/software/emacs/">Emacs</a> ecosystem over the all-mighty<sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup>
+<a href="https://orgmode.org/">orgmode</a>. Free and open source, local solution. This is what I use
+currently.</li>
+</ul>
+</li>
+<li>Then, there is a specific <em>method</em> of taking such notes called <a href="https://en.wikipedia.org/wiki/Zettelkasten">Zettelkasten</a>.
+The word means a slip-box with notes. The idea is that after some time you
+actually build such an &ldquo;external brain&rdquo; that conversations with it become
+surprisingly productive (resulting in new connections and ideas). It can be
+implemented with any reasonable tool. In fact, <a href="https://en.wikipedia.org/wiki/Niklas%5FLuhmann#Note-taking%5Fsystem%5F(Zettelkasten)">one</a> of the most famous
+<em>Zettelkästen</em> was implemented as a wooden box with drawers, filled with
+small (paper) notes. It is worth noting: its author, <a href="https://en.wikipedia.org/wiki/Niklas%5FLuhmann#Note-taking%5Fsystem%5F(Zettelkasten)">Niklas Luhmann</a>, was
+doing Sociology, and this approach might (or might not) be less effective
+for math-heavy fields. Anyways: It seems to be a vast topic, and there is a
+lot of resources out there, if you are interested further, including<sup id="fnref:7"><a href="#fn:7" class="footnote-ref" role="doc-noteref">7</a></sup>:
+<ul>
+<li>📖 <strong>A book:</strong><a href="https://openlibrary.org/works/OL18635700W/How%5Fto%5FTake%5FSmart%5FNotes">&ldquo;How to Take Smart Notes&hellip;&quot;</a> by Sönke Ahrens.
+Despite it has the sort of title I dislike very much, I found the book
+pretty useful and informative<sup id="fnref:8"><a href="#fn:8" class="footnote-ref" role="doc-noteref">8</a></sup>.</li>
+<li>💬 <strong>A community:</strong> <a href="https://www.reddit.com/r/Zettelkasten/comments/b566a4/what%5Fis%5Fa%5Fzettelkasten/">r/Zettelkasten</a> on Reddit (the linked note includes couple of
+good links on the subject; and there is a community <a href="https://zk.zettel.page/">wiki</a>, hosted
+separately)</li>
+</ul>
+</li>
+<li>On the contrary, someone from my friends just work on a relatively small
+number of notes in <code>.tex</code> format (something like &ldquo;internal papers&rdquo; in his
+lab).</li>
+</ul>
+<p>My system basically represents a graph of connected notes. It can even be
+visualized like this:</p>
+<p><img src="/images/notes.png#full-shadow" alt="Notes graph"></p>
+<p>Of course, I use it mostly from the text interface &ndash; imagine easily editable,
+local Wikipedia. Also seems very useful to store code snippets &ndash; for saving
+useful command line recipes, boilerplate <code>ggplot</code> code for figures, etc.</p>
+<p><strong>As a concluding note:</strong> it seems to me that specific <em>tools</em> are not as important as
+discipline, habits and procedures we set up for ourselves. Of course, a
+lab notebook in one form or another is a must. I liked a point that came up in
+one of private conversations recently, that <em>notes</em> is your product when you
+are not working on a specific paper. And when you accumulate enough of them
+&ndash; all this can &ldquo;graduate&rdquo; to a paper. Which is surprisingly along the
+lines of what Dr. Luhmann was saying.</p>
+<h2 id="discovering-the-literature">Discovering the literature</h2>
+<p>I wanted to jot down a couple of words on <em>discovering</em> the
+literature. Like, where do papers new can come from.</p>
+<p><strong>Note:</strong> your library might provide a surprising amount of useful resources!
+E.g., Clemson University Libraries offer <a href="https://libraries.clemson.edu/find/research-course-guides/">&ldquo;Research &amp; Course Guides&rdquo;</a> (with/
+specific sections on <a href="https://clemson.libguides.com/IE">Industrial Engineering</a>, <a href="https://clemson.libguides.com/Mathematics">Mathematics</a>, and <a href="https://clemson.libguides.com/ComputerScience">Computer
+Science</a>). I would like to thank our Librarian Jennifer Groff for a very
+productive email conversation, which helped me a lot in preparing this
+discussion. There might be more useful sources &ndash; check out the website!</p>
+<h3 id="proactive-search">🔎 Proactive search</h3>
+<p>Who doesn&rsquo;t know about free search? Right, right&hellip; But still:</p>
+<ul>
+<li>Just Google search is (un)surprisingly good, sometimes.</li>
+<li><a href="https://scholar.google.com">Google.Scholar</a> is handy when you are specifically looking for research
+papers. (It also provides citation data along the way.) What is more
+important: having a paper <code>X</code>, it allows to make more complicated requests,
+e.g., find all the papers that cite <code>X</code>, find new papers by keywords among
+those citing <code>X</code>, and such things.</li>
+<li>There are specialized (commercial, usually subscription-based)
+resources/databases to search for papers: the most general ones are,
+perhaps, (Elsevier&rsquo;s) <a href="https://en.wikipedia.org/wiki/Scopus">Scopus</a> and (Clarivate&rsquo;s) <a href="https://en.wikipedia.org/wiki/Web%5Fof%5FScience">Web of Science</a>. Also, there
+is <a href="https://en.wikipedia.org/wiki/MathSciNet">MathSciNet</a>, <a href="https://www.engineeringvillage.com/">EngineeringVillage</a>, etc. Of course, there is <a href="https://en.wikipedia.org/wiki/List%5Fof%5Facademic%5Fdatabases%5Fand%5Fsearch%5Fengines">more</a> &ndash; these
+are just random examples. I use these for more complicated searches, sometimes.</li>
+<li>(surprise!) The University Library. For example, Clemson Libraries has
+subscriptions to many databases, and allows to (1) search across these, and
+(2) retrieve paywalled papers. So, I found this <a href="https://libraries.clemson.edu/">&ldquo;everything&rdquo; library search</a>
+pretty useful. I think our CU library has access to more than <strong>500</strong>
+databases; to give a random sample:
+<ul>
+<li><a href="https://methods.sagepub.com/">SAGE Research Methods</a></li>
+<li><a href="https://credoreference.com">CREDO reference</a> (search in encyclopedias, dictionaries, etc.)</li>
+<li><a href="https://about.proquest.com/libraries/academic/dissertations-theses/pqdtglobal.html">ProQuest Disserations and Theses Global</a></li>
+</ul>
+</li>
+<li>as a separate note: if you are a CU student, note that Clemson Libraries
+provide trainings on what is out there and how to use it: e.g., see
+<em>&ldquo;Introducing Library Research Strategies and Navigating the Clemson
+Libraries&rdquo;</em> from <a href="https://grad360.sites.clemson.edu/index.php">Grad360</a> &ndash; seems to be scheduled for <span class="timestamp-wrapper"><span class="timestamp">[2021-01-29 Fri]</span></span>.</li>
+</ul>
+<p>Now, that was <em>proactive</em> search. There are also more or less obvious methods
+to receive papers, well, automatically. Apart from the obvious Twitter (or
+whatever other social networks are used in your subfield&rsquo;s community) these
+are feeds, mailing lists, and various seminars / events.</p>
+<h3 id="feeds-rss-atom">📰 Feeds: RSS, atom</h3>
+<p>The idea is that instead of checking relevant websites frequently yourself,
+you delegate this task to the computer (we&rsquo;re engineers, after all, right?).
+There is a web <a href="https://en.wikipedia.org/wiki/Atom%5F(Web%5Fstandard)">standard</a> for &ldquo;feeds&rdquo;, making websites machine readable &ndash; so
+that a special program, feed <em>reader</em>, or a feed <em>aggregator</em> checks out the
+websites that support such technology, and lets you know if a new paper /
+blog post / web page on the site was published. As simple as that. A couple
+of notes here:</p>
+<ul>
+<li>Speaking about software, I would mention Mozilla <a href="https://www.thunderbird.net">Thunderbird</a> or <a href="https://github.com/skeeto/elfeed">Elfeed</a> (if
+you are into Emacs ecosystem) &ndash; this is what I tried to use, but I don&rsquo;t
+really have an overview, so can&rsquo;t comment. Chances are, your default
+desktop email client (if you happen to use it), or a browser (Safari?) also
+can do that. Of course, there is a huge <a href="https://en.wikipedia.org/wiki/Comparison%5Fof%5Ffeed%5Faggregators">comparison table</a> on Wiki. There are
+web solutions (e.g., <a href="https://feedly.com/">Feedly</a>), which I have no clue about. The colleagues
+pointed out that Zotero can read feeds as well (so you could have
+everything in one place).</li>
+<li>Now, for this to work it must be supported by the <em>website</em>. There are some
+solutions that try to circumvent this and try to build an RSS feed for you
+(see <a href="https://feed43.com/">Feed43</a>)</li>
+<li>Some journals provide RSS/Atom feeds: e.g., IJOC, EJOR, OPRE, etc.</li>
+<li>Preprint servers might have feeds &ndash; e.g., arXiv <a href="https://arxiv.org/help/rss">mentions</a> subjects feeds,
+updated daily. (unfortunately, to the best of my knowledge <a href="http://www.optimization-online.org/">Optimization
+Online</a> does not do this).</li>
+</ul>
+<h3 id="mailing-lists">📨 Mailing lists</h3>
+<ul>
+<li>Web of Science, Engineering Village, Google Scholar (and, perhaps, many
+others) allow to set up citation alerts (e.g., weekly/monthly notifications
+on your search results; alerts for new publications from a specific author,
+etc.)</li>
+<li>Some journals offer email subscriptions instead of feeds, sending out list
+of papers, abstracts, etc. (e.g., Mathematical Programming)</li>
+<li>There might be other mailing lists worth mentioning (seminars, departmental
+lists, etc. &ndash; please let me know if you think I missed something worth
+mentioning separately).</li>
+</ul>
+<h3 id="journal-clubs-seminars">💬 Journal clubs / seminars</h3>
+<ul>
+<li>Quite often there are efforts to read and share relevant papers in the
+&ldquo;local&rdquo; community. I know at least one relatively large lab that systematically
+keeps track of many relevant journals and present &ldquo;fresh&rdquo; papers during a
+regular (internal) event.</li>
+<li>There are also studies-focused reading clubs, aimed mostly not to keep
+track of cutting-edge research, but to learn
+<ul>
+<li>how to do good science (essentially, pose and answer good research
+questions, plan the research, etc.)</li>
+<li>how to write good papers out of it.</li>
+</ul>
+</li>
+<li>We might want to make one, but this is a topic for another day.</li>
+</ul>
+<h1 id="bibliography">Bibliography</h1>
+<p><a id="ivey2018"></a>[ivey2018] Ivey &amp; Crum, Choosing the Right Citation Management Tool: Endnote, Mendeley, Refworks, or Zotero, <i>Journal of the Medical Library Association : JMLA</i>, <b>106(3)</b>, 399-403 (2018). <a href="http://dx.doi.org/10.5195/jmla.2018.468">doi</a>. <a href="#75f526c79b18bb5e78cde1133fd1c1f6">↩</a></p>
+<section class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1" role="doc-endnote">
+<p>Which is by the way a part of something that is usually called Personal Information Management (<a href="https://en.wikipedia.org/wiki/Personal%5Finformation%5Fmanagement">PIM</a>) or Personal Knowledge Management (<a href="https://en.wikipedia.org/wiki/Personal%5Fknowledge%5Fmanagement">PKM</a>) systems. These two do not seem well-defined concepts, in my opinion, but do have something to do with very important topics, especially for a researcher.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2" role="doc-endnote">
+<p>This is in Sociology &ndash; but I believe the benefits should translate well to STEM, at least to some extent.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3" role="doc-endnote">
+<p>Needless to say, this citation was inserted here using Zotero in under 1 minute (and I have a downloaded PDF as a by-product).&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4" role="doc-endnote">
+<p>I use layers: <code>bibtex, pdf</code>, and <code>org-roam</code> + <code>org-roam-bibtex</code> along with <code>helm</code> and such (a mandatory link to my <a href="https://github.com/alex-bochkarev/my-spacemacs-dotfiles">dotfiles</a>). If you are into Emacs world, you might find it useful to watch this EmacsConf2020 <a href="https://emacsconf.org/2020/talks/17/">talk</a> by <a href="https://noorahalhasan.com/">Noorah Alhasan</a>, which discusses a very similar approach.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:5" role="doc-endnote">
+<p>which I do not like as it is too much cloud-based and not, um&hellip; hacker friendly, to my feelings. For example, I do not quite understand how to export my stuff quickly and without losses, should I happen to need this&hellip;&#160;<a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:6" role="doc-endnote">
+<p>Speaking about orgmode: you can check out this great <a href="http://doc.norang.ca/org-mode.html">Bernt Hansen&rsquo;s page</a> to see what&rsquo;s possible. But despite I like this technology <strong>a lot</strong>, I must admit it is still a DIY type of thing, to my taste&#160;<a href="#fnref:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:7" role="doc-endnote">
+<p>There is also an original paper by Luhmann, <em>&ldquo;Kommunikation mit Zettelkästen&rdquo;</em> &ndash; however, it is in German 🇩🇪, I haven&rsquo;t seen any translation.&#160;<a href="#fnref:7" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:8" role="doc-endnote">
+<p>It left me with the same kind of feeling as the brilliant <a href="https://www.calnewport.com/books/deep-work/">&ldquo;Deep work&rdquo;</a> by Cal Newport.&#160;<a href="#fnref:8" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</section>
+
+</div>
+<br/>
+
+            </div>
+        </div>
+        <footer class="footer"><br>
+<div class="site-footer">
+    <p class="footer-text nav-link">© 2018&mdash;2021 <b><a class="nav-link" href="/">Alexey A. Bochkarev</a></b> All rights reserved
+        ⬩ <a class="nav-link" href="/privacy">Privacy Policy</a>
+        ⬩ <a class="nav-link" href="/disclaimer">Disclaimer</a>
+        | Made with a <a href="https://github.com/alex-bochkarev/hugo-desk-theme">custom theme</a> for <a href="https://gohugo.io/">Hugo</a>.
+    </p> <br>
+</div>
+</footer>
+    </body>
+</html>

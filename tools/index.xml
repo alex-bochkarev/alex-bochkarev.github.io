@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>The &#39;craft&#39; part. on A.B.</title>
+    <title>Tools on A.B.</title>
     <link>https://www.bochkarev.io/tools/</link>
-    <description>Recent content in The &#39;craft&#39; part. on A.B.</description>
+    <description>Recent content in Tools on A.B.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <managingEditor>web@bochkarev.io (Alexey A. Bochkarev)</managingEditor>
@@ -11,38 +11,20 @@
     <lastBuildDate>Sun, 15 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bochkarev.io/tools/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>On visualizing network graphs and Julia</title>
+      <link>https://www.bochkarev.io/tools/jl-graphviz/</link>
+      <pubDate>Sun, 15 Aug 2021 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/tools/jl-graphviz/</guid>
+      <description>How to invoke Graphviz or TikZ from Julia to produce nice network plots.</description>
+    </item>
+    
+    <item>
+      <title>On visualizing network graphs and Julia</title>
       <link>https://www.bochkarev.io/tools/julia-graphs/</link>
       <pubDate>Sun, 15 Aug 2021 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
       <guid>https://www.bochkarev.io/tools/julia-graphs/</guid>
       <description>How to invoke Graphviz or TikZ from Julia to produce nice network plots.</description>
-    </item>
-    
-    <item>
-      <title>🔀 Version control with git.</title>
-      <link>https://www.bochkarev.io/tools/ts-git/</link>
-      <pubDate>Sat, 30 Jan 2021 00:00:00 +0000</pubDate>
-      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/tools/ts-git/</guid>
-      <description>A quick intro to version control with git.</description>
-    </item>
-    
-    <item>
-      <title>📰 Working with the literature: tools and approaches</title>
-      <link>https://www.bochkarev.io/tools/ts-literature/</link>
-      <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
-      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/tools/ts-literature/</guid>
-      <description>A collection of notes on literature: discovery, reading, keeping track of references, and using them in writing.</description>
-    </item>
-    
-    <item>
-      <title>Text and derive - getting notifications from the cluster</title>
-      <link>https://www.bochkarev.io/tools/cluster-msg/</link>
-      <pubDate>Mon, 23 Sep 2019 00:00:00 +0000</pubDate>
-      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/tools/cluster-msg/</guid>
-      <description>How to get notifications from a remote machine with Telegram. A really simple and universal approach.</description>
     </item>
     
   </channel>
