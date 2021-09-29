@@ -79,274 +79,215 @@
 <br/>
 
                 
+                    <div id="table-of-contents">
+                        <h2> Index, <a href="#" class="nav-link">top</a> </h2> 
+                        <div id="text-table-of-contents" class="not-a-text-link">
+                            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#mini-courses">Mini-courses</a>
+      <ul>
+        <li><a href="#a-glimpse-into-algorithms">&ldquo;A glimpse into Algorithms.&rdquo;</a></li>
+        <li><a href="#practical-introduction-to-probability-theory">&ldquo;Practical Introduction to Probability Theory&rdquo;</a></li>
+      </ul>
+    </li>
+    <li><a href="#seminars-at-clemson-university">Seminars at Clemson University</a></li>
+    <li><a href="#full-index-of-other-teaching-notes">Full index of other &ldquo;teaching&rdquo; notes</a></li>
+  </ul>
+</nav>
+                        </div>
+                    </div>
+                
             
             <div id="content">
 
 
     <div class="main-text">
         <h1>Teaching</h1>
-        <p>I have designed from scratch and delivered two mini-courses for <a href="https://molbioschool.org/en/">School for
+        <p>My recent teaching experience comprises two parts: I have been teaching
+&ldquo;mini-courses&rdquo; for summer/winter schools, and participating in some activities
+in my current university (mostly organizing seminars). This page provides some
+details on these, along with a full list of my shorter notes that
+I think might be useful for teaching in one or another way.</p>
+<h2 id="mini-courses">Mini-courses</h2>
+<p>I have designed from scratch and delivered two mini-courses for <a href="https://molbioschool.org/en/">School for
 Molecular and Theoretical Biology</a> (SMTB) and
-Puschino Winter School. Both were aimed at gifted high school students (and, perhaps,
-early undergrads), and comprised four 50-minutes sessions each:</p>
-<ul>
-<li><a href="/teaching/smtb-algo">A Glimpse into Algorithms</a> (2020, 2021): a quick crash-course-intro to algorithms and
-data structures from the computational perspective.</li>
-<li><a href="/teaching/smtb-prob">Practical Introduction to Probability Theory</a> (2021): intro to some key
-concepts built around illustrations in Python.</li>
-</ul>
-<p>Two characteristic properties of these courses were that I tried to design them</p>
-<ul>
-<li>(1) without hiding too much complexity and oversimplifying things, and</li>
-<li>(2) building the material from a practical perspective of numerical illustrations,
-encouraging to discuss and play with the code.</li>
-</ul>
-<p>Also, I believe that learning need not necessarily happen in the
+Puschino Winter School. Both were aimed at (gifted) high school students and
+undergrads. They had nothing to do with the high school program, but I obviously
+needed to exercise some care with respect to prerequisites. Each course
+comprised four 50-minutes sessions.</p>
+<h3 id="a-glimpse-into-algorithms">&ldquo;A glimpse into Algorithms.&rdquo;</h3>
+<p><img src="./smtb_algo.png#full-shadow" alt="Runtimes figure"></p>
+<p><strong>Summary:</strong> Introducing and illustrating some key concepts from CS using simple
+numerical experiments in Python. A crash-course-intro to algorithms and data structures
+from the computational perspective. E.g., discussing correctness starting from unit
+tests; asymptotic, best/worst case, and other concepts related to runtime &mdash;
+with measuring actual runtime in seconds using Python&rsquo;s <code>time</code> module, etc. The
+purpose was to mention the key ideas, demonstrate that they are (1) not &ldquo;scary&rdquo;,
+and (2) pretty relevant to the practice, even if you are not an (aspiring)
+computer scientist or a programmer. (This aspect was especially relevant since
+majority of the students had a background in biology, but was interested in
+computational aspects as well.)</p>
+<p><strong>More details:</strong> for syllabus, a few methodological notes, and links to
+actual teaching materials (slides / jupyter notebooks) see 👉 <a href="/teaching/smtb-algo">here</a>.</p>
+<h3 id="practical-introduction-to-probability-theory">&ldquo;Practical Introduction to Probability Theory&rdquo;</h3>
+<p><img src="./smtb_probs.png#full-shadow" alt="Experiment with sample mean and variance"></p>
+<p><strong>Summary:</strong> This is a <em>theoretical</em> course, i.e., aimed in first place to
+introduce and discuss the concepts of probability space, random events,
+independence, random variables, and some others. However, it is presented kind of
+&ldquo;backwards&rdquo;: starting from numerical experiments and trying to
+&ldquo;reverse-engineer&rdquo; the logic behind the math that we actually have in
+Probability theory. The ultimate goal was to build (together with the students)
+a usable, practical, but consistent mathematical model of random events.</p>
+<p><strong>More details:</strong> for syllabus, a few methodological notes, and links to
+actual teaching materials (slides / jupyter notebooks) see 👉 <a href="/teaching/smtb-probs">here</a>.</p>
+<h2 id="seminars-at-clemson-university">Seminars at Clemson University</h2>
+<p>I believe that learning need not necessarily happen in the
 form of courses, so we have been working with the CU INFROMS Student Chapter on
 two series of seminars:</p>
 <ul>
-<li><a href="/edu/or-tech-seminar/">&ldquo;OR Tech Seminar&rdquo;</a> (Spring 2021): discussion of the
-&ldquo;researchers' toolbox&rdquo;</li>
-<li>Journal club on network optimization and interdiction (Fall 2021): learning
-to read papers and do science.</li>
+<li><strong>OR Tech Seminar</strong> (Spring 2021): discussion of the &ldquo;researchers' toolbox&rdquo;.
+I have presented a series of four one-hour seminars on working with the
+literature, organizing notes, version control, command line, etc. <a href="/edu/or-tech-seminar/">(more
+details)</a></li>
+<li><strong>Journal club</strong> on network optimization and interdiction (Fall 2021): we have
+organized regular meetings, basically, to learn how to read papers
+and how to do (good) science.</li>
 </ul>
+<h2 id="full-index-of-other-teaching-notes">Full index of other &ldquo;teaching&rdquo; notes</h2>
 <p>Below is a complete list of my notes and materials related to teaching. Any feedback /
 suggestions / corrections are very welcome!</p>
 
         <br/>
         
-            <div class="note-block">
-                <b><a href="/teaching/smtb-prob/">A Practical Introduction to Probability Theory (minicourse)</a></b><br> 
-                [ 𝚺 ] This is a quick numerical intro to probability theory in the form of a mini-course, four one-hour sessions. Designed for <a href="https://molbioschool.org/en/">SMTB</a> and Puschino Winter School in 2021. Discussing mathematical models for random things from the perspective of numerical examples in Python.
-                <div class="metadata">
-                    
-                        
-                        <a class="sticker" href="https://github.com/alex-bochkarev/Probs-SMTB-2021">
-                            
-                            <span class="nav-icon-link">
-                                <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
-                            </span>
-                             Syllabus (ENG)
-                        </a> &nbsp;
-                        
-                        <a class="sticker" href="https://github.com/alex-bochkarev/zpsh-21-probs">
-                            
-                            <span class="nav-icon-link">
-                                <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
-                            </span>
-                             Syllabus (RUS)
-                        </a> &nbsp;
-                        <br/>
-                    
-                    <br style="display: block; margin: 3px;">
-                    <div class="nav-icon-link">
-                        <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
-                    </div>
-                    Last update: <time datetime="0001-01-01">2021-09-27</time>.
-                    
-                        Tags: 
-                        
-                            
-                            <a class="nav-link" href="https://www.bochkarev.io/tags/smtb">#SMTB</a>
-                        
-                            
-                            <a class="nav-link" href="https://www.bochkarev.io/tags/talk">#talk</a>
-                        
-                            
-                            <a class="nav-link" href="https://www.bochkarev.io/tags/course">#course</a>
-                        
-                    
-                </div>
-            </div><br>
+            
+            
         
-            <div class="note-block">
-                <b><a href="/teaching/or-tech-seminar/">💬 OR Tech Seminar: outline</a></b><br> 
-                [ 𝚺 ] A quick note on OR Tech Seminar topics and logistics.
-                <div class="metadata">
-                    
-                        
-                        <a class="sticker" href="https://clemson.box.com/s/p75mzqb9sfw5u2my61axi15qqzu8y4nc">
-                            
-                            <span class="nav-icon-link">
-                                <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-play"></use></svg>
-                            </span>
-                             Video
-                        </a> &nbsp;
-                        <br/>
-                    
-                    <br style="display: block; margin: 3px;">
-                    <div class="nav-icon-link">
-                        <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
-                    </div>
-                    Last update: <time datetime="0001-01-01">2021-09-27</time>.
-                    
-                        Tags: 
-                        
-                            
-                            <a class="nav-link" href="https://www.bochkarev.io/tags/tech-seminar">#tech-seminar</a>
-                        
-                    
-                </div>
-            </div><br>
+            
+            
         
-            <div class="note-block">
-                <b><a href="/teaching/smtb-algo/">A Glimpse into Algorithms (minicourse)</a></b><br> 
-                [ 𝚺 ] This is a quick computational intro to algorithms and data structures in the form of a mini-course, four one-hour sessions. Designed and presented for <a href="https://molbioschool.org/en/">SMTB</a> in 2020 and 2021. Quick numerical illustrations for runtime, correctness, and other such fun things.
-                <div class="metadata">
-                    
-                        
-                        <a class="sticker" href="https://github.com/alex-bochkarev/Algo-SMTB-2021">
-                            
-                            <span class="nav-icon-link">
-                                <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
-                            </span>
-                             Syllabus (2021)
-                        </a> &nbsp;
-                        
-                        <a class="sticker" href="https://nbviewer.jupyter.org/github/alex-bochkarev/SMTB-Algo/blob/master/2020-07_SMTB_Algo_AB.ipynb">
-                            
-                            <span class="nav-icon-link">
-                                <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-ipynb"></use></svg>
-                            </span>
-                             Notebook (2020)
-                        </a> &nbsp;
-                        <br/>
-                    
-                    <br style="display: block; margin: 3px;">
-                    <div class="nav-icon-link">
-                        <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
-                    </div>
-                    Last update: <time datetime="0001-01-01">2021-09-27</time>.
-                    
-                        Tags: 
-                        
-                            
-                            <a class="nav-link" href="https://www.bochkarev.io/tags/smtb">#SMTB</a>
-                        
-                            
-                            <a class="nav-link" href="https://www.bochkarev.io/tags/talk">#talk</a>
-                        
-                            
-                            <a class="nav-link" href="https://www.bochkarev.io/tags/course">#course</a>
-                        
-                    
-                </div>
-            </div><br>
+            
+            
         
-            <div class="note-block">
-                <b><a href="/teaching/quals-mm/">A mind-map for (some) basic OR topics</a></b><br> 
-                [ 𝚺 ] An attempt to summarize some key OR concepts, inspired by the IE/OR Qualifying exams scope in 2019. Designed as an easy-to-overview mindmap.
-                <div class="metadata">
-                    
+            
+                <div class="note-block">
+                    <b><a href="/teaching/quals-mm/">A mind-map for (some) basic OR topics</a></b><br> 
+                    [ 𝚺 ] An attempt to summarize some key OR concepts, inspired by the IE/OR Qualifying exams scope in 2019. Designed as an easy-to-overview mindmap.
+                    <div class="metadata">
                         
-                        <a class="sticker" href="/edu/quals-mm/1_Deterministic_OR.pdf">
                             
-                            <span class="nav-icon-link">
-                                <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-pdf"></use></svg>
-                            </span>
-                             Deterministic
-                        </a> &nbsp;
+                            <a class="sticker" href="/edu/quals-mm/1_Deterministic_OR.pdf">
+                                
+                                <span class="nav-icon-link">
+                                    <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-pdf"></use></svg>
+                                </span>
+                                 Deterministic
+                            </a> &nbsp;
+                            
+                            <a class="sticker" href="/edu/quals-mm/2_Stochastic_OR.pdf">
+                                
+                                <span class="nav-icon-link">
+                                    <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-pdf"></use></svg>
+                                </span>
+                                 Stochastic
+                            </a> &nbsp;
+                            
+                            <a class="sticker" href="https://github.com/alex-bochkarev/OR_mmap">
+                                
+                                <span class="nav-icon-link">
+                                    <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
+                                </span>
+                                 Source
+                            </a> &nbsp;
+                            <br/>
                         
-                        <a class="sticker" href="/edu/quals-mm/2_Stochastic_OR.pdf">
-                            
-                            <span class="nav-icon-link">
-                                <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-pdf"></use></svg>
-                            </span>
-                             Stochastic
-                        </a> &nbsp;
+                        <br style="display: block; margin: 3px;">
+                        <div class="nav-icon-link">
+                            <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
+                        </div>
+                        Last update: <time datetime="0001-01-01">2020-01-18</time>.
                         
-                        <a class="sticker" href="https://github.com/alex-bochkarev/OR_mmap">
+                            Tags: 
                             
-                            <span class="nav-icon-link">
-                                <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
-                            </span>
-                             Source
-                        </a> &nbsp;
-                        <br/>
-                    
-                    <br style="display: block; margin: 3px;">
-                    <div class="nav-icon-link">
-                        <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
+                                
+                                <a class="nav-link" href="https://www.bochkarev.io/tags/deterministic">#deterministic</a>
+                            
+                                
+                                <a class="nav-link" href="https://www.bochkarev.io/tags/stochastic">#stochastic</a>
+                            
+                                
+                                <a class="nav-link" href="https://www.bochkarev.io/tags/quals">#quals</a>
+                            
+                        
                     </div>
-                    Last update: <time datetime="0001-01-01">2020-01-18</time>.
-                    
-                        Tags: 
-                        
-                            
-                            <a class="nav-link" href="https://www.bochkarev.io/tags/deterministic">#deterministic</a>
-                        
-                            
-                            <a class="nav-link" href="https://www.bochkarev.io/tags/stochastic">#stochastic</a>
-                        
-                            
-                            <a class="nav-link" href="https://www.bochkarev.io/tags/quals">#quals</a>
-                        
-                    
-                </div>
-            </div><br>
+                </div><br>
+            
         
-            <div class="note-block">
-                <b><a href="/teaching/convexity-gen/">An Euler diagram for convexity generalizations</a></b><br> 
-                [ 𝚺 ] On convexity generalization concepts (quasiconvexity and such) &ndash; a one-pager with examples.
-                <div class="metadata">
-                    
+            
+                <div class="note-block">
+                    <b><a href="/teaching/convexity-gen/">An Euler diagram for convexity generalizations</a></b><br> 
+                    [ 𝚺 ] A one-page, visual summary of various concepts generalizing &ldquo;convexity&rdquo; (i.e., quasiconvexity and such) with simple 2D examples.
+                    <div class="metadata">
                         
-                        <a class="sticker" href="/edu/convexity-gen/convexity_generalizations.pdf">
                             
-                            <span class="nav-icon-link">
-                                <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-pdf"></use></svg>
-                            </span>
-                             PDF
-                        </a> &nbsp;
-                        <br/>
-                    
-                    <br style="display: block; margin: 3px;">
-                    <div class="nav-icon-link">
-                        <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
+                            <a class="sticker" href="/edu/convexity-gen/convexity_generalizations.pdf">
+                                
+                                <span class="nav-icon-link">
+                                    <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-pdf"></use></svg>
+                                </span>
+                                 PDF
+                            </a> &nbsp;
+                            <br/>
+                        
+                        <br style="display: block; margin: 3px;">
+                        <div class="nav-icon-link">
+                            <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
+                        </div>
+                        Last update: <time datetime="0001-01-01">2021-01-14</time>.
+                        
+                            Tags: 
+                            
+                                
+                                <a class="nav-link" href="https://www.bochkarev.io/tags/deterministic">#deterministic</a>
+                            
+                                
+                                <a class="nav-link" href="https://www.bochkarev.io/tags/quals">#quals</a>
+                            
+                        
                     </div>
-                    Last update: <time datetime="0001-01-01">2021-01-14</time>.
-                    
-                        Tags: 
-                        
-                            
-                            <a class="nav-link" href="https://www.bochkarev.io/tags/deterministic">#deterministic</a>
-                        
-                            
-                            <a class="nav-link" href="https://www.bochkarev.io/tags/quals">#quals</a>
-                        
-                    
-                </div>
-            </div><br>
+                </div><br>
+            
         
-            <div class="note-block">
-                <b><a href="/teaching/dotplotgen/">Dotplot sample generation utility</a></b><br> 
-                [ 𝚺 ] A tiny <a href="https://en.wikipedia.org/wiki/Dot_plot_(bioinformatics)">dot-plot</a> generation utility in R
-                <div class="metadata">
-                    
+            
+                <div class="note-block">
+                    <b><a href="/teaching/dotplotgen/">Dotplot sample generation utility</a></b><br> 
+                    [ 𝚺 ] A utility to facilitate the discussion of the <a href="https://en.wikipedia.org/wiki/Dot_plot_(bioinformatics)">dot-plot</a> concept. Written in R with ggplot.
+                    <div class="metadata">
                         
-                        <a class="sticker" href="https://github.com/alex-bochkarev/dotplot-gen">
                             
-                            <span class="nav-icon-link">
-                                <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
-                            </span>
-                             Source
-                        </a> &nbsp;
-                        <br/>
-                    
-                    <br style="display: block; margin: 3px;">
-                    <div class="nav-icon-link">
-                        <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
+                            <a class="sticker" href="https://github.com/alex-bochkarev/dotplot-gen">
+                                
+                                <span class="nav-icon-link">
+                                    <svg class="nav-link" viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-gh"></use></svg>
+                                </span>
+                                 Source
+                            </a> &nbsp;
+                            <br/>
+                        
+                        <br style="display: block; margin: 3px;">
+                        <div class="nav-icon-link">
+                            <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-date"></use></svg>
+                        </div>
+                        Last update: <time datetime="0001-01-01">2019-05-20</time>.
+                        
+                            Tags: 
+                            
+                                
+                                <a class="nav-link" href="https://www.bochkarev.io/tags/bioinformatics">#bioinformatics</a>
+                            
+                        
                     </div>
-                    Last update: <time datetime="0001-01-01">2019-05-20</time>.
-                    
-                        Tags: 
-                        
-                            
-                            <a class="nav-link" href="https://www.bochkarev.io/tags/bioinformatics">#bioinformatics</a>
-                        
-                    
-                </div>
-            </div><br>
+                </div><br>
+            
         
     </div>
 

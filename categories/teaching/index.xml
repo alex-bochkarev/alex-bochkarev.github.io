@@ -36,5 +36,14 @@
       <description>This is a quick computational intro to algorithms and data structures in the form of a mini-course, four one-hour sessions. Designed and presented for &lt;a href=&#34;https://molbioschool.org/en/&#34;&gt;SMTB&lt;/a&gt; in 2020 and 2021. Quick numerical illustrations for runtime, correctness, and other such fun things.</description>
     </item>
     
+    <item>
+      <title>Dotplot sample generation utility</title>
+      <link>https://www.bochkarev.io/teaching/dotplotgen/</link>
+      <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
+      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
+      <guid>https://www.bochkarev.io/teaching/dotplotgen/</guid>
+      <description>A utility to facilitate the discussion of the &lt;a href=&#34;https://en.wikipedia.org/wiki/Dot_plot_(bioinformatics)&#34;&gt;dot-plot&lt;/a&gt; concept. Written in R with ggplot.</description>
+    </item>
+    
   </channel>
 </rss>

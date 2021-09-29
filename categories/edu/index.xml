@@ -24,16 +24,7 @@
       <pubDate>Wed, 22 May 2019 00:00:00 +0000</pubDate>
       <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
       <guid>https://www.bochkarev.io/teaching/convexity-gen/</guid>
-      <description>On convexity generalization concepts (quasiconvexity and such) &amp;ndash; a one-pager with examples.</description>
-    </item>
-    
-    <item>
-      <title>Dotplot sample generation utility</title>
-      <link>https://www.bochkarev.io/teaching/dotplotgen/</link>
-      <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
-      <author>web@bochkarev.io (Alexey A. Bochkarev)</author>
-      <guid>https://www.bochkarev.io/teaching/dotplotgen/</guid>
-      <description>A tiny &lt;a href=&#34;https://en.wikipedia.org/wiki/Dot_plot_(bioinformatics)&#34;&gt;dot-plot&lt;/a&gt; generation utility in R</description>
+      <description>A one-page, visual summary of various concepts generalizing &amp;ldquo;convexity&amp;rdquo; (i.e., quasiconvexity and such) with simple 2D examples.</description>
     </item>
     
   </channel>
