@@ -58,7 +58,7 @@
                 <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-CV"></use></svg>
             </a>
             
-            <a class="nav-link nav-icon-link" href="mailto:web@bochkarev.io">
+            <a class="nav-link nav-icon-link" href="mailto:a@bochkarev.io">
                 <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-envelope"></use></svg>
             </a>
             
@@ -195,9 +195,9 @@ happens to be addressed particularly well by git &ndash; but this is out of the
 scope of this note.)</p>
 <h3 id="tools-for-today">Tools for today</h3>
 <p><strong>1)</strong> You would need to have <strong>git</strong> installed. Check from the command line:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git --version
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git --version
 </code></pre></div><p>which gave me:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">git version 2.27.0
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">git version 2.27.0
 </code></pre></div><details> <summary> [ What if not? ]</summary>
 <p>If it did not work, start <a href="https://git-scm.com/download">here</a>. It works out of the box on my GNU/Linux
 machine, but if I were to use other systems, I would look into <a href="https://gitforwindows.org/">GitForWindows</a>
@@ -207,7 +207,7 @@ for more details).</p>
 </details>
 <p>As pointed out in the <a href="https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup">docs</a>, you would need to set your name and email (to be
 associated with your changes in the code).</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ git config --global user.name <span style="color:#e6db74">&#34;Your Name&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ git config --global user.name <span style="color:#e6db74">&#34;Your Name&#34;</span>
 $ git config --global user.email YourName@example.com
 $ git config --global init.defaultBranch main <span style="color:#75715e"># set the name of the default branch</span>
 </code></pre></div><p><strong>2)</strong> We will need a text editor, of course. Any one will work. I am using
@@ -239,22 +239,22 @@ special <code>.git</code> subfolder, where the magic happens. There is something
 <h3 id="basics-tracking-changes">Basics: tracking changes</h3>
 <p>Assume we would like to develop some code in Python (this will be our running
 example). So, we create a folder and immediately initialize a repo:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git init
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git init
 </code></pre></div><p>Output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Initialized empty Git repository in /home/bochkarev/sandbox/demo-repo/.git/
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Initialized empty Git repository in /home/bochkarev/sandbox/demo-repo/.git/
 </code></pre></div><p>It has created a special directory, <code>.git</code>, that will contain
 the information concerning the history. Now, let us add some code and
 save it as <code>new_doc.py</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
 
 <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
 	print(<span style="color:#e6db74">&#34;i=&#34;</span> <span style="color:#f92672">+</span> str(i))
 </code></pre></div><p>Assume we have implemented some basic functionality, and would like to save a
 snapshot of this state in the repo. Note that git &ldquo;knows&rdquo; that we have some
 changes now:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git status
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git status
 </code></pre></div><p>Output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">On branch master
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">On branch master
 
 No commits yet
 
@@ -264,13 +264,13 @@ Untracked files:
 
 nothing added to commit but untracked files present (use &#34;git add&#34; to track)
 </code></pre></div><p>So, as git suggests, we first add the changes to the &ldquo;staging area&rdquo;:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git add .
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git add .
 </code></pre></div><p>Here the period <code>.</code> means &ldquo;all files in the current directory&rdquo; (we could have
 used a specific filename instead). Now <code>git status</code> shows that we have &ldquo;changes
 to be committed&rdquo; (saved to the versions history):</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git status
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git status
 </code></pre></div><p>Output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">On branch master
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">On branch master
 
 No commits yet
 
@@ -278,21 +278,21 @@ Changes to be committed:
   (use &#34;git rm --cached &lt;file&gt;...&#34; to unstage)
 	new file:   new_doc.py
 </code></pre></div><p>We actually create a record in the versions history with:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git commit -m<span style="color:#e6db74">&#34;first commit&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git commit -m<span style="color:#e6db74">&#34;first commit&#34;</span>
 </code></pre></div><p>Output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[master (root-commit) de41445] first commit
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[master (root-commit) de41445] first commit
  1 file changed, 4 insertions(+)
  create mode 100644 new_doc.py
 </code></pre></div><p>Let&rsquo;s say, we continue the development, and add more code, so that <code>new_doc.py</code> now reads:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
 
 <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
 	<span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
 		print(<span style="color:#e6db74">&#34;i=&#34;</span> <span style="color:#f92672">+</span> str(i)<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;, j=&#34;</span> <span style="color:#f92672">+</span> str(j))
 </code></pre></div><p>Note that git is aware of specific changes. We can highlight them by saying:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git diff
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git diff
 </code></pre></div><p>Output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">diff --git a/new_doc.py b/new_doc.py
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">diff --git a/new_doc.py b/new_doc.py
 index fe46b97..105a3b3 100644
 --- a/new_doc.py
 +++ b/new_doc.py
@@ -311,15 +311,15 @@ Control&rdquo; tab and choose the changed file (<code>new_doc.py</code>):</p>
 <p><img src="/images/ts-git/2021-02-05_13-11-46_screenshot.png#full-shadow" alt="Changes highlighted"></p>
 <p>If we are happy with the changes, again, we add them to the &ldquo;staging&rdquo; area and
 &ldquo;commit&rdquo; to the versions history with commands:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git add .
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git add .
 git commit -m<span style="color:#e6db74">&#34;inner loop&#34;</span>
 </code></pre></div><p>Output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[master acd00af] inner loop
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[master acd00af] inner loop
  1 file changed, 2 insertions(+), 1 deletion(-)
 </code></pre></div><p>Now, to see the commits history, we can issue:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git log
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git log
 </code></pre></div><p>Output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">commit acd00afdf4c0c0a3fa6f5229752f1807d4398688
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">commit acd00afdf4c0c0a3fa6f5229752f1807d4398688
 Author: Alexey Bochkarev &lt;a@bochkarev.io&gt;
 Date:   Fri Feb 5 13:15:56 2021 +0100
 
@@ -332,9 +332,9 @@ Date:   Fri Feb 5 13:05:17 2021 +0100
     first commit
 </code></pre></div><p>Or, if we have a lot of these and want a quick overview, we might want them
 in a compact form:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git log --pretty<span style="color:#f92672">=</span>oneline --abbrev-commit
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git log --pretty<span style="color:#f92672">=</span>oneline --abbrev-commit
 </code></pre></div><p>Output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">acd00af inner loop
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">acd00af inner loop
 de41445 first commit
 </code></pre></div><p>Now, getting back to the commit <code>first commit</code> is as simple as <code>git checkout de41445</code>. The repo will come back to the state at that moment, so we can look
 around. For example, we could save something and get back with <code>git checkout master</code>. Usually what I might want, however, is to fetch a specific file from a
@@ -350,16 +350,16 @@ show to your supervisor&rdquo;), and experiment in separate versions, merging ba
 those that worked out.</p>
 <p>Assume we want to try to switch to nice unicode variable names (greek
 letters). First, we create a new <em>branch</em> for this feature:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git checkout -b unicode_vars
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git checkout -b unicode_vars
 </code></pre></div><p>Now, <code>git status</code> gives:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git status
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git status
 </code></pre></div><p>And the bottom left corner of my VSCodium editor also hints of the current
 branch, like this:</p>
 <p><img src="/images/ts-git/2021-02-05_16-38-40_screenshot.png#full-shadow" alt="Branch name indicator"></p>
 <p>Our previous state of the tracked files (one file in this case) was left in a
 <code>master</code> branch, and we jumped into a separate code &ldquo;spin-off&rdquo;. Let me
 rename a variable, so <code>new_doc.py</code> now would look like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
 
 <span style="color:#66d9ef">for</span> ɑ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
     <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
@@ -369,30 +369,30 @@ rename a variable, so <code>new_doc.py</code> now would look like:</p>
 changed:</p>
 <p><img src="/images/ts-git/2021-02-05_16-49-00_screenshot.png#full-shadow" alt="Changes highlighted"></p>
 <p>Again, we commit this change:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git add .
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git add .
 git commit -m<span style="color:#e6db74">&#34;renamed variables&#34;</span>
 </code></pre></div><p>Output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[unicode_vars 985d560] renamed variables
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[unicode_vars 985d560] renamed variables
  1 file changed, 2 insertions(+), 2 deletions(-)
 </code></pre></div><p>Assume we want to make some unrelated change now. (Suddenly! Or maybe because
 we&rsquo;ve got an email about this) E.g., remember that there is a more compact
 syntax for printing strings in Python. So we go back to the main branch to edit
 the file:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git checkout master
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git checkout master
 </code></pre></div><p>We are immediately back to the state we left when we made a spin-off, so we
 change the file to become:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
 
 <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
     <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
         print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;i=</span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">, j=</span><span style="color:#e6db74">{</span>j<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
 
 </code></pre></div><p>That&rsquo;s way more readable, so we &ldquo;save&rdquo; it into the master branch:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git diff <span style="color:#75715e"># let&#39;s see the changes</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git diff <span style="color:#75715e"># let&#39;s see the changes</span>
 git add .
 git commit -m<span style="color:#e6db74">&#34;improved code readability (printing strings)&#34;</span>
 </code></pre></div><p>Output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">diff --git a/new_doc.py b/new_doc.py
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">diff --git a/new_doc.py b/new_doc.py
 index 105a3b3..f288fa7 100644
 --- a/new_doc.py
 +++ b/new_doc.py
@@ -410,16 +410,16 @@ Assume we test the feature with <code>python ./new_doc.py</code>, make sure it w
 want to integrate it back into the &ldquo;main&rdquo; branch of our code. To do this, we go
 back to the <code>master</code> branch and try to merge it with the feature branch
 (<code>unicode_vars</code>):</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git checkout master
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git checkout master
 git merge unicode_vars
 </code></pre></div><p>Output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Auto-merging new_doc.py
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Auto-merging new_doc.py
 CONFLICT (content): Merge conflict in new_doc.py
 Automatic merge failed; fix conflicts and then commit the result.
 </code></pre></div><p>We have created a <em>conflict</em>: edited the same line in both branches, and there
 is no way to resolve it automatically. This is a normal situation, and the
 source file now looks as follows:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
 
 <span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#66d9ef">for</span> ɑ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
 </span>    <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
@@ -437,7 +437,7 @@ allows convenience of &ldquo;Accept Change&rdquo;-like buttons (which we wouldn&
 this case, though):</p>
 <p><img src="/images/ts-git/2021-02-05_17-10-50_screenshot.png#full-shadow" alt="Changes highlighted"></p>
 <p>After the edits, the resulting file is:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">print(<span style="color:#e6db74">&#34;Hello world&#34;</span>)
 
 <span style="color:#66d9ef">for</span> ɑ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
     <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
@@ -445,10 +445,10 @@ this case, though):</p>
 
 </code></pre></div><p>Following the instructions, we add and commit the changes initiated by <code>merge</code>
 as usual:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git add .
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git add .
 git commit -m<span style="color:#e6db74">&#34;merged &#39;unicode variables&#39; feature&#34;</span>
 </code></pre></div><p>Output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[master 1c7dd06] merged &#39;unicode variables&#39; feature
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[master 1c7dd06] merged &#39;unicode variables&#39; feature
 </code></pre></div><p>So, again, what we have just done: we created a spin-off branch, tried to
 implement a feature, introduced some changes into the &ldquo;main&rdquo; code along the way,
 and merged everything back successfully. Many tools, including VSCode, can show
@@ -461,9 +461,9 @@ commits, and then we merged everything back at the very top commit, <code>1c7dd0
 <code>unicode_vars</code> branch on top of the changes in <code>master</code>, as if it were based
 on <em>already updated <code>master</code></em> &ndash; see git <a href="https://git-scm.com/book/en/v2/Git-Branching-Rebasing">rebase</a> for details.</p>
 <p>You can check what branches are there with:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git branch
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git branch
 </code></pre></div><p>Output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">* master
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">* master
   unicode_vars
 </code></pre></div><p>To show just branches not merged into the main branch: <code>git branch --no-merged master</code>. Branches that are no longer needed can be deleted with
 <code>git branch -d &lt;branch-name&gt;</code>.</p>
@@ -536,10 +536,10 @@ any branch/tag/commit to explore. It helps sometimes to answer questions like
 &ldquo;where have this figure come from? Which version of my code?..&rdquo;.</p>
 <p>Sometimes it is also handy to have the current commit and branch (automatically
 &ndash; e.g., to include into a log file). The following commands might help:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git rev-parse --abbrev-ref HEAD <span style="color:#75715e"># current branch</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git rev-parse --abbrev-ref HEAD <span style="color:#75715e"># current branch</span>
 git rev-parse HEAD <span style="color:#75715e"># current commit</span>
 </code></pre></div><p>Output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">master
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">master
 1c7dd06adb46c63e2706babd2500c040e934d80e
 </code></pre></div><h3 id="ignoring-files">Ignoring files</h3>
 <p>Sometimes you want to issue a simple <code>git add .</code> command, but do not want
@@ -633,7 +633,7 @@ contributions back); a simple <a href="https://guides.github.com/activities/hell
         </div>
         <footer class="footer"><br>
 <div class="site-footer">
-    <p class="footer-text nav-link">© 2018&mdash;2021 <b><a class="nav-link" href="/">Alexey A. Bochkarev</a></b> All rights reserved
+    <p class="footer-text nav-link">© 2018&mdash;2022 <b><a class="nav-link" href="/">Alexey A. Bochkarev</a></b> All rights reserved
         ⬩ <a class="nav-link" href="/privacy">Privacy Policy</a>
         ⬩ <a class="nav-link" href="/disclaimer">Disclaimer</a>
         | Made with a <a href="https://github.com/alex-bochkarev/hugo-desk-theme">custom theme</a> for <a href="https://gohugo.io/">Hugo</a>.

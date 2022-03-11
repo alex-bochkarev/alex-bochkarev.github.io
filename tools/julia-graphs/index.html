@@ -58,7 +58,7 @@
                 <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-CV"></use></svg>
             </a>
             
-            <a class="nav-link nav-icon-link" href="mailto:web@bochkarev.io">
+            <a class="nav-link nav-icon-link" href="mailto:a@bochkarev.io">
                 <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-envelope"></use></svg>
             </a>
             
@@ -155,7 +155,7 @@
 <p>But then I thought, if I use R with (totally amazing) <a href="https://ggplot2.tidyverse.org/">ggplot2</a> to visualize the data from <code>csv</code> files generated elsewhere &mdash; why not to do the same with graphs? <a href="https://en.wikipedia.org/wiki/Unix%5Fphilosophy#Do%5FOne%5FThing%5Fand%5FDo%5FIt%5FWell">Unix way</a> and all&hellip; Apparently, this is both very easy to do and capable of producing nice output.</p>
 <h2 id="a-quick-but-efficient-hack">A quick, but efficient hack</h2>
 <p>My tool of choice for visualizing graphs from the previous project was a stand-alone program<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup> called <em>Graphviz</em> (<code>dot</code> command). To use it, I would just need to form and compile a plain-text <code>.dot</code> file written in <a href="https://graphviz.org/gallery/">DOT language</a>. This is straightforward to do automatically. Assuming I have a <code>SimpleDiGraph</code> named <code>G</code> that I&rsquo;d like to visualize, I can do:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">open(<span style="color:#e6db74">&#34;./graph.tmp.dot&#34;</span>, <span style="color:#e6db74">&#34;w&#34;</span>) <span style="color:#66d9ef">do</span> file
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">open(<span style="color:#e6db74">&#34;./graph.tmp.dot&#34;</span>, <span style="color:#e6db74">&#34;w&#34;</span>) <span style="color:#66d9ef">do</span> file
     write(file, <span style="color:#e6db74">&#34;digraph {</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
 
     <span style="color:#66d9ef">for</span> n <span style="color:#66d9ef">in</span> vertices(G)  <span style="color:#75715e"># add nodes</span>
@@ -173,7 +173,7 @@
 <span style="color:#66d9ef">end</span>
 </code></pre></div><details> <summary> [What does this code produce?]</summary>
 <p>A resulting <code>.dot</code> file might look like this, for a five-nodes graph:</p>
-<pre><code class="language-dot" data-lang="dot">digraph {
+<pre tabindex="0"><code class="language-dot" data-lang="dot">digraph {
     1;
     2;
     3;
@@ -189,13 +189,13 @@
 }
 </code></pre></details>
 <p>Now, this totally works, but I would need to compile it manually, that&rsquo;s not user-friendly. Luckily, this is trivial to fix by adding:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">run(pipeline(<span style="color:#e6db74">`dot -Tpdf ./graph.tmp.dot`</span>,
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">run(pipeline(<span style="color:#e6db74">`dot -Tpdf ./graph.tmp.dot`</span>,
              stdout<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./graph.tmp.pdf&#34;</span>))
 run(<span style="color:#e6db74">`xdg-open </span><span style="color:#e6db74">$filename</span><span style="color:#e6db74">.pdf`</span>, wait<span style="color:#f92672">=</span>false)
 </code></pre></div><p>(Note that these are backticks, <code>`</code>, not quotes <code>'</code>!)</p>
 <p>So, it will produce <code>./graph.tmp.dot</code>, compile it with the program <code>dot</code>, and open<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup> the resulting PDF with the default viewer in a separate window! (The REPL will not be blocked since we asked it not to with this <code>wait = false</code>.)</p>
 <p>But wait, there&rsquo;s more. It immediately gives us all the power of DOT language directly (which was, ehm, designed specifically to draw graphs!). Say, if I want to mark <em>source</em> and <em>dest</em> nodes with different colors, and show arc costs as well, I can modify the code above as follows:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#e6db74">&#34;&#34;&#34;Shows the graph with source node `s`,
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#e6db74">&#34;&#34;&#34;Shows the graph with source node `s`,
 </span><span style="color:#e6db74">dest `t`, and arc costs `W`.&#34;&#34;&#34;</span>
 <span style="color:#66d9ef">function</span> showgraph(G, s, t, W,
                    filename<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./graph.dot&#34;</span>,
@@ -236,7 +236,7 @@ run(<span style="color:#e6db74">`xdg-open </span><span style="color:#e6db74">$fi
 <p>Now, if I want to examine <em>two</em> graphs (and save them as different files), I can call <code>showgraph(G,s,t,W, &quot;file1&quot;)</code> and <code>showgraph(G2,s2,t2,W2, &quot;file2&quot;)</code>. If I just want to update the file, without opening another window (e.g., if it is already open), I can ask to <code>showgraph(G,s,t,W, &quot;file&quot;, false)</code>.</p>
 <h2 id="further-improvement">Further improvement</h2>
 <p>Since we have just hacked the function together ourselves, it is really easy to modify. Assume I am drawing some more complicated things, and want to show more details about my nodes, which I have in <code>names</code> and <code>info</code> (indexed by the node number). Maybe, also format edge labels in some special way. It does not require any new ideas:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> showgraph_more(G, s, t, W,
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> showgraph_more(G, s, t, W,
                    names,
                    info,
                    filename<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./graph.dot&#34;</span>,
@@ -282,7 +282,7 @@ run(<span style="color:#e6db74">`xdg-open </span><span style="color:#e6db74">$fi
 <p>No doubt, DOT language is still somewhat limited, but again, it is a stand-alone, easy-to-plug tool. Also, we don&rsquo;t discuss super-fancy publication-ready figures. Unless you want to&hellip;</p>
 <h3 id="go-tikz">Go TikZ!</h3>
 <p>Well, at this point nothing prevents us from employing even more complex tools, should we need some formatting heavy-lifting. There is basically no difference for us which &ldquo;backend&rdquo; to choose, even TeX-based! So, rewriting the simpler version of the function above for <a href="https://github.com/pgf-tikz/pgf">PGF/TikZ</a>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#e6db74">&#34;&#34;&#34;Draws a graph using TikZ.&#34;&#34;&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#e6db74">&#34;&#34;&#34;Draws a graph using TikZ.&#34;&#34;&#34;</span>
 <span style="color:#66d9ef">function</span> showgraph_tikz(G, s, t, W,
                    filename<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./graph&#34;</span>,
                    display<span style="color:#f92672">=</span>true)
@@ -336,7 +336,7 @@ run(<span style="color:#e6db74">`xdg-open </span><span style="color:#e6db74">$fi
 <span style="color:#66d9ef">end</span>
 </code></pre></div><details> <summary> [What does this code produce?]</summary>
 <p>That&rsquo;s just a good old <code>.tex</code> file:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-latex" data-lang="latex"><span style="color:#66d9ef">\documentclass</span>{standalone}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-latex" data-lang="latex"><span style="color:#66d9ef">\documentclass</span>{standalone}
 <span style="color:#66d9ef">\usepackage</span>{tikz}
 <span style="color:#66d9ef">\usetikzlibrary</span>{graphs,graphdrawing,quotes}
 <span style="color:#66d9ef">\usegdlibrary</span>{force}
@@ -384,7 +384,7 @@ run(<span style="color:#e6db74">`xdg-open </span><span style="color:#e6db74">$fi
         </div>
         <footer class="footer"><br>
 <div class="site-footer">
-    <p class="footer-text nav-link">© 2018&mdash;2021 <b><a class="nav-link" href="/">Alexey A. Bochkarev</a></b> All rights reserved
+    <p class="footer-text nav-link">© 2018&mdash;2022 <b><a class="nav-link" href="/">Alexey A. Bochkarev</a></b> All rights reserved
         ⬩ <a class="nav-link" href="/privacy">Privacy Policy</a>
         ⬩ <a class="nav-link" href="/disclaimer">Disclaimer</a>
         | Made with a <a href="https://github.com/alex-bochkarev/hugo-desk-theme">custom theme</a> for <a href="https://gohugo.io/">Hugo</a>.
