@@ -1,0 +1,646 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>BB_search &mdash; Align-BDD  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#reproducibility">Reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#code-organization">Code organization</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>BB_search</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for BB_search</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; A branch-and-bound search scheme</span>
+<span class="sd">implementation for the align-sequences problem:</span>
+<span class="sd">alignts two :py:class:`varseq.VarSeq` objects.</span>
+
+<span class="sd">Tests coverage: :py:mod:`BB_search_test`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">varseq</span> <span class="k">as</span> <span class="nn">vs</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">copy</span> <span class="k">as</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">anytree</span> <span class="k">as</span> <span class="nn">at</span>
+<span class="kn">from</span> <span class="nn">anytree.exporter</span> <span class="kn">import</span> <span class="n">DotExporter</span>
+<span class="kn">import</span> <span class="nn">heapq</span> <span class="k">as</span> <span class="nn">heap</span>
+<span class="kn">from</span> <span class="nn">experiments.misc</span> <span class="kn">import</span> <span class="n">log</span>
+<span class="kn">import</span> <span class="nn">heuristics</span> <span class="k">as</span> <span class="nn">heu</span>
+
+<span class="c1"># Selected algorithm parameters</span>
+<span class="n">TIMEOUT_ITERATIONS</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">UB_UPDATE_FREQ</span> <span class="o">=</span> <span class="mi">5000</span> <span class="c1"># in iterations</span>
+<span class="n">ALWAYS_FAST</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="c1">######################################################################</span>
+<span class="c1">## Lower bound calculations</span>
+<div class="viewcode-block" id="LB_current"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.LB_current">[docs]</a><span class="k">def</span> <span class="nf">LB_current</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;LB: current size (before the alignment).&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">B</span><span class="o">.</span><span class="n">size</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="LB_first_aligned"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.LB_first_aligned">[docs]</a><span class="k">def</span> <span class="nf">LB_first_aligned</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;LB: min current size after aligning the first element only.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">B</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">A</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">B</span><span class="o">.</span><span class="n">size</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="LB_last_aligned"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.LB_last_aligned">[docs]</a><span class="k">def</span> <span class="nf">LB_last_aligned</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;LB: min current size after aligning the last element (enumeration).&quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">([</span><span class="n">A</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span></div>
+
+<div class="viewcode-block" id="LB_by_level"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.LB_by_level">[docs]</a><span class="k">def</span> <span class="nf">LB_by_level</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;LB: Inversions-driven heuristic.</span>
+
+<span class="sd">    The one based on the lemma presented in the paper.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">LB</span> <span class="o">=</span> <span class="n">LB_current</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">Ai</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="p">];</span> <span class="n">Aj</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">B</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">Ai</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">B</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">Aj</span><span class="p">]:</span>
+                <span class="c1"># it is an inversion</span>
+                <span class="n">LB</span> <span class="o">+=</span> <span class="nb">min</span><span class="p">(</span>
+                    <span class="mi">2</span><span class="o">*</span><span class="n">A</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="mi">2</span><span class="o">*</span><span class="n">B</span><span class="o">.</span><span class="n">var_size</span><span class="p">(</span><span class="n">Aj</span><span class="p">)</span> <span class="o">-</span> <span class="n">B</span><span class="o">.</span><span class="n">n</span><span class="p">[</span> <span class="n">B</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">Aj</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="p">]</span>
+                <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">LB</span></div>
+
+<div class="viewcode-block" id="LB_by_level_complicated"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.LB_by_level_complicated">[docs]</a><span class="k">def</span> <span class="nf">LB_by_level_complicated</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;LB: Another variant of the inversions-driven heuristic (improved)&quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">LB</span> <span class="o">=</span> <span class="n">LB_current</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">Bs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+            <span class="n">Ai</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="p">];</span> <span class="n">Aj</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">B</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">Ai</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">B</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">Aj</span><span class="p">]:</span>
+                <span class="c1"># an inversion</span>
+                <span class="n">Bs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">B</span><span class="o">.</span><span class="n">var_size</span><span class="p">(</span><span class="n">Aj</span><span class="p">)</span> <span class="o">-</span> <span class="n">B</span><span class="o">.</span><span class="n">n</span><span class="p">[</span> <span class="n">B</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">Aj</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="p">])</span>
+        <span class="n">B_srt</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bs</span><span class="p">))</span>
+        <span class="n">A_srt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">A</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">k</span><span class="p">)</span> <span class="o">-</span> <span class="n">A</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">Bs</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+        <span class="n">LB</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">A_srt</span><span class="p">,</span><span class="n">B_srt</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">LB</span></div>
+
+<div class="viewcode-block" id="LB_lvl_compl_symm"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.LB_lvl_compl_symm">[docs]</a><span class="k">def</span> <span class="nf">LB_lvl_compl_symm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;LB: Symmetric version of the previous one.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">LB_by_level_complicated</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">),</span> <span class="n">LB_by_level_complicated</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="n">A</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="LB_lvl_symm"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.LB_lvl_symm">[docs]</a><span class="k">def</span> <span class="nf">LB_lvl_symm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Symmetric version of the :py:func:`LB_by_level`.&quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">LB_by_level</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">),</span> <span class="n">LB_by_level</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="n">A</span><span class="p">))</span></div>
+
+<span class="c1"># List of lower bounds to examine</span>
+<span class="c1"># CODE - FUNC - LEGEND</span>
+<span class="n">LOWER_BOUNDS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;LB_first&quot;</span><span class="p">,</span><span class="n">LB_first_aligned</span><span class="p">,</span><span class="s2">&quot;min size first element aligned&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;LB_last&quot;</span><span class="p">,</span><span class="n">LB_last_aligned</span><span class="p">,</span><span class="s2">&quot;min size last element aligned&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;LB_levels&quot;</span><span class="p">,</span><span class="n">LB_by_level</span><span class="p">,</span><span class="s2">&quot;inversions-driven LB&quot;</span><span class="p">]</span>
+<span class="c1">#    [&quot;LB_levels_amd&quot;,LB_by_level_complicated,&quot;inversions-driven LB (amd)&quot;],</span>
+<span class="c1">#    [&quot;LB_lvl_symm&quot;,LB_lvl_symm,&quot;inversion-driven (symmetric)&quot;]</span>
+<span class="c1">#    [&quot;LB_lvl_symm_amd&quot;,LB_lvl_compl_symm,&quot;inversion-driven (amd, symm)&quot;]</span>
+<span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;List of lower bounds to examine (used in a separate experiment).&quot;&quot;&quot;</span>
+
+<span class="c1">######################################################################</span>
+<span class="c1">## auxiliary functions</span>
+
+<span class="c1">## DOT graph (tree) export-specific</span>
+<span class="c1">## adding labels (for DOT export)</span>
+<div class="viewcode-block" id="nodenamefunc"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.nodenamefunc">[docs]</a><span class="k">def</span> <span class="nf">nodenamefunc</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper: Generates node names for graphviz export.&quot;&quot;&quot;</span>
+
+    <span class="n">fixed_A_start</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">A_tail_start</span> <span class="c1">#len(node.A)-node.depth</span>
+    <span class="n">fixed_B_start</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">B_tail_start</span> <span class="c1">#len(node.B)-node.depth</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">[</span><span class="si">{}</span><span class="s2">]</span><span class="se">\n</span><span class="s2">A:</span><span class="si">{}{}</span><span class="s2">(</span><span class="si">{: &gt;3d}</span><span class="s2">)</span><span class="se">\n</span><span class="s2">B:</span><span class="si">{}{}</span><span class="s2">(</span><span class="si">{: &gt;3d}</span><span class="s2">)</span><span class="se">\n</span><span class="s2">|A|+|B|=</span><span class="si">{}</span><span class="s2">, LB:</span><span class="si">{}</span><span class="s2">, UB:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[:</span><span class="n">fixed_A_start</span><span class="p">],</span><span class="n">node</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">fixed_A_start</span><span class="p">:],</span><span class="n">node</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">node</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[:</span><span class="n">fixed_B_start</span><span class="p">],</span><span class="n">node</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">fixed_B_start</span><span class="p">:],</span> <span class="n">node</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span><span class="n">node</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">node</span><span class="o">.</span><span class="n">LB</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">UB</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="nodeattrfunc"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.nodeattrfunc">[docs]</a><span class="k">def</span> <span class="nf">nodeattrfunc</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper: Generates node attributes for graphviz export.&quot;&quot;&quot;</span>
+
+    <span class="n">nlabel</span> <span class="o">=</span> <span class="s2">&quot;xlabel=</span><span class="se">\&quot;</span><span class="s2">Tree: LB=</span><span class="si">{}</span><span class="s2">, UB=</span><span class="si">{}</span><span class="s2">, obj=</span><span class="si">{}</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tree_LB</span><span class="p">,</span><span class="n">node</span><span class="o">.</span><span class="n">tree_UB</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">best_obj</span><span class="p">)</span>
+    <span class="n">ncolor</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;P&quot;</span><span class="p">:</span>
+        <span class="n">ncolor</span> <span class="o">=</span> <span class="s2">&quot;fillcolor=grey, style=filled&quot;</span>
+    <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
+        <span class="n">ncolor</span> <span class="o">=</span> <span class="s2">&quot;fillcolor=lightgrey, style=dashed&quot;</span>
+    <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;O&quot;</span><span class="p">:</span>
+        <span class="n">ncolor</span> <span class="o">=</span> <span class="s2">&quot;fillcolor=orange, style=filled&quot;</span>
+    <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;T&quot;</span><span class="p">:</span>
+        <span class="n">ncolor</span> <span class="o">=</span> <span class="s2">&quot;penwidth=5&quot;</span>
+
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nlabel</span><span class="p">,</span><span class="n">ncolor</span><span class="p">)</span></div>
+
+<span class="c1">######################################################################</span>
+<div class="viewcode-block" id="SearchNode"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.SearchNode">[docs]</a><span class="k">class</span> <span class="nc">SearchNode</span><span class="p">(</span><span class="n">at</span><span class="o">.</span><span class="n">NodeMixin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Implements search tree node.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        name (str): node name,</span>
+<span class="sd">        parent (:py:class:`SearchNode`): parent node,</span>
+<span class="sd">        A, B (:py:class:`varseq.VarSeq`): sequences to align,</span>
+<span class="sd">        Ar, Br (:py:class:`varseq.VarSeq`): not-yet-aligned parts of ``A`` and ``B``.</span>
+<span class="sd">        A_tail_start, B_tail_start (int) : position for the already-aligned tail start.</span>
+<span class="sd">        status (str): node type (see the note below),</span>
+<span class="sd">        tree_UB, tree_LB (int): current (tree) upper / lower bound,</span>
+<span class="sd">        best_obj (int): current best objective seen,</span>
+
+<span class="sd">    Note:</span>
+
+<span class="sd">        - possible node types are: ``T`` = Terminal, ``O`` = Optimal,</span>
+<span class="sd">          ``I`` = initialized, ``P`` = pruned, ``?`` = unknown</span>
+<span class="sd">          (&#39;open&#39;, not processed), ``E`` = processed (&#39;expanded&#39;)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">Aresid</span><span class="p">,</span> <span class="n">Bresid</span><span class="p">,</span> <span class="n">A_tail_start</span><span class="p">,</span> <span class="n">B_tail_start</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Class constructor&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ar</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Aresid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Br</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Bresid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A_tail_start</span> <span class="o">=</span> <span class="n">A_tail_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">B_tail_start</span> <span class="o">=</span> <span class="n">B_tail_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;I&quot;</span>
+
+        <span class="c1"># tree-specific notes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree_UB</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree_LB</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_obj</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">UB</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="SearchNode.size"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.SearchNode.size">[docs]</a>    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns node size (total no. of nodes in both diagrams).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">size</span><span class="p">()</span></div>
+
+    <span class="c1"># upper bound at the current node</span>
+<div class="viewcode-block" id="SearchNode.calculate_UB"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.SearchNode.calculate_UB">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_UB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="s1">&#39;fast&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns an upper bound for the specific node.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;T&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">UB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">layer_var</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">t</span><span class="o">==</span><span class="s1">&#39;fast&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">UB</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="n">heu</span><span class="o">.</span><span class="n">minAB</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">UB</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="n">heu</span><span class="o">.</span><span class="n">simpl_greedy_swaps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">UB</span><span class="p">,</span> <span class="n">order</span><span class="p">]</span></div>
+
+    <span class="c1"># lower bound at the current node</span>
+<div class="viewcode-block" id="SearchNode.calculate_LB"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.SearchNode.calculate_LB">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_LB</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a lower bound for the current search tree node.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">==</span><span class="s2">&quot;T&quot;</span><span class="p">:</span>
+            <span class="n">LB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">LB</span> <span class="o">=</span> <span class="n">LB_by_level</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">)</span> <span class="c1"># inversions-driven bound</span>
+
+        <span class="k">return</span> <span class="n">LB</span></div>
+
+
+    <span class="c1"># a special method that tells which node to choose</span>
+    <span class="c1"># if lower bounds are equal</span>
+    <span class="c1"># approach: break ties arbitrarily</span>
+    <span class="k">def</span> <span class="fm">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A special methods used to break ties (if LBs are equal) -- randomly.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">ranf</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.5</span></div>
+
+<span class="c1">######################################################################</span>
+<div class="viewcode-block" id="BBSearch"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.BBSearch">[docs]</a><span class="k">class</span> <span class="nc">BBSearch</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Implements the search tree.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        A, B (:py:class:`varseq.VarSeq`): first sequence,</span>
+<span class="sd">        step (int): current step number,</span>
+<span class="sd">        tree_size (int): current number of nodes in the tree,</span>
+<span class="sd">        verbose (Boolean): debug information printing flag,</span>
+<span class="sd">        logging (Boolean): log bounds flag,</span>
+<span class="sd">        logs_UB, logs_LB (list): upper/lower bounds by step (if ``verbose``),</span>
+<span class="sd">        logs_step (list): step numbers (if ``verbose``),</span>
+<span class="sd">        status (str): search status,</span>
+<span class="sd">        root (class SearchNode): root node,</span>
+<span class="sd">        Ap_cand, Bp_cand (:py:class:`varseq.VarSeq`): ``A`` / ``B`` aligned to the current candidate optimum,</span>
+<span class="sd">        node_cand, cand_parent (:py:class:`SearchNode`): node corresponding to the current candidate and its parent,</span>
+<span class="sd">        open_nodes (list): list of nodes to process during the search,</span>
+<span class="sd">            each entry is a tuple (``&lt;lower bound&gt;``,``SearchNode``).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Class constructor&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">A</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">=</span> <span class="n">B</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree_size</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logs_UB</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logs_LB</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logs_step</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logging</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;initialized&quot;</span>
+
+        <span class="c1">## create the root node</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">SearchNode</span><span class="p">(</span><span class="s2">&quot;root&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">B</span><span class="p">),</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">UB</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">calculate_UB</span><span class="p">(</span><span class="s1">&#39;fast&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ap_cand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Bp_cand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_cand</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cand_parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+
+        <span class="n">LB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">calculate_LB</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_nodes</span> <span class="o">=</span> <span class="p">[(</span><span class="n">LB</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)]</span>
+        <span class="n">heap</span><span class="o">.</span><span class="n">heapify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_nodes</span><span class="p">)</span> <span class="c1"># create a heap, key = lower bound</span>
+
+<div class="viewcode-block" id="BBSearch.current_best"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.BBSearch.current_best">[docs]</a>    <span class="k">def</span> <span class="nf">current_best</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns current upper bound (best objective seen).&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">Bp_cand</span><span class="o">.</span><span class="n">size</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BBSearch.dump"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.BBSearch.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Technical: dump the tree into a DOT-file (graphivz).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">:</span>
+            <span class="n">DotExporter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">nodenamefunc</span><span class="o">=</span><span class="n">nodenamefunc</span><span class="p">,</span><span class="n">nodeattrfunc</span> <span class="o">=</span> <span class="n">nodeattrfunc</span><span class="p">)</span><span class="o">.</span><span class="n">to_dotfile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBSearch.make_graph_gap"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.BBSearch.make_graph_gap">[docs]</a>    <span class="k">def</span> <span class="nf">make_graph_gap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">trueOpt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;figure: produces an LB/UB vs step no. figure&quot;&quot;&quot;</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span> <span class="ow">or</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+
+        <span class="n">graph_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logs_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs_UB</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs_LB</span><span class="p">)))</span>
+        <span class="n">graph_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">,</span><span class="s1">&#39;UB&#39;</span><span class="p">,</span><span class="s1">&#39;LB&#39;</span><span class="p">]</span>
+
+        <span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span><span class="s1">&#39;UB&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">graph_df</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span><span class="n">markers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span><span class="s1">&#39;LB&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">graph_df</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">markers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">ci</span><span class="o">=</span><span class="kc">None</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">trueOpt</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">trueOpt</span><span class="p">,</span><span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+        <span class="c1"># Add titles (main and on axis)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;step number (node expansions)&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Upper (red) and lower (blue) bounds&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;LB/UB gap&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">0.05</span><span class="p">,</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">0.8</span><span class="p">,</span><span class="s2">&quot;A:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">0.55</span><span class="p">,</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">0.8</span><span class="p">,</span><span class="s2">&quot;B:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="BBSearch.set_logging"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.BBSearch.set_logging">[docs]</a>    <span class="k">def</span> <span class="nf">set_logging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logfile</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">steps_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets up the logging process for BB search.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logging</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span> <span class="o">=</span> <span class="n">logfile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_prefix</span> <span class="o">=</span> <span class="n">prefix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snapshot_steps</span> <span class="o">=</span> <span class="n">steps_list</span></div>
+
+    <span class="c1">## MAIN LOGIC</span>
+<div class="viewcode-block" id="BBSearch.search"><a class="viewcode-back" href="../_autosummary/BB_search.html#BB_search.BBSearch.search">[docs]</a>    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Performs BB search (the main procedure).</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            After the call, the following attributes allow to recover the</span>
+<span class="sd">            solution:</span>
+
+<span class="sd">                - ``status`` (str): ``optimal``, ``timeout`` (``initialized``</span>
+<span class="sd">                  before),</span>
+<span class="sd">                - ``Ap_cand``, ``Bp_cand``</span>
+<span class="sd">                  (:py:class:`varseq.VarSeq`): ``A`` and ``B`` after aligning</span>
+<span class="sd">                  to the candidate (optimum if ``status`` = ``optimal``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># calculate the initial UB and LB</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">==</span><span class="s2">&quot;optimal&quot;</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_nodes</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No nodes to explore / optimal state reached&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial LB=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">LB</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">while</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span> <span class="o">&lt;=</span> <span class="n">TIMEOUT_ITERATIONS</span><span class="p">):</span>
+            <span class="n">LB</span><span class="p">,</span> <span class="n">node</span> <span class="o">=</span> <span class="n">heap</span><span class="o">.</span><span class="n">heappop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_nodes</span><span class="p">)</span> <span class="c1"># pick a node with the smallest LB</span>
+            <span class="c1">######################################################################</span>
+            <span class="c1"># expanding the node</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Node expansion: </span><span class="si">{}</span><span class="s2">, node LB=</span><span class="si">{}</span><span class="s2">, UB=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">LB</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">UB</span><span class="p">))</span>
+
+            <span class="c1"># set tree bounds to be shown on the graph</span>
+            <span class="c1"># (sample BB search tree figure)</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">tree_LB</span> <span class="o">=</span> <span class="n">LB</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">tree_UB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">UB</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">best_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_best</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">LB</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">UB</span><span class="p">:</span>
+                <span class="c1"># we can prune the node</span>
+                <span class="n">node</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span><span class="s2">&quot;P&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;optimal&quot;</span>
+                <span class="n">LB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">UB</span>
+                <span class="k">break</span>
+
+            <span class="n">node</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;E&quot;</span> <span class="c1"># actually processing the node</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">Ar</span><span class="p">))</span> <span class="p">):</span>
+                <span class="c1"># enumerating all the possible last elements</span>
+                <span class="c1"># starting from the last one</span>
+                <span class="k">if</span> <span class="n">vs</span><span class="o">.</span><span class="n">non_dominated</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">Ar</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">node</span><span class="o">.</span><span class="n">Ar</span><span class="p">,</span><span class="n">node</span><span class="o">.</span><span class="n">Br</span><span class="p">):</span>
+                    <span class="c1">## add a node</span>
+                    <span class="c1">## sift the element under consideration to the last position</span>
+                    <span class="n">A_new</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+                    <span class="n">B_new</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">B</span><span class="p">)</span>
+                    <span class="n">a</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">Ar</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">pos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">Ar</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+                    <span class="n">A_new</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">pos</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">B_new</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">pos</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="c1">## reshuffle the rest ``covered&#39;&#39; elements</span>
+                    <span class="n">xA</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">Ar</span><span class="o">.</span><span class="n">layer_var</span>
+                    <span class="n">xB</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">Br</span><span class="o">.</span><span class="n">layer_var</span>
+                    <span class="n">A_covered_els</span> <span class="o">=</span> <span class="n">xA</span><span class="p">[</span><span class="n">i</span><span class="p">:]</span>
+                    <span class="n">i_A</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="k">if</span> <span class="n">A_covered_els</span> <span class="o">!=</span> <span class="p">[]:</span>
+                        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xB</span><span class="p">)):</span>
+                            <span class="k">if</span> <span class="n">xB</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="ow">in</span> <span class="n">A_covered_els</span> <span class="ow">and</span> <span class="n">xB</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">!=</span><span class="n">xA</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                                <span class="n">A_new</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i_A</span><span class="p">]</span> <span class="o">=</span> <span class="n">xB</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                                <span class="n">A_new</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">xB</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span> <span class="o">=</span> <span class="n">i_A</span>
+                                <span class="n">i_A</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                    <span class="n">B_covered_els</span> <span class="o">=</span> <span class="n">xB</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">xA</span><span class="p">[</span><span class="n">i</span><span class="p">]]:]</span>
+                    <span class="k">if</span> <span class="n">B_covered_els</span> <span class="o">!=</span> <span class="p">[]:</span>
+                        <span class="n">i_B</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">xA</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xA</span><span class="p">)):</span>
+                            <span class="k">if</span> <span class="n">xA</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="ow">in</span> <span class="n">B_covered_els</span> <span class="ow">and</span> <span class="n">j</span><span class="o">!=</span><span class="n">i</span><span class="p">:</span>
+                                <span class="n">B_new</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i_B</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                                <span class="n">B_new</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span> <span class="o">=</span> <span class="n">i_B</span>
+                                <span class="n">i_B</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                    <span class="c1">## save the results / create a node</span>
+                    <span class="n">Ar_new</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">A_new</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">Ar</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">A_new</span><span class="o">.</span><span class="n">n</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">Ar</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">Br_new</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">B_new</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">Br</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">B_new</span><span class="o">.</span><span class="n">n</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">Br</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+                    <span class="n">newnode</span> <span class="o">=</span> <span class="n">SearchNode</span><span class="p">(</span><span class="s2">&quot;step </span><span class="si">{}</span><span class="s2">, node </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">to</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_size</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">Ar</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">Ar</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">node</span><span class="p">,</span> <span class="n">Ar_new</span><span class="p">,</span> <span class="n">Br_new</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span><span class="n">A_new</span><span class="p">,</span> <span class="n">B_new</span><span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">tree_size</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                    <span class="c1">## check if the new one is a terminal node</span>
+                    <span class="k">if</span> <span class="n">A_new</span><span class="o">.</span><span class="n">is_aligned</span><span class="p">(</span><span class="n">B_new</span><span class="p">):</span>
+                        <span class="n">newnode</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;T&quot;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">newnode</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span> <span class="c1"># node to be expanded</span>
+
+                    <span class="c1">## calculate the node lower bound</span>
+                    <span class="n">newnode</span><span class="o">.</span><span class="n">LB</span> <span class="o">=</span> <span class="n">newnode</span><span class="o">.</span><span class="n">calculate_LB</span><span class="p">()</span>
+
+                    <span class="c1">## update UPPER BOUND</span>
+                    <span class="n">t</span> <span class="o">=</span> <span class="s1">&#39;fast&#39;</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span> <span class="o">%</span> <span class="n">UB_UPDATE_FREQ</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ALWAYS_FAST</span><span class="p">:</span>
+                        <span class="n">t</span> <span class="o">=</span> <span class="s1">&#39;slow&#39;</span>
+
+                    <span class="n">newnode</span><span class="o">.</span><span class="n">UB</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="n">newnode</span><span class="o">.</span><span class="n">calculate_UB</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">UB</span> <span class="o">&gt;</span> <span class="n">newnode</span><span class="o">.</span><span class="n">UB</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">UB</span> <span class="o">=</span> <span class="n">newnode</span><span class="o">.</span><span class="n">UB</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">Ap_cand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">Bp_cand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">newnode</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;T&quot;</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">node_cand</span> <span class="o">=</span> <span class="n">newnode</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">cand_parent</span> <span class="o">=</span> <span class="n">newnode</span>
+
+                    <span class="k">if</span> <span class="n">newnode</span><span class="o">.</span><span class="n">LB</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">UB</span> <span class="ow">and</span> <span class="n">newnode</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;T&quot;</span><span class="p">:</span>
+                        <span class="n">heap</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_nodes</span><span class="p">,(</span><span class="n">newnode</span><span class="o">.</span><span class="n">LB</span><span class="p">,</span> <span class="n">newnode</span><span class="p">))</span>
+
+            <span class="c1">## update LOWER BOUND</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logging</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logs_step</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logs_UB</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">UB</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logs_LB</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LB</span><span class="p">)</span>
+            <span class="c1"># end of node expansion</span>
+            <span class="c1">######################################################################</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">step</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;node expanded. Step </span><span class="si">{}</span><span class="s2">, LB=</span><span class="si">{}</span><span class="s2">, UB=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">,</span> <span class="n">LB</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">UB</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logging</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">snapshot_steps</span><span class="p">:</span>
+                    <span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_prefix</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">LB</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">UB</span><span class="p">),</span> <span class="n">outfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span> <span class="o">&gt;</span> <span class="n">TIMEOUT_ITERATIONS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;timeout&quot;</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_cand</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cand_parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="c1"># create an optimal node</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span>
+            <span class="n">opt_node</span> <span class="o">=</span> <span class="n">SearchNode</span><span class="p">(</span><span class="s2">&quot;step </span><span class="si">{}</span><span class="s2">, node </span><span class="si">{}</span><span class="s2">: UB=LB&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_size</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">cand_parent</span><span class="p">,[],[],</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">order</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">order</span><span class="p">))</span>
+            <span class="n">opt_node</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;O&quot;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;optimal node created&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;optimal&quot;</span>
+            <span class="n">LB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">UB</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_cand</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cand_parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: optimum found, but both node candidate and candidate parent are None (please report a bug)&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimal order: </span><span class="si">{}</span><span class="s2">, objective=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_best</span><span class="p">()))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...while aligning: </span><span class="se">\n</span><span class="s2">A:</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">B:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">))</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;optimal&quot;</span>
+            <span class="n">LB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">UB</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Search done in </span><span class="si">{}</span><span class="s2"> iterations. UB=</span><span class="si">{}</span><span class="s2">, LB=</span><span class="si">{}</span><span class="s2">, status: </span><span class="si">{}</span><span class="s2">, tree size: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">UB</span><span class="p">,</span> <span class="n">LB</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_size</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_cand</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No candidate node found!&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;optimal&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_cand</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_cand</span><span class="o">.</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;O&quot;</span>
+
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">node_LB</span><span class="p">,</span> <span class="n">next_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_nodes</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">next_node</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
+                    <span class="n">next_node</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;P&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logging</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logs_LB</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LB</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logs_UB</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">UB</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logs_step</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+            <span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_prefix</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">LB</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">UB</span><span class="p">),</span> <span class="n">outfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="s2">&quot;status:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

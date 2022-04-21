@@ -1,0 +1,1094 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>UFL &mdash; Align-BDD  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#reproducibility">Reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#code-organization">Code organization</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>UFL</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for UFL</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Implements basic functions for UFL -- Uncapacitated Facility Location.</span>
+
+<span class="sd">Used as a basis for :py:mod:`tUFLP`.</span>
+
+<span class="sd">Tests coverage: :py:mod:`UFLP_test`</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">graphviz</span> <span class="kn">import</span> <span class="n">Digraph</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">gurobipy</span> <span class="k">as</span> <span class="nn">gp</span>
+<span class="kn">from</span> <span class="nn">gurobipy</span> <span class="kn">import</span> <span class="n">GRB</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+
+<span class="kn">import</span> <span class="nn">varseq</span> <span class="k">as</span> <span class="nn">vs</span>
+<span class="kn">import</span> <span class="nn">BB_search</span> <span class="k">as</span> <span class="nn">bb</span>
+<span class="kn">import</span> <span class="nn">BDD</span> <span class="k">as</span> <span class="nn">DD</span>
+
+
+<div class="viewcode-block" id="draw_problem_dia"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.draw_problem_dia">[docs]</a><span class="k">def</span> <span class="nf">draw_problem_dia</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;run_logs/problem_dia.gv&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Draws the bipartite graph describing the problem.&quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">build_Sf</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="n">dia</span> <span class="o">=</span> <span class="n">Digraph</span><span class="p">(</span><span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;Uncapacitated Facility Location&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">dia</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;F</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s1">&#39;doublecircle&#39;</span><span class="p">,</span>
+                 <span class="n">style</span><span class="o">=</span><span class="s1">&#39;filled&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;lightgrey&#39;</span><span class="p">,</span>
+                 <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;F</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)):</span>
+        <span class="n">dia</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;C</span><span class="si">{</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s1">&#39;circle&#39;</span><span class="p">,</span>
+                 <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;C</span><span class="si">{</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="se">\n</span><span class="s2">g=(</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">g</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">)])</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>  <span class="c1"># noqa: E501</span>
+
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">S_j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">S_j</span><span class="p">:</span>
+            <span class="n">dia</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;F</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;C</span><span class="si">{</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">dia</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_covering_BDD_wg"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.create_covering_BDD_wg">[docs]</a><span class="k">def</span> <span class="nf">create_covering_BDD_wg</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>  <span class="c1"># pylint: disable=all</span>
+    <span class="sd">&quot;&quot;&quot;Creates and returns &quot;covering&quot; BDD given an UFL instance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        S (list): of adjacency lists</span>
+<span class="sd">        g (dict): overlapping costs, g(k,n) is a cost of `n`</span>
+<span class="sd">            overlaps for consumer `k`)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        C (class BDD): covering BDD</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+
+    <span class="n">var_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;z</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">DD</span><span class="o">.</span><span class="n">BDD</span><span class="p">(</span>
+        <span class="n">N</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">var_names</span><span class="p">),</span>  <span class="c1"># number of z-variables</span>
+        <span class="nb">vars</span><span class="o">=</span><span class="n">var_names</span><span class="p">,</span>
+        <span class="n">weighted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">root</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">current_layer</span> <span class="o">=</span> <span class="p">[</span><span class="n">root</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])):</span>  <span class="c1"># all *but* the last nearby facility</span>
+            <span class="n">next_layer</span> <span class="o">=</span> <span class="p">[</span><span class="n">C</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">current_layer</span><span class="p">]</span> <span class="o">+</span> \
+                <span class="p">[</span><span class="n">C</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">current_layer</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span>
+
+            <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">current_layer</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">current_layer</span><span class="p">[</span><span class="n">q</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">next_layer</span><span class="p">[</span><span class="n">q</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+
+            <span class="n">current_layer</span> <span class="o">=</span> <span class="n">next_layer</span>
+
+        <span class="c1"># process the last layer of the subnetwork corresponding</span>
+        <span class="c1"># to consumer `j`: this is always a special case</span>
+        <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">current_layer</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">current_layer</span><span class="p">):</span>
+            <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span>
+                   <span class="n">edge_weight</span><span class="o">=</span><span class="n">g</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+            <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">,</span>
+                   <span class="n">edge_weight</span><span class="o">=</span><span class="n">g</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">idx</span><span class="p">)])</span>
+
+        <span class="n">current_layer</span> <span class="o">=</span> <span class="p">[</span><span class="n">target</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">C</span></div>
+
+
+<div class="viewcode-block" id="create_covering_BDD"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.create_covering_BDD">[docs]</a><span class="k">def</span> <span class="nf">create_covering_BDD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create and return the diagram given the instance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        S (list): of adjacency lists. len(S) = no. of consumers</span>
+<span class="sd">        c (dict): costs of covering, keyed by (facility_id, consumer_id)</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        - encodes the fact that all customers need to be covered</span>
+<span class="sd">            by at least one facility.</span>
+<span class="sd">        - assumes no edge costs, does *not* allow</span>
+<span class="sd">            for arbitrary g(·) function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+
+    <span class="n">C</span> <span class="o">=</span> <span class="n">DD</span><span class="o">.</span><span class="n">BDD</span><span class="p">(</span>
+        <span class="n">N</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">S</span><span class="p">)),</span>  <span class="c1"># number of z-variables</span>
+        <span class="nb">vars</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;z</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="p">]],</span>
+        <span class="n">weighted</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">root</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># current nodes</span>
+    <span class="n">s_maybe</span> <span class="o">=</span> <span class="n">root</span>
+    <span class="n">s_no</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+        <span class="n">s_yes</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">S_j</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">S_j</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">S_j</span><span class="p">):</span>
+            <span class="n">new_maybe</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">s_maybe</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+            <span class="n">new_yes</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">s_maybe</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">c</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+
+            <span class="k">if</span> <span class="n">s_yes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_yes</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">new_yes</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">c</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+                <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_yes</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">new_yes</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">s_no</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">new_no</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">s_no</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">c</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_no</span> <span class="o">=</span> <span class="n">new_maybe</span>
+                    <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_no</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">new_no</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">c</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+
+                <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_no</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">new_no</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                <span class="n">s_no</span> <span class="o">=</span> <span class="n">new_no</span>
+
+            <span class="n">s_yes</span> <span class="o">=</span> <span class="n">new_yes</span>
+
+            <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># the last layer of the subnetwork</span>
+                <span class="c1"># (related to customer j)</span>
+                <span class="n">s_no</span> <span class="o">=</span> <span class="n">new_maybe</span>
+                <span class="n">s_maybe</span> <span class="o">=</span> <span class="n">new_yes</span>
+                <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_yes</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">new_yes</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">c</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+                <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_yes</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">new_yes</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">s_maybe</span> <span class="o">=</span> <span class="n">new_maybe</span>
+
+    <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_maybe</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NTRUE</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">c</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+    <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_maybe</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NFALSE</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">s_yes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">s_yes</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">s_maybe</span><span class="o">.</span><span class="n">id</span><span class="p">):</span>
+        <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_yes</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NTRUE</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">c</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+        <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_yes</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NTRUE</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">s_no</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_no</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NFALSE</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">c</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+        <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_no</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NFALSE</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">C</span></div>
+
+
+<div class="viewcode-block" id="build_Sf"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.build_Sf">[docs]</a><span class="k">def</span> <span class="nf">build_Sf</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the list of facility neighborhoods.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        S (list): of consumer neighborhoods (facility IDs)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Sf</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">facility</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">facility</span> <span class="ow">in</span> <span class="n">Sf</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">Sf</span><span class="p">[</span><span class="n">facility</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">Sf</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">facility</span><span class="p">:</span> <span class="nb">set</span><span class="p">([</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">])})</span>
+
+    <span class="k">return</span> <span class="n">Sf</span></div>
+
+
+<div class="viewcode-block" id="create_availability_BDD"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.create_availability_BDD">[docs]</a><span class="k">def</span> <span class="nf">create_availability_BDD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Encodes consistency of &quot;cover&quot;(z) decisions.</span>
+
+<span class="sd">    Either all &quot;yes&quot;, or all &quot;no&quot; for a specific facility.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        S (list): neighborhood list</span>
+<span class="sd">        f (dict): facility costs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Sf</span> <span class="o">=</span> <span class="n">build_Sf</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Sf</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">var_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;z</span><span class="si">{</span><span class="n">facility</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span>
+                 <span class="k">for</span> <span class="n">facility</span> <span class="ow">in</span> <span class="n">F</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">Sf</span><span class="p">[</span><span class="n">facility</span><span class="p">]]</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">DD</span><span class="o">.</span><span class="n">BDD</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">var_names</span><span class="p">),</span> <span class="nb">vars</span><span class="o">=</span><span class="n">var_names</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">s_main</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">s_false</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">F</span><span class="p">:</span>
+        <span class="n">s_yes</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">s_no</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">y_weight</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">consumers_i</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Sf</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">consumers_i</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">n</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">==</span> <span class="n">consumers_i</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="c1"># this is the very last layer</span>
+                <span class="k">if</span> <span class="n">s_yes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">A</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_yes</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NTRUE</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">y_weight</span><span class="p">)</span>
+                    <span class="n">A</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_yes</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NFALSE</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">s_no</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">A</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_no</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NTRUE</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                    <span class="n">A</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_no</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NFALSE</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">y_weight</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">s_main</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">A</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_main</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NTRUE</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">y_weight</span><span class="p">)</span>
+                    <span class="n">A</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_main</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NTRUE</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">s_false</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">A</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_false</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NFALSE</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+                    <span class="n">A</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_false</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NFALSE</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># this is not the very last layer</span>
+                <span class="c1"># ( so we need to create a layer )</span>
+                <span class="k">if</span> <span class="n">s_main</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># this is the first decision for a facility</span>
+                    <span class="n">new_yes</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">s_main</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">y_weight</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_yes</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">s_yes</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">y_weight</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="n">consumers_i</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="c1"># this is the last decision for a facility</span>
+                    <span class="n">new_no</span> <span class="o">=</span> <span class="n">new_yes</span>
+                    <span class="k">if</span> <span class="n">s_main</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">A</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_main</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">new_no</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                    <span class="n">s_main</span> <span class="o">=</span> <span class="n">new_yes</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">s_main</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">new_no</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">s_main</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                        <span class="n">s_main</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">new_no</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">s_no</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">s_false</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">s_yes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">new_f</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">s_yes</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">s_false</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">new_f</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">s_false</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+                    <span class="n">A</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_false</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">new_f</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_f</span> <span class="o">=</span> <span class="kc">None</span>
+
+                <span class="k">if</span> <span class="n">s_yes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">A</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_yes</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">new_yes</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">y_weight</span><span class="p">)</span>
+                    <span class="n">A</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_yes</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">new_f</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">s_no</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">A</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_no</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">new_no</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                    <span class="n">A</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">s_no</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">new_f</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+
+                <span class="n">s_yes</span> <span class="o">=</span> <span class="n">new_yes</span>
+                <span class="n">s_no</span> <span class="o">=</span> <span class="n">new_no</span>
+                <span class="n">s_false</span> <span class="o">=</span> <span class="n">new_f</span>
+
+            <span class="n">y_weight</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="n">A</span></div>
+
+
+<span class="c1"># testing</span>
+<div class="viewcode-block" id="test_DD_creation"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.test_DD_creation">[docs]</a><span class="k">def</span> <span class="nf">test_DD_creation</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Testing unit: BDD generation.&quot;&quot;&quot;</span>
+    <span class="c1"># unpack the problem from S</span>
+    <span class="n">draw_problem_dia</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;run_logs/&quot;</span><span class="o">+</span><span class="n">name</span><span class="o">+</span><span class="s2">&quot;_problem.gv&quot;</span><span class="p">)</span>
+
+    <span class="n">create_covering_BDD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">dump_gv</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;run_logs/&quot;</span> <span class="o">+</span>
+                                             <span class="n">name</span><span class="o">+</span><span class="s2">&quot;_covering.gv&quot;</span><span class="p">)</span>
+    <span class="n">create_availability_BDD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">dump_gv</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;run_logs/&quot;</span> <span class="o">+</span>
+                                                 <span class="n">name</span><span class="o">+</span><span class="s2">&quot;_avail.gv&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="build_MIP"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.build_MIP">[docs]</a><span class="k">def</span> <span class="nf">build_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Builds &#39;plain-vanilla&#39; MIP instance for UFL.</span>
+
+<span class="sd">    Encodes arbitrary penalty function g(·).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        S (list): list of customer neighborhoods</span>
+<span class="sd">        f (dict): facility costs</span>
+<span class="sd">        g (dict): values for overlap penalties, `(j, n)`</span>
+<span class="sd">                    for `n` overlaps at consumer `j`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        `gurobipy` model (`gp.Model`)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">modelSense</span> <span class="o">=</span> <span class="n">GRB</span><span class="o">.</span><span class="n">MINIMIZE</span>
+
+    <span class="n">Sf</span> <span class="o">=</span> <span class="n">build_Sf</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="n">F</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">Sf</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">F</span><span class="p">:</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;x</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">Sf</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+            <span class="n">z</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;z</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">z</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">==</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">C</span><span class="p">:</span>
+        <span class="n">b</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">z</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="c1"># set the Objective</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">F</span><span class="p">)</span>
+
+    <span class="c1"># overlap penalty</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">C</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">v</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;v</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">v</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">&lt;=</span> <span class="n">v</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">v</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+
+        <span class="n">obj</span> <span class="o">+=</span> <span class="n">g</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">+</span> <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">((</span><span class="n">g</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">-</span> <span class="n">g</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)])</span><span class="o">*</span><span class="n">v</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span>
+                                       <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="n">m</span><span class="o">.</span><span class="n">setObjective</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">m</span></div>
+
+
+<div class="viewcode-block" id="add_BDD_to_MIP"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.add_BDD_to_MIP">[docs]</a><span class="k">def</span> <span class="nf">add_BDD_to_MIP</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Builds a MIP (network flow) from a given BDD.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        D (class BDD): the diagram object</span>
+<span class="sd">        model (gurobipy Model):</span>
+<span class="sd">            a model to amend with vars and constraints(default None)</span>
+<span class="sd">        x (dict): linking binary variables, if available (default None)</span>
+<span class="sd">        prefix (str): a string prefix for variable names</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        m (gurobipy Model): resulting network flow</span>
+<span class="sd">        c (list): list of constraints added</span>
+<span class="sd">        v (dict): flow variables added, keyed as (from_id, to_id, arc_type)</span>
+<span class="sd">        x (dict): binary variables added (one per layer), keyed by _layer_no_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">modelSense</span> <span class="o">=</span> <span class="n">GRB</span><span class="o">.</span><span class="n">MINIMIZE</span>
+
+    <span class="n">constraints</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">incoming_flows</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="n">l_no</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">D</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+        <span class="n">l_no</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">l_no</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">D</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">l_no</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">x</span><span class="p">[</span><span class="n">D</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">l_no</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span>
+                                                 <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;link_</span><span class="si">{</span><span class="n">D</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">l_no</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">yes_sum</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">LinExpr</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="n">inc_nodes_new</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">L</span><span class="p">:</span>
+            <span class="c1"># determine node inflow</span>
+            <span class="n">inflow</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">LinExpr</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">DD</span><span class="o">.</span><span class="n">NROOT</span><span class="p">:</span>
+                <span class="n">inflow</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">LinExpr</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">incoming_flows</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">inflow</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">v_i</span> <span class="k">for</span> <span class="n">v_i</span> <span class="ow">in</span> <span class="n">incoming_flows</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">])</span>
+
+            <span class="c1"># determine node outflow and add a linking constraint</span>
+            <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">DD</span><span class="o">.</span><span class="n">NTRUE</span><span class="p">:</span>
+                <span class="n">outflow</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">LinExpr</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">DD</span><span class="o">.</span><span class="n">NFALSE</span><span class="p">:</span>
+                <span class="n">outflow</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">LinExpr</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">vh</span><span class="si">{</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">obj</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)])</span>
+                <span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">vl</span><span class="si">{</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">obj</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)])</span>
+                <span class="n">outflow</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">LinExpr</span><span class="p">(</span><span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span> <span class="o">+</span>
+                                     <span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)])</span>
+                <span class="n">yes_sum</span> <span class="o">+=</span> <span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span>
+
+            <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">inflow</span> <span class="o">==</span> <span class="n">outflow</span><span class="p">,</span>
+                                               <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">cont-at-</span><span class="si">{</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">DD</span><span class="o">.</span><span class="n">NTRUE</span> <span class="ow">and</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">DD</span><span class="o">.</span><span class="n">NFALSE</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">inc_nodes_new</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">inc_nodes_new</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">inc_nodes_new</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]]</span>
+
+            <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">DD</span><span class="o">.</span><span class="n">NTRUE</span> <span class="ow">and</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">DD</span><span class="o">.</span><span class="n">NFALSE</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">inc_nodes_new</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">inc_nodes_new</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">inc_nodes_new</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]]</span>
+
+        <span class="n">incoming_flows</span> <span class="o">=</span> <span class="n">inc_nodes_new</span>
+
+        <span class="k">if</span> <span class="n">l_no</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
+            <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">[</span><span class="n">D</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">l_no</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">==</span> <span class="n">yes_sum</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">bin-link-</span><span class="si">{</span><span class="n">l_no</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+
+    <span class="n">model</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="create_NF"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.create_NF">[docs]</a><span class="k">def</span> <span class="nf">create_NF</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates a network flow instance for diagram `D`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">       D (class BDD): the underlying diagram.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        model (`gurobipy` model): resulting model,</span>
+<span class="sd">        constraints (list),</span>
+<span class="sd">        v(dict): variables.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">modelSense</span> <span class="o">=</span> <span class="n">GRB</span><span class="o">.</span><span class="n">MINIMIZE</span>
+
+    <span class="n">constraints</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">incoming_flows</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="n">l_no</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">D</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+        <span class="n">l_no</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">inc_nodes_new</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">L</span><span class="p">:</span>
+            <span class="c1"># determine node inflow</span>
+            <span class="n">inflow</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">LinExpr</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">DD</span><span class="o">.</span><span class="n">NROOT</span><span class="p">:</span>
+                <span class="n">inflow</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">LinExpr</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">incoming_flows</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">inflow</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">v_i</span> <span class="k">for</span> <span class="n">v_i</span> <span class="ow">in</span> <span class="n">incoming_flows</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">])</span>
+
+            <span class="c1"># determine node outflow and add a linking constraint</span>
+            <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">DD</span><span class="o">.</span><span class="n">NTRUE</span><span class="p">:</span>
+                <span class="n">outflow</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">LinExpr</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">DD</span><span class="o">.</span><span class="n">NFALSE</span><span class="p">:</span>
+                <span class="n">outflow</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">LinExpr</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;vh</span><span class="si">{</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">obj</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)])</span>
+                <span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;vl</span><span class="si">{</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">obj</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)])</span>
+                <span class="n">outflow</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">LinExpr</span><span class="p">(</span><span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span> <span class="o">+</span>
+                                     <span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)])</span>
+
+            <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">inflow</span> <span class="o">==</span> <span class="n">outflow</span><span class="p">,</span>
+                                               <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;cont-at-</span><span class="si">{</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">DD</span><span class="o">.</span><span class="n">NTRUE</span> <span class="ow">and</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">DD</span><span class="o">.</span><span class="n">NFALSE</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">inc_nodes_new</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">inc_nodes_new</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">inc_nodes_new</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]]</span>
+
+            <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">DD</span><span class="o">.</span><span class="n">NTRUE</span> <span class="ow">and</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">DD</span><span class="o">.</span><span class="n">NFALSE</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">inc_nodes_new</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">inc_nodes_new</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">inc_nodes_new</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]]</span>
+
+        <span class="n">incoming_flows</span> <span class="o">=</span> <span class="n">inc_nodes_new</span>
+
+    <span class="n">model</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="solve_with_intBDD"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.solve_with_intBDD">[docs]</a><span class="k">def</span> <span class="nf">solve_with_intBDD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Solves the UFL instance by aligning two BDDs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">       S (list): neighborhood list</span>
+<span class="sd">       f (dict): facility location costs</span>
+<span class="sd">       g (dict): overlap penalty dict.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Resulting model, constraints, and variables.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">create_availability_BDD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">create_covering_BDD_wg</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+    <span class="n">vs_A</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">A</span><span class="o">.</span><span class="n">layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="n">vs_C</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">C</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">C</span><span class="o">.</span><span class="n">layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+
+    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">vs_A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">vs_C</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">bb</span><span class="o">.</span><span class="n">BBSearch</span><span class="p">(</span><span class="n">vs_A</span><span class="p">,</span> <span class="n">vs_C</span><span class="p">)</span>
+
+    <span class="c1"># bb.TIMEOUT_ITERATIONS=10000</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;optimal&quot;</span> <span class="ow">or</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;timeout&quot;</span>
+
+    <span class="n">Ap</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">Cp</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">int_DD</span> <span class="o">=</span> <span class="n">DD</span><span class="o">.</span><span class="n">intersect</span><span class="p">(</span><span class="n">Ap</span><span class="p">,</span> <span class="n">Cp</span><span class="p">)</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">create_NF</span><span class="p">(</span><span class="n">int_DD</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">setParam</span><span class="p">(</span><span class="s2">&quot;OutputFlag&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">m</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="build_DP_DD"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.build_DP_DD">[docs]</a><span class="k">def</span> <span class="nf">build_DP_DD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Builds a BDD for the UFL problem (with x-variables only)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">       S (list): neighborhood list,</span>
+<span class="sd">       f (dict): location costs,</span>
+<span class="sd">       g (dict): overlap costs.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The resulting BDD.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        - employs a DP approach with state being the number of overlaps</span>
+<span class="sd">            for each customer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Sf</span> <span class="o">=</span> <span class="n">build_Sf</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">DD</span><span class="o">.</span><span class="n">BDD</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">Sf</span><span class="p">),</span> <span class="nb">vars</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">Sf</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)],</span>
+               <span class="n">weighted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># a *state* is the number of overlaps for each customer</span>
+    <span class="n">root_state</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">))]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">({</span><span class="n">DD</span><span class="o">.</span><span class="n">NROOT</span><span class="p">:</span> <span class="n">root_state</span><span class="p">})</span>
+    <span class="n">next_layer</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">root_state</span><span class="p">):</span> <span class="n">D</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="kc">None</span><span class="p">)}</span>
+
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">Sf</span><span class="p">):</span>
+        <span class="n">current_layer</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">next_layer</span><span class="p">)</span>
+        <span class="n">next_layer</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">current_layer</span><span class="p">:</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">current_layer</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">state</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">next_layer</span><span class="p">:</span>
+                <span class="n">D</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">next_layer</span><span class="p">[</span><span class="n">state</span><span class="p">],</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">newnode</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                <span class="n">next_layer</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">state</span><span class="p">:</span> <span class="n">newnode</span><span class="p">})</span>
+                <span class="n">node_labels</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">newnode</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">state</span><span class="p">)})</span>
+
+            <span class="n">next_state</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">Sf</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">next_state</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">next_state</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">next_state</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">next_state</span> <span class="ow">in</span> <span class="n">next_layer</span><span class="p">:</span>
+                <span class="n">D</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">next_layer</span><span class="p">[</span><span class="n">next_state</span><span class="p">],</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span>
+                        <span class="n">edge_weight</span><span class="o">=</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">newnode</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">next_layer</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">next_state</span><span class="p">:</span> <span class="n">newnode</span><span class="p">})</span>
+                <span class="n">node_labels</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">newnode</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">next_state</span><span class="p">)})</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">next_layer</span><span class="p">:</span>
+        <span class="n">w_hi</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">g</span><span class="p">[(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+                          <span class="k">if</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Sf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">else</span> <span class="n">g</span><span class="p">[(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="n">j</span><span class="p">])]</span>
+                          <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="p">)))</span>
+
+        <span class="n">w_lo</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">g</span><span class="p">[(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="n">j</span><span class="p">])]</span>
+                   <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="p">)))</span>
+
+        <span class="n">node_id</span> <span class="o">=</span> <span class="n">next_layer</span><span class="p">[</span><span class="n">state</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
+        <span class="n">D</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NTRUE</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">w_hi</span><span class="p">)</span>
+        <span class="n">D</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">DD</span><span class="o">.</span><span class="n">NTRUE</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">w_lo</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">D</span><span class="p">,</span> <span class="n">node_labels</span></div>
+<span class="c1"># =====================================================================</span>
+<span class="c1"># Testing code</span>
+<span class="c1"># =====================================================================</span>
+
+<div class="viewcode-block" id="make_simple_problem"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.make_simple_problem">[docs]</a><span class="k">def</span> <span class="nf">make_simple_problem</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Creates a &#39;toy&#39; UFLP instance (for debugging).&quot;&quot;&quot;</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">11</span><span class="p">,</span>  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">12</span><span class="p">,</span>  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">13</span><span class="p">,</span>  <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">14</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span>  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span>  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span>  <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mf">2.1</span><span class="p">,</span>  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mf">2.2</span><span class="p">,</span>  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mf">2.3</span><span class="p">,</span>  <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mf">2.4</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mf">3.1</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span></div>
+
+
+<div class="viewcode-block" id="show_BDD_to_MIP"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.show_BDD_to_MIP">[docs]</a><span class="k">def</span> <span class="nf">show_BDD_to_MIP</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Tests making a MIP from a single BDD.&quot;&quot;&quot;</span>
+    <span class="c1"># adhoc experiments</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">DD</span><span class="o">.</span><span class="n">BDD</span><span class="p">()</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;tests/simple_DD.bdd&quot;</span><span class="p">)</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;A.dot&quot;</span><span class="p">)</span>
+
+    <span class="n">B</span> <span class="o">=</span> <span class="n">DD</span><span class="o">.</span><span class="n">BDD</span><span class="p">()</span>
+    <span class="n">B</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;tests/simple_BDD_different_vars.bdd&quot;</span><span class="p">)</span>
+    <span class="n">B</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;B.dot&quot;</span><span class="p">)</span>
+
+    <span class="n">m</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">add_BDD_to_MIP</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;A_&quot;</span><span class="p">)</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">add_BDD_to_MIP</span><span class="p">(</span><span class="n">D</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;B_&quot;</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">display</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="show_build_MIP"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.show_build_MIP">[docs]</a><span class="k">def</span> <span class="nf">show_build_MIP</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Tests a simple MIP building function.&quot;&quot;&quot;</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">}</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mf">1.0</span><span class="p">,</span>  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mf">2.0</span><span class="p">,</span>  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mf">3.0</span><span class="p">,</span>  <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mf">4.0</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mf">1.1</span><span class="p">,</span>  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mf">2.1</span><span class="p">,</span>  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mf">3.1</span><span class="p">,</span>  <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mf">4.1</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mf">1.21</span><span class="p">,</span>  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mf">2.22</span><span class="p">,</span>  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mf">3.23</span><span class="p">,</span>  <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mf">4.24</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mf">3.33</span><span class="p">}</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;S=</span><span class="si">{</span><span class="n">S</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2"> f=</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2"> g=</span><span class="si">{</span><span class="n">g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;===&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The resulting MIP is:&quot;</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">build_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">display</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="show_BDD_build"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.show_BDD_build">[docs]</a><span class="k">def</span> <span class="nf">show_BDD_build</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Runs a simple test against a toy problem.&quot;&quot;&quot;</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">}</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mf">0.11</span><span class="p">,</span>  <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mf">0.12</span><span class="p">,</span>  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mf">0.22</span><span class="p">,</span>  <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mf">0.13</span><span class="p">,</span>
+         <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mf">0.23</span><span class="p">,</span>  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span> <span class="mf">0.24</span><span class="p">}</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span>  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span>  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span>  <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>  <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">2</span><span class="p">,</span>  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">2</span><span class="p">,</span>  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">2</span><span class="p">,</span>  <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">2</span><span class="p">}</span>
+
+    <span class="n">draw_problem_dia</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">create_covering_BDD_wg</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+    <span class="n">C</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">x_prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;covering.dot&quot;</span><span class="p">,</span> <span class="nb">dir</span><span class="o">=</span><span class="s2">&quot;run_logs&quot;</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">create_availability_BDD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">x_prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;availability.dot&quot;</span><span class="p">,</span> <span class="nb">dir</span><span class="o">=</span><span class="s2">&quot;run_logs&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="show_BDD_to_MIP_wg"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.show_BDD_to_MIP_wg">[docs]</a><span class="k">def</span> <span class="nf">show_BDD_to_MIP_wg</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Runs a simple test against a toy problem.&quot;&quot;&quot;</span>
+    <span class="n">draw_problem_dia</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">create_covering_BDD_wg</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+    <span class="n">C</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">x_prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;covering.dot&quot;</span><span class="p">,</span> <span class="nb">dir</span><span class="o">=</span><span class="s2">&quot;run_logs&quot;</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">create_availability_BDD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">x_prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;availability.dot&quot;</span><span class="p">,</span> <span class="nb">dir</span><span class="o">=</span><span class="s2">&quot;run_logs&quot;</span><span class="p">)</span>
+
+    <span class="n">m</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">add_BDD_to_MIP</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;A_&quot;</span><span class="p">)</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">add_BDD_to_MIP</span><span class="p">(</span><span class="n">D</span><span class="o">=</span><span class="n">C</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;C_&quot;</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">display</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="generate_test_figures"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.generate_test_figures">[docs]</a><span class="k">def</span> <span class="nf">generate_test_figures</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Generates a simple test instance and creates PDFs.&quot;&quot;&quot;</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">}</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mf">0.11</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mf">0.12</span><span class="p">,</span>
+         <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mf">0.21</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mf">0.22</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mf">0.23</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span> <span class="mf">0.24</span><span class="p">,</span>
+         <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mf">0.32</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mf">0.33</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span> <span class="mf">0.34</span><span class="p">,</span>
+         <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mf">0.43</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span> <span class="mf">0.44</span><span class="p">}</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span>  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span>  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span>  <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>  <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>  <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">2</span><span class="p">,</span>  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">2</span><span class="p">,</span>  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">2</span><span class="p">,</span>  <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">2</span><span class="p">}</span>
+
+    <span class="n">draw_problem_dia</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+
+    <span class="n">C</span> <span class="o">=</span> <span class="n">create_covering_BDD_wg</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+    <span class="n">C</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">x_prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;tst_covering.dot&quot;</span><span class="p">,</span> <span class="nb">dir</span><span class="o">=</span><span class="s2">&quot;run_logs&quot;</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">create_availability_BDD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">x_prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;tst_availability.dot&quot;</span><span class="p">,</span> <span class="nb">dir</span><span class="o">=</span><span class="s2">&quot;run_logs&quot;</span><span class="p">)</span>
+
+    <span class="n">m</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">add_BDD_to_MIP</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;A_&quot;</span><span class="p">)</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">add_BDD_to_MIP</span><span class="p">(</span><span class="n">D</span><span class="o">=</span><span class="n">C</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;C_&quot;</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">display</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="generate_test_instance"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.generate_test_instance">[docs]</a><span class="k">def</span> <span class="nf">generate_test_instance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates a test facility location instance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">       n (int): number of facilities</span>
+<span class="sd">       m (int): number of customers</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple of the following values.</span>
+
+<span class="sd">            - S (list): neighborhood list</span>
+<span class="sd">            - f (dict): costs of facility location</span>
+<span class="sd">              (generated uniformly random int from `f_min` to `f_max`)</span>
+<span class="sd">            - g (dict): overlap costs, keys: (customer, overlap)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+
+    <span class="n">good_instance</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">good_instance</span><span class="p">:</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span>
+                              <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">M</span><span class="p">]</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">N</span><span class="p">}</span>
+
+        <span class="n">g</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">M</span><span class="p">:</span>
+            <span class="n">g</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">,</span> <span class="mi">4</span><span class="o">*</span><span class="n">n</span><span class="p">)</span>
+            <span class="n">g</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">g</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">g</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span> <span class="o">+</span> \
+                    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">2</span><span class="o">+</span><span class="nb">int</span><span class="p">(</span><span class="mi">5</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="n">j</span><span class="p">))</span>
+
+        <span class="n">Sf</span> <span class="o">=</span> <span class="n">build_Sf</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">N</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Sf</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">good_instance</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span></div>
+
+
+<div class="viewcode-block" id="generate_dense_instance"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.generate_dense_instance">[docs]</a><span class="k">def</span> <span class="nf">generate_dense_instance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">covering</span><span class="o">=</span><span class="mf">0.95</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates a dense test facility location instance.</span>
+
+<span class="sd">    In the sense that every customer can be covered by (almost)</span>
+<span class="sd">    every facility.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n (int): number of facilities</span>
+<span class="sd">        m (int): number of customers</span>
+<span class="sd">        covering (float): share of facilities covering each customer</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple of the following values.</span>
+
+<span class="sd">            - S (list): neighborhood list</span>
+<span class="sd">            - f (dict): costs of facility location</span>
+<span class="sd">              (generated uniformly random int from `f_min` to `f_max`)</span>
+<span class="sd">            - g (dict): overlap costs, keys: (customer, overlap)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+
+    <span class="n">good_instance</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">good_instance</span><span class="p">:</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">covering</span><span class="p">),</span>
+                              <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">M</span><span class="p">]</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">N</span><span class="p">}</span>
+
+        <span class="n">g</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">M</span><span class="p">:</span>
+            <span class="n">g</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">,</span> <span class="mi">4</span><span class="o">*</span><span class="n">n</span><span class="p">)</span>
+            <span class="n">g</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">g</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">g</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span> <span class="o">+</span> \
+                    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">2</span><span class="o">+</span><span class="nb">int</span><span class="p">(</span><span class="mi">5</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="n">j</span><span class="p">))</span>
+
+        <span class="n">Sf</span> <span class="o">=</span> <span class="n">build_Sf</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">N</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Sf</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">good_instance</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span></div>
+
+
+<div class="viewcode-block" id="test_MIPs_protocol"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.test_MIPs_protocol">[docs]</a><span class="k">def</span> <span class="nf">test_MIPs_protocol</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Runs a series of cross-checks.</span>
+
+<span class="sd">    Uses :py:func:`generate_test_instance`.</span>
+
+<span class="sd">    Covers functions:</span>
+<span class="sd">        - build_MIP</span>
+<span class="sd">        - create_covering_BDD_wg</span>
+<span class="sd">        - create_availability_BDD</span>
+<span class="sd">        - add_BDD_to_MIP</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">test_protocol</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                     <span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+                     <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">test_protocol</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Testing </span><span class="si">{</span><span class="n">test</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> instances with n=</span><span class="si">{</span><span class="n">test</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">, m=</span><span class="si">{</span><span class="n">test</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">test_BDD_and_plain_MIPs</span><span class="p">(</span><span class="n">K</span><span class="o">=</span><span class="n">test</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="n">test</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">m</span><span class="o">=</span><span class="n">test</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test finished.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_BDD_and_plain_MIPs"><a class="viewcode-back" href="../_autosummary/UFL.html#UFL.test_BDD_and_plain_MIPs">[docs]</a><span class="k">def</span> <span class="nf">test_BDD_and_plain_MIPs</span><span class="p">(</span><span class="n">K</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">TOL</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tests that objectives for the two MIPs coincide.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        K (int): number of instances to generate (default 500)</span>
+<span class="sd">        TOL (float): objective tolerance (for comparison) (default 1e-3)</span>
+<span class="sd">        n (int): number of facilities (default 3)</span>
+<span class="sd">        m (type): number of customers (default 4)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Nothing (outputs the success rate to the screen)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># define a problem</span>
+    <span class="n">no_success</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">plain_MIP_time</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">CPP_MIP_time</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+        <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">generate_test_instance</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">)</span>
+
+        <span class="c1"># Generate and solve plain MIP</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">build_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">setParam</span><span class="p">(</span><span class="s2">&quot;OutputFlag&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+        <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">plain_MIP_time</span> <span class="o">+=</span> <span class="p">(</span><span class="n">t1</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="n">GRB</span><span class="o">.</span><span class="n">OPTIMAL</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Plain MIP status is: </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">S=</span><span class="si">{</span><span class="n">S</span><span class="si">}</span><span class="s2">; f=</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2">; g=</span><span class="si">{</span><span class="n">g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">plain_MIP_obj</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">objVal</span>
+
+        <span class="c1"># Generate and solve CPP MIP</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">create_covering_BDD_wg</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">create_availability_BDD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+        <span class="n">model</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">add_BDD_to_MIP</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;A_&quot;</span><span class="p">)</span>
+        <span class="n">model</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">add_BDD_to_MIP</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;C_&quot;</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">setParam</span><span class="p">(</span><span class="s2">&quot;OutputFlag&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+        <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">CPP_MIP_time</span> <span class="o">+=</span> <span class="p">(</span><span class="n">t1</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="n">GRB</span><span class="o">.</span><span class="n">OPTIMAL</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CPP MIP status is: </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">S=</span><span class="si">{</span><span class="n">S</span><span class="si">}</span><span class="s2">; f=</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2">; g=</span><span class="si">{</span><span class="n">g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="n">CPP_MIP_obj</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">objVal</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">CPP_MIP_obj</span> <span class="o">-</span> <span class="n">plain_MIP_obj</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TOL</span><span class="p">:</span>
+            <span class="n">no_success</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;!&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">S=</span><span class="si">{</span><span class="n">S</span><span class="si">}</span><span class="s2">; f=</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2">; g=</span><span class="si">{</span><span class="n">g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Testing finished. Success rate: </span><span class="si">{</span><span class="n">no_success</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="n">K</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean times (per instance), construction + solving:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Plain MIP: </span><span class="si">{</span><span class="n">plain_MIP_time</span> <span class="o">/</span> <span class="n">K</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> sec.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CPP MIP: </span><span class="si">{</span><span class="n">CPP_MIP_time</span> <span class="o">/</span> <span class="n">K</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> sec.&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># benchmark(K=int(args.K), n=int(args.n), m=int(args.m), prefix=args.prefix)</span>
+    <span class="c1"># Procedure that is run if executed from the command line</span>
+
+    <span class="c1"># S = [[1], [1, 2], [1, 2, 3], [2, 3]]</span>
+    <span class="c1"># f = {1: 0.1, 2: 0.2, 3: 0.3}</span>
+    <span class="c1"># g = {</span>
+    <span class="c1">#     (1, 0): 0,  (2, 0): 0,  (3, 0): 0,  (4, 0): 0,</span>
+    <span class="c1">#     (1, 1): 1,  (2, 1): 1,  (3, 1): 1,  (4, 1): 1,</span>
+    <span class="c1">#     (1, 2): 2,  (2, 2): 2,  (3, 2): 2,  (4, 2): 2,</span>
+    <span class="c1">#     (3, 3): 3}</span>
+
+    <span class="c1"># m = build_MIP(S, f, c, g)</span>
+    <span class="c1"># print(&quot;*==============================================================*&quot;)</span>
+    <span class="c1"># print(&quot;* A MIP for the problem:                                       *&quot;)</span>
+    <span class="c1"># print(&quot;*==============================================================*&quot;)</span>
+    <span class="c1"># m.display()</span>
+
+    <span class="c1"># test_MIPs_protocol()</span>
+    <span class="c1"># test_build_MIP()</span>
+    <span class="c1"># test_BDD_to_MIP_wg(S, f, g)</span>
+    <span class="c1"># generate_test_figures()</span>
+    <span class="c1"># test_BDD_to_MIP()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

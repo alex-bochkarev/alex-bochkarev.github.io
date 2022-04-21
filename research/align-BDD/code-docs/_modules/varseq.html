@@ -1,0 +1,451 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>varseq &mdash; Align-BDD  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#reproducibility">Reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#code-organization">Code organization</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>varseq</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for varseq</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Implements weighted variable sequences data structure.</span>
+
+<span class="sd">Mostly mirrors the corresponding key methods of :py:class:`BDD.BDD`</span>
+<span class="sd">class.</span>
+
+<span class="sd">Tests coverage: :py:mod:`varseq_test`</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">iters</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<div class="viewcode-block" id="VarSeq"><a class="viewcode-back" href="../_autosummary/varseq.html#varseq.VarSeq">[docs]</a><span class="k">class</span> <span class="nc">VarSeq</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Implements weighted variable sequence data structure.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_vars</span><span class="p">,</span> <span class="n">layer_sizes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Class constructor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            layer_vars (list): variable labels (strings or ints),</span>
+<span class="sd">            layer_sizes (list): variable weights (integers)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">layer_vars</span><span class="p">)</span><span class="o">==</span><span class="nb">len</span><span class="p">(</span><span class="n">layer_sizes</span><span class="p">)</span> <span class="c1"># obviously, each layer should have a size</span>
+        <span class="c1"># NOTE: we do not enforce n_1 = 1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_var</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">layer_vars</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">layer_sizes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">layer_vars</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">layer_vars</span><span class="p">))))</span> <span class="c1"># dictionary of var positions</span>
+
+    <span class="c1"># generating a random varseq</span>
+<div class="viewcode-block" id="VarSeq.generate_weights"><a class="viewcode-back" href="../_autosummary/varseq.html#varseq.VarSeq.generate_weights">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">generate_weights</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates a random valid sequence of ``N`` weights.</span>
+
+<span class="sd">        That is, respects the requirement: :math:`n_{i+1} \leq 2n_i`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">ns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">ns</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VarSeq.random"><a class="viewcode-back" href="../_autosummary/varseq.html#varseq.VarSeq.random">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">vars</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">7</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates a random variable sequence.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :py:class:`VarSeq`: an object representing a weighted</span>
+<span class="sd">            variable sequence with `N` variables and random element</span>
+<span class="sd">            weights. If no variable labels are given (in ``vars``),</span>
+<span class="sd">            uses a random permutation of integer labels 1,...,N.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">vars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="nb">vars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">([(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">layer_vars</span><span class="o">=</span><span class="nb">vars</span><span class="p">,</span><span class="n">layer_sizes</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">generate_weights</span><span class="p">(</span><span class="n">N</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="VarSeq.size"><a class="viewcode-back" href="../_autosummary/varseq.html#varseq.VarSeq.size">[docs]</a>    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the total sequence size (sum of element weights).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VarSeq.var_size"><a class="viewcode-back" href="../_autosummary/varseq.html#varseq.VarSeq.var_size">[docs]</a>    <span class="k">def</span> <span class="nf">var_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the element weight (given its label ``var``).&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="p">]</span></div>
+
+<div class="viewcode-block" id="VarSeq.S"><a class="viewcode-back" href="../_autosummary/varseq.html#varseq.VarSeq.S">[docs]</a>    <span class="k">def</span> <span class="nf">S</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span><span class="n">j</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns cost of sliding element ``a`` (label) to position ``j``.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span> <span class="c1"># nothing to do</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">j</span><span class="p">:</span>  <span class="c1"># &quot;slide forward&quot;</span>
+             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">a</span><span class="p">])])</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">a</span><span class="p">]]</span>
+
+        <span class="c1"># otherwise, it&#39;s p(a) &lt; j -- &quot;slide back&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">j</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">a</span><span class="p">]]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">a</span><span class="p">],</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span></div>
+
+    <span class="c1"># performs an actual &quot;slide&quot;</span>
+    <span class="c1"># of the element a(int) to position j</span>
+<div class="viewcode-block" id="VarSeq.slide"><a class="viewcode-back" href="../_autosummary/varseq.html#varseq.VarSeq.slide">[docs]</a>    <span class="k">def</span> <span class="nf">slide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Performs a sift of element ``a`` (label) to position ``j``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :py:class:`VarSeq`: a revised copy of a variable sequence</span>
+<span class="sd">            or a self-pointer (if ``inplace`` = *True*)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">s</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">j</span><span class="p">:</span> <span class="c1"># slide forward</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">a</span><span class="p">])</span> <span class="p">):</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="mi">2</span> <span class="c1"># update layer sizes</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="c1"># update layer vars</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">1</span> <span class="c1"># positions dictionary</span>
+
+            <span class="n">s</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">j</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">j</span><span class="p">:</span> <span class="c1"># slide backward</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">s</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># update layer sizes</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="c1"># update layer vars</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">-=</span> <span class="mi">1</span> <span class="c1"># update positions dict</span>
+
+            <span class="n">s</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">j</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="n">s</span></div>
+
+    <span class="c1">## auxiliary functions</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts the object to a string (used to print a sequence).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;Vars: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">n   : </span><span class="si">{}</span><span class="s1"> (sz=</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_var</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a sequence length (number of elements)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span>
+
+<div class="viewcode-block" id="VarSeq.count_inversions_to"><a class="viewcode-back" href="../_autosummary/varseq.html#varseq.VarSeq.count_inversions_to">[docs]</a>    <span class="k">def</span> <span class="nf">count_inversions_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_what</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Counts inversions with another list (or :py:class:`VarSeq`).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">to_what</span><span class="p">)</span><span class="o">==</span><span class="nb">list</span><span class="p">:</span>
+            <span class="n">to_what</span> <span class="o">=</span> <span class="n">VarSeq</span><span class="p">(</span><span class="n">to_what</span><span class="p">,[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">to_what</span><span class="p">))])</span>
+
+        <span class="n">invs</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">to_what</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">&gt;=</span> <span class="n">to_what</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">j</span><span class="p">]]:</span>
+                    <span class="n">invs</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">invs</span></div>
+
+    <span class="c1"># weighted variable sequence transformations (revisions)</span>
+<div class="viewcode-block" id="VarSeq.greedy_sort"><a class="viewcode-back" href="../_autosummary/varseq.html#varseq.VarSeq.greedy_sort">[docs]</a>    <span class="k">def</span> <span class="nf">greedy_sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_what</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Revises the :py:class:`VarSeq` to a given order of labels ``to_what``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            to_what (list / :py:class:`VarSeq`): target order of variables</span>
+<span class="sd">                (or a varseq where it can be extracted from.)</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            A naive implementation / cross-check, &quot;sift-align&quot; procedure, :math:`O(N^2)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">to_what</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">to_what</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span>
+
+        <span class="n">galigned</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">);</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+            <span class="n">galigned</span> <span class="o">=</span> <span class="n">galigned</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">to_what</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">galigned</span><span class="p">;</span></div>
+
+<div class="viewcode-block" id="VarSeq.align_to"><a class="viewcode-back" href="../_autosummary/varseq.html#varseq.VarSeq.align_to">[docs]</a>    <span class="k">def</span> <span class="nf">align_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_what</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Revises the varseq to given variable order in :math:`O(N)` time.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            to_what: a list/tuple/np.darray of target var names,</span>
+<span class="sd">            or a variable sequence (to extract variable labels from).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :py:class:`VarSeq`: a revised variable sequence</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            The original sequence in unchanged (the operation is NOT in-place!)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">to_what</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">to_what</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">to_what</span><span class="p">,</span><span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">to_what</span><span class="p">,</span><span class="nb">tuple</span><span class="p">)</span> \
+                <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">to_what</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+            <span class="n">to_what</span> <span class="o">=</span> <span class="n">to_what</span><span class="o">.</span><span class="n">layer_var</span>
+
+        <span class="c1"># to-be var indices for each variable</span>
+        <span class="c1"># in the current sequence</span>
+        <span class="n">var_ind</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">))]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">to_what</span><span class="p">)):</span>
+            <span class="n">var_ind</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">to_what</span><span class="p">[</span><span class="n">i</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">i</span>
+
+        <span class="c1"># var_ind[i] now is the index of the i-th variable  in the *target* alignment</span>
+
+        <span class="c1"># initalize an empty sequence (-1 to indicate un-init value)</span>
+        <span class="n">lsorted</span> <span class="o">=</span> <span class="n">VarSeq</span><span class="p">(</span><span class="n">to_what</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+        <span class="n">sliding_up</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">iB</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">iA</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">iA</span><span class="p">]</span> <span class="ow">in</span> <span class="n">sliding_up</span><span class="p">:</span>
+                <span class="c1">## a &quot;sinking&quot; element found</span>
+
+                <span class="n">lsorted</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="n">iB</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="n">iA</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="nb">len</span><span class="p">(</span><span class="n">sliding_up</span><span class="p">))</span>
+
+                <span class="k">while</span> <span class="n">iB</span> <span class="o">&lt;</span> <span class="n">var_ind</span><span class="p">[</span><span class="n">iA</span><span class="p">]:</span>
+                    <span class="n">sliding_up</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">lsorted</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">iB</span><span class="p">])</span>
+                    <span class="n">iB</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">lsorted</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="n">iB</span><span class="p">]</span> <span class="o">=</span> <span class="n">lsorted</span><span class="o">.</span><span class="n">n</span><span class="p">[</span><span class="n">iB</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">2</span>
+                <span class="n">iB</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sliding_up</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">iA</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">lsorted</span></div>
+
+<div class="viewcode-block" id="VarSeq.OA_bruteforce"><a class="viewcode-back" href="../_autosummary/varseq.html#varseq.VarSeq.OA_bruteforce">[docs]</a>    <span class="k">def</span> <span class="nf">OA_bruteforce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">with_what</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Enumerates all possible alignments with another sequence.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            with_what (:py:class:`VarSeq`): target ordering.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: [``&lt;no. of optima&gt;``, ``&lt;list of A-aligned&gt;``, ``&lt;list of B-aligned&gt;``]</span>
+
+<span class="sd">        Example:</span>
+
+<span class="sd">            Having the returned object ``res``, ``res[0]`` gives the</span>
+<span class="sd">            number of optima. Then, assuming it is at least 3,</span>
+<span class="sd">            ``res[1][2]`` gives A-aligned in the third optimum,</span>
+<span class="sd">            ``res[2][2]`` gives B-aligned in the third optimum.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># generate all possible permutations</span>
+        <span class="n">perms</span> <span class="o">=</span> <span class="n">iters</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span>
+        <span class="n">min_size</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+        <span class="n">A_aligned</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">B_aligned</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">alternatives</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">perms</span><span class="p">:</span>
+            <span class="n">A_c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">perm</span><span class="p">)</span>
+            <span class="n">B_c</span> <span class="o">=</span> <span class="n">with_what</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">perm</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">min_size</span> <span class="o">&gt;</span> <span class="n">A_c</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B_c</span><span class="o">.</span><span class="n">size</span><span class="p">():</span>
+                <span class="n">A_aligned</span> <span class="o">=</span> <span class="p">[</span><span class="n">A_c</span><span class="p">]</span>
+                <span class="n">B_aligned</span> <span class="o">=</span> <span class="p">[</span><span class="n">B_c</span><span class="p">]</span>
+                <span class="n">min_size</span> <span class="o">=</span> <span class="n">A_c</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">B_c</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+                <span class="n">alternatives</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">min_size</span> <span class="o">==</span> <span class="n">A_c</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B_c</span><span class="o">.</span><span class="n">size</span><span class="p">():</span>
+                <span class="n">A_aligned</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">A_c</span><span class="p">)</span>
+                <span class="n">B_aligned</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">B_c</span><span class="p">)</span>
+                <span class="n">alternatives</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">alternatives</span><span class="p">,</span> <span class="n">A_aligned</span><span class="p">,</span> <span class="n">B_aligned</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="VarSeq.is_aligned"><a class="viewcode-back" href="../_autosummary/varseq.html#varseq.VarSeq.is_aligned">[docs]</a>    <span class="k">def</span> <span class="nf">is_aligned</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_what</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function: checks if varseq is aligned with ``to_what``.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_var</span><span class="p">,</span> <span class="n">to_what</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span></div></div>
+
+<span class="c1">######################################################################</span>
+<span class="c1">## Auxiliary functions (outside of the varseq class)</span>
+
+<div class="viewcode-block" id="non_dominated"><a class="viewcode-back" href="../_autosummary/varseq.html#varseq.non_dominated">[docs]</a><span class="k">def</span> <span class="nf">non_dominated</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks if the element &quot;e&quot; is non-dominated.</span>
+
+<span class="sd">    Considering ``e`` as a candidate for the last position</span>
+<span class="sd">    in the target alignment of :py:class:`VarSeq` -s ``A`` and ``B``,</span>
+<span class="sd">    check if it is non-dominated.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        *True* = non-dominated, *False* = dominated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">A</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">e</span><span class="p">]</span><span class="o">==</span><span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">B</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">e</span><span class="p">]</span><span class="o">==</span><span class="nb">len</span><span class="p">(</span><span class="n">B</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">e</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span><span class="o">.</span><span class="n">isdisjoint</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">B</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">e</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">:]))</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,969 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>BDD &mdash; Align-BDD  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="varseq" href="varseq.html" />
+    <link rel="prev" title="Implementation: overview" href="../overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#reproducibility">Reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../overview.html#code-organization">Code organization</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#producing-figures">Producing figures</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">BDD</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-summary">Module summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">BDD</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#node">node</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="varseq.html">varseq</a></li>
+<li class="toctree-l3"><a class="reference internal" href="heuristics.html">heuristics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BB_search.html">BB_search</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#testing-framework">Testing framework</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
+        
+      <li>BDD</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_autosummary/BDD.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <span class="target" id="module-BDD"></span><div class="section" id="bdd">
+<h1>BDD<a class="headerlink" href="#bdd" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-summary">
+<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this headline">¶</a></h2>
+<p>Implements the Binary Decision Diagram data type.</p>
+<p>Defines the “original” BDD-related machinery (as opposed to the
+simplification defined in <a class="reference internal" href="varseq.html#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">varseq.VarSeq</span></code></a>), including
+actual simultaneous variable reordering (inspired by Rudell’93) and
+other BDD alignment-related functions, along with technical utilities
+(such as load/save to file, etc.). A simple auxiliary class
+<a class="reference internal" href="#BDD.node" title="BDD.node"><code class="xref py py-class docutils literal notranslate"><span class="pre">node</span></code></a> keeps the necessary data related to BDD nodes.</p>
+<p>Tests coverage: <a class="reference internal" href="BDD_test.html#module-BDD_test" title="BDD_test"><code class="xref py py-mod docutils literal notranslate"><span class="pre">BDD_test</span></code></a></p>
+<p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
+<p class="centered">
+<strong>❖❖❖</strong></p><div class="section" id="implements-classes">
+<h3>Implements classes:<a class="headerlink" href="#implements-classes" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.BDD" title="BDD.BDD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BDD</span></code></a>([N, vars, weighted])</p></td>
+<td><p>Encodes a BDD and implements layer-ordering (revision) methods.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.node" title="BDD.node"><code class="xref py py-obj docutils literal notranslate"><span class="pre">node</span></code></a>(id[, hi, lo, layer])</p></td>
+<td><p>Represents a BDD node, with the following attributes.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="implements-functions-outside-the-classes-above">
+<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.intersect" title="BDD.intersect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">intersect</span></code></a>(A, B)</p></td>
+<td><p>Produces an intersection BDD of <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.simscore" title="BDD.simscore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simscore</span></code></a>(seq_A, seq_B[, p_B])</p></td>
+<td><p>Calculates a ‘similarity score’ between <cite>A</cite> and <cite>B</cite>.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="centered">
+<strong>❖❖❖</strong></p><p class="centered">
+<strong>Implementation details</strong></p><p class="centered">
+<strong>❖❖❖</strong></p></div>
+</div>
+<div class="section" id="id1">
+<h2>BDD<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="BDD.BDD">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">BDD.</span></code><code class="sig-name descname"><span class="pre">BDD</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encodes a BDD and implements layer-ordering (revision) methods.</p>
+<dl class="py attribute">
+<dt id="BDD.BDD.N">
+<code class="sig-name descname"><span class="pre">N</span></code><a class="headerlink" href="#BDD.BDD.N" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of variables (equals number of layers - 1)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="BDD.BDD.layers">
+<code class="sig-name descname"><span class="pre">layers</span></code><a class="headerlink" href="#BDD.BDD.layers" title="Permalink to this definition">¶</a></dt>
+<dd><p>a list of layers (sets/hashes), including {T, F}-nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="BDD.BDD.nodes">
+<code class="sig-name descname"><span class="pre">nodes</span></code><a class="headerlink" href="#BDD.BDD.nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>a set/hash of nodes, key by node ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="BDD.BDD.vars">
+<code class="sig-name descname"><span class="pre">vars</span></code><a class="headerlink" href="#BDD.BDD.vars" title="Permalink to this definition">¶</a></dt>
+<dd><p>variables associated with layers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname"><span class="pre">T,F</span></code></dt>
+<dd><p>pointers to <cite>True</cite> and <cite>False</cite> sink nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#BDD.node" title="BDD.node">node</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="BDD.BDD.weighted">
+<code class="sig-name descname"><span class="pre">weighted</span></code><a class="headerlink" href="#BDD.BDD.weighted" title="Permalink to this definition">¶</a></dt>
+<dd><p>a flag whether arcs have weights</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="BDD.BDD.weights">
+<code class="sig-name descname"><span class="pre">weights</span></code><a class="headerlink" href="#BDD.BDD.weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>arc weights, keys: <cite>(id_from, id_to, arc_type)</cite>
+(with the latter either ‘hi’, or ‘lo’)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="autoclasstoc docutils container">
+<p class="rubric">Public Methods:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code>([N, vars, weighted])</p></td>
+<td><p>Defines an empty BDD with N variables.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.BDD.link" title="BDD.BDD.link"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link</span></code></a>(parent, child[, etype, edge_weight])</p></td>
+<td><p>Creates a link between two nodes in the BDD.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.BDD.llink" title="BDD.BDD.llink"><code class="xref py py-obj docutils literal notranslate"><span class="pre">llink</span></code></a>(parent, child[, etype, edge_weight])</p></td>
+<td><p>Creates a link between two nodes.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__len__</span></code>()</p></td>
+<td><p>Returns no of variables (layers, except the terminal).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.BDD.n" title="BDD.BDD.n"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code></a>(i)</p></td>
+<td><p>Returns size of the i-th layer.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.BDD.p" title="BDD.BDD.p"><code class="xref py py-obj docutils literal notranslate"><span class="pre">p</span></code></a>(a)</p></td>
+<td><p>Returns position (0-based layer index) of variable <code class="docutils literal notranslate"><span class="pre">a</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.BDD.size" title="BDD.BDD.size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">size</span></code></a>()</p></td>
+<td><p>Returns the size of the BDD (total no.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.BDD.new_node_name" title="BDD.BDD.new_node_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">new_node_name</span></code></a>()</p></td>
+<td><p>Returns a unique name for the next node to be created.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.BDD.dump_gv" title="BDD.BDD.dump_gv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump_gv</span></code></a>([layerCapt, x_prefix, node_labels])</p></td>
+<td><p>Exports the BDD to the Graphviz format (<code class="docutils literal notranslate"><span class="pre">.dot</span></code>).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.BDD.addnode" title="BDD.BDD.addnode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addnode</span></code></a>(parent_node[, arc, node_id, edge_weight])</p></td>
+<td><p>Adds a node and updates aux info as necessary.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.BDD.swap_up" title="BDD.BDD.swap_up"><code class="xref py py-obj docutils literal notranslate"><span class="pre">swap_up</span></code></a>(layer_idx)</p></td>
+<td><p>Swaps the layer with the one immediately above it (in-place).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.BDD.sift" title="BDD.BDD.sift"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sift</span></code></a>(var, pos)</p></td>
+<td><p>Sifts variable <code class="docutils literal notranslate"><span class="pre">var</span></code> (by name) to (0-based) position <code class="docutils literal notranslate"><span class="pre">pos</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.BDD.gsifts" title="BDD.BDD.gsifts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gsifts</span></code></a>(with_whom[, start_order])</p></td>
+<td><p>Performs greedy sifts to align with <code class="docutils literal notranslate"><span class="pre">with_whom</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.BDD.save" title="BDD.BDD.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(filename)</p></td>
+<td><p>Saves a BDD to a text file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.BDD.load" title="BDD.BDD.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code></a>(filename[, weighted])</p></td>
+<td><p>Loads a BDD from a (text) file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.BDD.random" title="BDD.BDD.random"><code class="xref py py-obj docutils literal notranslate"><span class="pre">random</span></code></a>([N, p, weighted])</p></td>
+<td><p>Generates a random BDD with <cite>N</cite> variables (N+1 layers).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.BDD.profile" title="BDD.BDD.profile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">profile</span></code></a>()</p></td>
+<td><p>Returns a BDD “profile” – an (almost) BFS-ordered list of nodes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.BDD.show" title="BDD.BDD.show"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show</span></code></a>([dir, filename, layerCapt, x_prefix, …])</p></td>
+<td><p>Shows the diagram on the screen (saving the auxiliary pdf).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.BDD.align_to" title="BDD.BDD.align_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">align_to</span></code></a>(vars_order[, inplace])</p></td>
+<td><p>Revises the BDD to a given order.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.BDD.OA_bruteforce" title="BDD.BDD.OA_bruteforce"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OA_bruteforce</span></code></a>(with_what[, LR])</p></td>
+<td><p>Finds the best (smallest) alignment with BDD <code class="docutils literal notranslate"><span class="pre">with_what</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.BDD.is_reduced" title="BDD.BDD.is_reduced"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_reduced</span></code></a>()</p></td>
+<td><p>Checks if the BDD is quasi-reduced (no “redundant” nodes).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.BDD.make_reduced" title="BDD.BDD.make_reduced"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_reduced</span></code></a>()</p></td>
+<td><p>Makes the BDD quasi-reduced.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.BDD.rename_vars" title="BDD.BDD.rename_vars"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename_vars</span></code></a>(ren_dict)</p></td>
+<td><p>Helper function: renames variables.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.BDD.shuffle_vars" title="BDD.BDD.shuffle_vars"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shuffle_vars</span></code></a>()</p></td>
+<td><p>Randomly renames the variables (shuffles their order).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.BDD.is_aligned" title="BDD.BDD.is_aligned"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_aligned</span></code></a>(to_what)</p></td>
+<td><p>Checks if the BDD is aligned with <code class="docutils literal notranslate"><span class="pre">to_what</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.BDD.get_value" title="BDD.BDD.get_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_value</span></code></a>(x)</p></td>
+<td><p>Finds the terminal node (T or F) – an endpoint for <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.BDD.truth_table" title="BDD.BDD.truth_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">truth_table</span></code></a>()</p></td>
+<td><p>Returns a “truth table” for the encoded Boolean function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.BDD.is_equivalent" title="BDD.BDD.is_equivalent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_equivalent</span></code></a>(B)</p></td>
+<td><p>Checks if two BDDs (A and B) are equivalent.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD.BDD.shortest_path" title="BDD.BDD.shortest_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shortest_path</span></code></a>()</p></td>
+<td><p>Finds a shortest-path in O(<cite>no-of-nodes</cite>) time.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.BDD.simscore" title="BDD.BDD.simscore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simscore</span></code></a>(B)</p></td>
+<td><p>Computes a simscore with another diagram, <cite>B</cite> (see <a class="reference internal" href="#BDD.simscore" title="BDD.simscore"><code class="xref py py-func docutils literal notranslate"><span class="pre">simscore()</span></code></a>).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<dl class="py method">
+<dt id="BDD.BDD.OA_bruteforce">
+<code class="sig-name descname"><span class="pre">OA_bruteforce</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">with_what</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.OA_bruteforce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.OA_bruteforce" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the best (smallest) alignment with BDD <code class="docutils literal notranslate"><span class="pre">with_what</span></code>.</p>
+<p>Uses brute-force enumeration of all possible orders.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>with_what</strong> (<a class="reference internal" href="#BDD.BDD" title="BDD.BDD"><em>BDD</em></a>) – target diagram.</p></li>
+<li><p><strong>LR</strong> (<em>bool</em>) – if set, layer-reduces each candidate BDD.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>A tuple of values</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>alternatives (int): number of alternative optima</p></li>
+<li><p>A_aligned (list): of A-aligned (in each optimum)</p></li>
+<li><p>B_aligned (list): of B-aligned (in respective optimum)</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.addnode">
+<code class="sig-name descname"><span class="pre">addnode</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent_node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.addnode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.addnode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a node and updates aux info as necessary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.align_to">
+<code class="sig-name descname"><span class="pre">align_to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vars_order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.align_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.align_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Revises the BDD to a given order.</p>
+<p>(with a series of consecutive sifts)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.dump_gv">
+<code class="sig-name descname"><span class="pre">dump_gv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layerCapt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.dump_gv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.dump_gv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports the BDD to the Graphviz format (<code class="docutils literal notranslate"><span class="pre">.dot</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>layerCapt</strong> (<em>bool</em>) – whether to generate layer captions.</p></li>
+<li><p><strong>x_prefix</strong> (<em>str</em>) – a prefix to be shown for layer name (default ‘x’)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a Digraph object (see <code class="docutils literal notranslate"><span class="pre">graphviz</span></code> package).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.get_value">
+<code class="sig-name descname"><span class="pre">get_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.get_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the terminal node (T or F) – an endpoint for <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+<p>Returns a terminal node ID corresponding to the variable choices in <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>dict</em>) – of {var_name: value}, where value is in {0,1}.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>A tuple of values</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>terminal (bool or <cite>-1</cite>):</dt><dd><p>terminal node corresponding to the path
+implied by x, encoded as Boolean (or -1 if error)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>cost (float):</dt><dd><p>if the BDD is weighted, cost of the path.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.gsifts">
+<code class="sig-name descname"><span class="pre">gsifts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">with_whom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.gsifts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.gsifts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs greedy sifts to align with <code class="docutils literal notranslate"><span class="pre">with_whom</span></code>.</p>
+<p>Runs a simplistic implementation of Rudell’93
+sifting alorithm extension to minimize |A|+|B|</p>
+<p>starts with aligning to <code class="docutils literal notranslate"><span class="pre">self</span></code> or <code class="docutils literal notranslate"><span class="pre">start_order</span></code> (if given)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.is_aligned">
+<code class="sig-name descname"><span class="pre">is_aligned</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_what</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.is_aligned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.is_aligned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the BDD is aligned with <code class="docutils literal notranslate"><span class="pre">to_what</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.is_equivalent">
+<code class="sig-name descname"><span class="pre">is_equivalent</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.is_equivalent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.is_equivalent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if two BDDs (A and B) are equivalent.</p>
+<p>Equivalent in the sense that they define the same Boolean
+function and the corresponding path costs coincide. Checks:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>if the corresponding truth tables coincide.</p></li>
+<li><p>(if the BDD is weighted) if all paths have the same costs.</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>A tuple of</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>result (bool): whether the diagrams are equivalent,</p></li>
+<li><p>message (str): information regarding the difference, if found.</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.is_reduced">
+<code class="sig-name descname"><span class="pre">is_reduced</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.is_reduced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.is_reduced" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the BDD is quasi-reduced (no “redundant” nodes).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.link">
+<code class="sig-name descname"><span class="pre">link</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">child</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.link"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.link" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a link between two nodes in the BDD.</p>
+<p>(Saving auxiliary info as appropriate)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parent</strong> (<em>int</em>) – parent node id</p></li>
+<li><p><strong>child</strong> (<em>int</em>) – child node id</p></li>
+<li><p><strong>etype</strong> (<em>str</em>) – edge type, <code class="docutils literal notranslate"><span class="pre">hi</span></code> or <code class="docutils literal notranslate"><span class="pre">lo</span></code> (default <code class="docutils literal notranslate"><span class="pre">hi</span></code>)</p></li>
+<li><p><strong>edge_weight</strong> (<em>float</em>) – edge weight (default 0.0)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.llink">
+<code class="sig-name descname"><span class="pre">llink</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">child</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.llink"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.llink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a link between two nodes.</p>
+<p>A version of <a class="reference internal" href="#BDD.BDD.link" title="BDD.BDD.link"><code class="xref py py-func docutils literal notranslate"><span class="pre">BDD.BDD.link()</span></code></a> that takes
+<a class="reference internal" href="#BDD.node" title="BDD.node"><code class="xref py py-class docutils literal notranslate"><span class="pre">BDD.node</span></code></a> objects as arguments instead of node
+IDs.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.load">
+<code class="sig-name descname"><span class="pre">load</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a BDD from a (text) file.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The format is described in <a class="reference internal" href="#BDD.BDD.save" title="BDD.BDD.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">save()</span></code></a>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.make_reduced">
+<code class="sig-name descname"><span class="pre">make_reduced</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.make_reduced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.make_reduced" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes the BDD quasi-reduced.</p>
+<p>Swaps each layer back and forth, starting from the last one,
+(which makes sure the results is quasi-reduced due to
+<code class="xref py py-func docutils literal notranslate"><span class="pre">BDD.BDD.swap()</span></code> implementation.)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.n">
+<code class="sig-name descname"><span class="pre">n</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.n"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.n" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns size of the i-th layer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.new_node_name">
+<code class="sig-name descname"><span class="pre">new_node_name</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.new_node_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.new_node_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a unique name for the next node to be created.</p>
+<p>Picks the one to re-cycle after some node deletions, when available;
+when it is not – just takes the <code class="docutils literal notranslate"><span class="pre">max_id+1</span></code> (adjusting the <code class="docutils literal notranslate"><span class="pre">max_id</span></code>)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.p">
+<code class="sig-name descname"><span class="pre">p</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.p" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns position (0-based layer index) of variable <code class="docutils literal notranslate"><span class="pre">a</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.profile">
+<code class="sig-name descname"><span class="pre">profile</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a BDD “profile” – an (almost) BFS-ordered list of nodes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is used to determine, e.g., if the generated
+instance is unique. A ‘profile’ is a string of the format
+<code class="docutils literal notranslate"><span class="pre">&lt;vars&gt;</span></code>:<code class="docutils literal notranslate"><span class="pre">&lt;BFS-nodes&gt;</span></code>, where:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;vars&gt;</span></code>      :  comma-separated variable names by layer;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;BFS-nodes&gt;</span></code> :  comma-separated list of node-numbers (not IDs!)
+in a BFS-traverse order</p></li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.random">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">random</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a random BDD with <cite>N</cite> variables (N+1 layers).</p>
+<p>Layers are numbered with consecutive integers by default,
+starting with <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>N</strong> (<em>int</em>) – number of variables (results in N+1 layers, incl. T,F)</p></li>
+<li><p><strong>p</strong> (<em>float</em>) – tree size parameter
+0 will generate a non-random exponential-sized diagram,
+1 will result in a single node per layer.</p></li>
+<li><p><strong>weighted</strong> (<em>bool</em>) – whether to generate a weighted diagram.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A generated <a class="reference internal" href="#module-BDD" title="BDD"><code class="xref py py-class docutils literal notranslate"><span class="pre">BDD</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.rename_vars">
+<code class="sig-name descname"><span class="pre">rename_vars</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ren_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.rename_vars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.rename_vars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function: renames variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ren_dict</strong> (<em>dict</em>) – a dict of &lt;= <a class="reference internal" href="#BDD.BDD.N" title="BDD.BDD.N"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BDD.N</span></code></a> labels
+in the form {<code class="docutils literal notranslate"><span class="pre">before</span></code>: <code class="docutils literal notranslate"><span class="pre">after</span></code>}</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.save">
+<code class="sig-name descname"><span class="pre">save</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves a BDD to a text file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>string</em>) – destination file name.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>File format is as follows.</p>
+<blockquote>
+<div><ul>
+<li><dl>
+<dt>File header, the first two lines</dt><dd><div class="line-block">
+<div class="line">N= <cite>&lt;no-of-layers&gt;</cite></div>
+<div class="line">vars= <cite>&lt;comma-separated layer labels&gt;</cite></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Then, one node description = one line of the format:</dt><dd><p><cite>id</cite> : <cite>hi</cite> , <cite>lo</cite></p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>where <code class="docutils literal notranslate"><span class="pre">id</span></code> is node’s ID, <code class="docutils literal notranslate"><span class="pre">hi</span></code> and <code class="docutils literal notranslate"><span class="pre">lo</span></code> are IDs of
+the nodes corresponding to one- and zero- pointers of the
+node <code class="docutils literal notranslate"><span class="pre">ID</span></code>. The procedure performs breadth-first search
+and just saves all the nodes.</p>
+<p>Three nodes have reserved ID values:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Root</strong> node: 0</p></li>
+<li><p><strong>True</strong> terminal: -1</p></li>
+<li><p><strong>False</strong> terminal: -2</p></li>
+</ul>
+</div></blockquote>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.shortest_path">
+<code class="sig-name descname"><span class="pre">shortest_path</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.shortest_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.shortest_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds a shortest-path in O(<cite>no-of-nodes</cite>) time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>node labels (using node IDs as keys)
+corresponding to a shortest path from the current node to
+<strong>True</strong> terminal.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Expects the diagram to be <a class="reference internal" href="#BDD.BDD.weighted" title="BDD.BDD.weighted"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BDD.weighted</span></code></a>. (An
+unweighted version, in terms of ‘number of hops’, does
+not make any sense for a quasi-reduced BDD: the answer
+would be <code class="docutils literal notranslate"><span class="pre">len(self)</span></code>.)</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.show">
+<code class="sig-name descname"><span class="pre">show</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tmp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'showfunc.dot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layerCapt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.show"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shows the diagram on the screen (saving the auxiliary pdf).</p>
+<p>Generates a <code class="docutils literal notranslate"><span class="pre">.dot</span></code> file and compiles it to <code class="docutils literal notranslate"><span class="pre">.pdf</span></code>.
+Requires <code class="docutils literal notranslate"><span class="pre">graphviz</span></code> (<code class="docutils literal notranslate"><span class="pre">dot</span></code> program)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dir</strong> (<em>str</em>) – directory to place files (default: <code class="docutils literal notranslate"><span class="pre">tmp</span></code>)</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – <cite>.dot</cite> filename (default: <code class="docutils literal notranslate"><span class="pre">showfunc.dot</span></code>)</p></li>
+<li><p><strong>layerCapt</strong> (<em>bool</em>) – whether to show layer captions (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>x_prefix</strong> (<em>str</em>) – a prefix for variable captions (default: <code class="docutils literal notranslate"><span class="pre">x</span></code>)</p></li>
+<li><p><strong>node_labels</strong> (<em>dict</em>) – node labels to display (optional).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.shuffle_vars">
+<code class="sig-name descname"><span class="pre">shuffle_vars</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.shuffle_vars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.shuffle_vars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly renames the variables (shuffles their order).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.sift">
+<code class="sig-name descname"><span class="pre">sift</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.sift"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.sift" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sifts variable <code class="docutils literal notranslate"><span class="pre">var</span></code> (by name) to (0-based) position <code class="docutils literal notranslate"><span class="pre">pos</span></code>.</p>
+<p>Uses <a class="reference internal" href="#BDD.BDD.sift" title="BDD.BDD.sift"><code class="xref py py-func docutils literal notranslate"><span class="pre">BDD.sift()</span></code></a> under the hood, in-place operation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.simscore">
+<code class="sig-name descname"><span class="pre">simscore</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.simscore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.simscore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes a simscore with another diagram, <cite>B</cite> (see <a class="reference internal" href="#BDD.simscore" title="BDD.simscore"><code class="xref py py-func docutils literal notranslate"><span class="pre">simscore()</span></code></a>).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.size">
+<code class="sig-name descname"><span class="pre">size</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the size of the BDD (total no. of nodes).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.swap_up">
+<code class="sig-name descname"><span class="pre">swap_up</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.swap_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.swap_up" title="Permalink to this definition">¶</a></dt>
+<dd><p>Swaps the layer with the one immediately above it (in-place).</p>
+<p>(by <em>index</em> ! in-place operation)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>layer_idx</strong> (<em>int</em>) – number (0-based index) of the layer to be ‘’bubbled up’’</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Operation takes O (<cite>no-of-nodes in the upper layer</cite>)
+time. Drops the layer being swapped. Then iterates
+through the nodes of the layer immediately above it and
+creates nodes as necessary (re-cycling new nodes to avoid
+redundancy: a quasi-reduced BDD keeps this property)</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="BDD.BDD.truth_table">
+<code class="sig-name descname"><span class="pre">truth_table</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#BDD.truth_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.BDD.truth_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a “truth table” for the encoded Boolean function.</p>
+<p>Returns:</p>
+<p><code class="docutils literal notranslate"><span class="pre">pandas</span></code> dataframe: column numbers correspond to
+variable names with two additional columns: <code class="docutils literal notranslate"><span class="pre">Terminal</span></code> for
+the function value (of Boolean type) and <code class="docutils literal notranslate"><span class="pre">Cost</span></code> if the
+diagram is <a class="reference internal" href="#BDD.BDD.weighted" title="BDD.BDD.weighted"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BDD.weighted</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p class="centered">
+<strong>❖❖❖</strong></p></div>
+<div class="section" id="node">
+<h2>node<a class="headerlink" href="#node" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="BDD.node">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">BDD.</span></code><code class="sig-name descname"><span class="pre">node</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#node"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a BDD node, with the following attributes.</p>
+<dl class="py attribute">
+<dt id="BDD.node.id">
+<code class="sig-name descname"><span class="pre">id</span></code><a class="headerlink" href="#BDD.node.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>an integer node ID</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="BDD.node.hi">
+<code class="sig-name descname"><span class="pre">hi</span></code><a class="headerlink" href="#BDD.node.hi" title="Permalink to this definition">¶</a></dt>
+<dd><p>a pointer to the <code class="docutils literal notranslate"><span class="pre">hi</span></code>-node</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="BDD.node.lo">
+<code class="sig-name descname"><span class="pre">lo</span></code><a class="headerlink" href="#BDD.node.lo" title="Permalink to this definition">¶</a></dt>
+<dd><p>a pointer to the <code class="docutils literal notranslate"><span class="pre">lo</span></code>-node</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="BDD.node.layer">
+<code class="sig-name descname"><span class="pre">layer</span></code><a class="headerlink" href="#BDD.node.layer" title="Permalink to this definition">¶</a></dt>
+<dd><p>layer number (id)</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There are special node IDs:
+<code class="docutils literal notranslate"><span class="pre">0</span></code>   for the root,
+<code class="docutils literal notranslate"><span class="pre">-1</span></code>  for True sink,
+<code class="docutils literal notranslate"><span class="pre">-2</span></code>  for the False sink.</p>
+</div>
+<div class="autoclasstoc docutils container">
+<p class="rubric">Public Methods:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code>(id[, hi, lo, layer])</p></td>
+<td><p>A simple class constructor.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD.node.link" title="BDD.node.link"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link</span></code></a>(to_whom[, arc])</p></td>
+<td><p>Helper function: links the node to another one.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<dl class="py method">
+<dt id="BDD.node.link">
+<code class="sig-name descname"><span class="pre">link</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_whom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hi'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#node.link"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.node.link" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function: links the node to another one.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p class="centered">
+<strong>❖❖❖</strong></p></div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="BDD.intersect">
+<code class="sig-prename descclassname"><span class="pre">BDD.</span></code><code class="sig-name descname"><span class="pre">intersect</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#intersect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.intersect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces an intersection BDD of <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code>.</p>
+<p class="rubric">Notes</p>
+<p>BDDs need to be order-associated (same vars in the same order).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>an intersection BDD.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#module-BDD" title="BDD"><code class="xref py py-class docutils literal notranslate"><span class="pre">BDD</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="BDD.simscore">
+<code class="sig-prename descclassname"><span class="pre">BDD.</span></code><code class="sig-name descname"><span class="pre">simscore</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD.html#simscore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD.simscore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates a ‘similarity score’ between <cite>A</cite> and <cite>B</cite>.</p>
+<p>The function has nothing to do with other data structures,
+technically: it just calculates the normalized number of
+inversions between the two ordered lists of variables
+(which we call ‘similarity score’).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seq_A</strong> (<em>list</em>) – sequence A</p></li>
+<li><p><strong>seq_B</strong> (<em>list</em>) – sequence B to compare</p></li>
+<li><p><strong>p_B</strong> (<em>dict</em>) – dict of element positions in B (default: None, will be built)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>share of possible inversions.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>number (between 0 and 1)</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">simscore</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="go">1.0</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">simscore</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="go">0.0</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">simscore</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<span class="go">0.6666666666666667</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">simscore</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="go">0.33333333333333337</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

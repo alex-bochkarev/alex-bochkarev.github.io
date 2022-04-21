@@ -1,0 +1,303 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>experiments.heu_sol_struct &mdash; Align-BDD  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/autoclasstoc.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Align-BDD
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#reproducibility">Reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#code-organization">Code organization</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Align-BDD</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>experiments.heu_sol_struct</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for experiments.heu_sol_struct</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Examines heuristic solutions to a random align-BDD instance.</span>
+
+<span class="sd">Used to look into the number of optima and ``simscore`` related</span>
+<span class="sd">experiments.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">BDD</span> <span class="k">as</span> <span class="nn">DD</span>
+<span class="kn">import</span> <span class="nn">varseq</span> <span class="k">as</span> <span class="nn">vs</span>
+<span class="kn">import</span> <span class="nn">BB_search</span> <span class="k">as</span> <span class="nn">bb</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">argparse</span> <span class="k">as</span> <span class="nn">ap</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">import</span> <span class="nn">tUFLP</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<div class="viewcode-block" id="run_experiment"><a class="viewcode-back" href="../../_autosummary/experiments.heu_sol_struct.html#experiments.heu_sol_struct.run_experiment">[docs]</a><span class="k">def</span> <span class="nf">run_experiment</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">inst_type</span><span class="o">=</span><span class="s2">&quot;rnd&quot;</span><span class="p">,</span> <span class="n">logdest</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Runs the experiment with diagrams of `N` layers.&quot;&quot;&quot;</span>
+    <span class="c1"># prepare an align-BDD instance</span>
+    <span class="n">inst_log</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">inst_type</span> <span class="o">==</span> <span class="s2">&quot;rnd&quot;</span><span class="p">:</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">DD</span><span class="o">.</span><span class="n">BDD</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">DD</span><span class="o">.</span><span class="n">BDD</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+        <span class="n">B</span><span class="o">.</span><span class="n">rename_vars</span><span class="p">(</span>
+            <span class="nb">dict</span><span class="p">(</span>
+                <span class="nb">zip</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]))))</span>
+
+        <span class="k">if</span> <span class="n">logdest</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+            <span class="n">A</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+            <span class="n">B</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+            <span class="n">A</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">logdest</span><span class="si">}</span><span class="s2">/A</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">.bdd&quot;</span><span class="p">)</span>
+            <span class="n">B</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">logdest</span><span class="si">}</span><span class="s2">/B</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">.bdd&quot;</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">inst_type</span> <span class="o">==</span> <span class="s2">&quot;tUFL&quot;</span><span class="p">:</span>
+        <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">fc</span><span class="p">,</span> <span class="n">kb</span> <span class="o">=</span> <span class="n">tUFLP</span><span class="o">.</span><span class="n">generate_test_instance</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">logdest</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+            <span class="n">inst_log</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">logdest</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+            <span class="n">inst_log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
+                <span class="s1">&#39;S&#39;</span><span class="p">:</span><span class="n">S</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">:</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;fc&#39;</span><span class="p">:</span><span class="n">fc</span><span class="p">,</span> <span class="s1">&#39;kb&#39;</span><span class="p">:</span><span class="n">kb</span><span class="p">})</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">A</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tUFLP</span><span class="o">.</span><span class="n">build_cover_DD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="n">pref_order</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">A</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span>
+        <span class="n">B</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tUFLP</span><span class="o">.</span><span class="n">build_type_DD</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fc</span><span class="p">,</span> <span class="n">kb</span><span class="p">,</span> <span class="n">pref_order</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrong instance inst_type: </span><span class="si">{</span><span class="n">inst_type</span><span class="si">}</span><span class="s2"> (expected: &#39;rnd&#39; or &#39;tUFL&#39;)&quot;</span><span class="p">)</span>
+
+    <span class="n">A</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+    <span class="n">B</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+
+    <span class="n">AB_simscore</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">simscore</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+
+    <span class="c1"># create and solve the simplified problem</span>
+    <span class="n">vsA</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
+    <span class="n">vsB</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="n">B</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">bb</span><span class="o">.</span><span class="n">BBSearch</span><span class="p">(</span><span class="n">vsA</span><span class="p">,</span> <span class="n">vsB</span><span class="p">)</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
+
+    <span class="n">Ap</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">Bp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+
+    <span class="n">Ap</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span> <span class="n">Bp</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+
+    <span class="c1"># calculate (brute-force) the real optima</span>
+    <span class="n">no_opts</span><span class="p">,</span> <span class="n">A_aligned</span><span class="p">,</span> <span class="n">B_aligned</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">OA_bruteforce</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+    <span class="n">opts_diam</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">best_VS_simscore</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">worst_VS_simscore</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">seq_VS</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span>
+
+    <span class="k">if</span> <span class="n">no_opts</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">opts_diam</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">VS_simscore</span> <span class="o">=</span> <span class="n">DD</span><span class="o">.</span><span class="n">simscore</span><span class="p">(</span><span class="n">seq_VS</span><span class="p">,</span> <span class="n">A_aligned</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+        <span class="n">best_VS_simscore</span> <span class="o">=</span> <span class="n">VS_simscore</span>
+        <span class="n">worst_VS_simscore</span> <span class="o">=</span> <span class="n">best_VS_simscore</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">no_opts</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">no_opts</span><span class="p">):</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="n">DD</span><span class="o">.</span><span class="n">simscore</span><span class="p">(</span><span class="n">A_aligned</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="n">A_aligned</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">opts_diam</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">dist</span> <span class="o">&gt;</span> <span class="n">opts_diam</span><span class="p">:</span>
+                <span class="n">opts_diam</span> <span class="o">=</span> <span class="n">dist</span>
+
+            <span class="n">VS_simscore</span> <span class="o">=</span> <span class="n">DD</span><span class="o">.</span><span class="n">simscore</span><span class="p">(</span><span class="n">seq_VS</span><span class="p">,</span> <span class="n">A_aligned</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">best_VS_simscore</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">best_VS_simscore</span> <span class="o">&lt;</span> <span class="n">VS_simscore</span><span class="p">:</span>
+                <span class="n">best_VS_simscore</span> <span class="o">=</span> <span class="n">VS_simscore</span>
+
+            <span class="k">if</span> <span class="n">worst_VS_simscore</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">worst_VS_simscore</span> <span class="o">&gt;</span> <span class="n">VS_simscore</span><span class="p">:</span>
+                <span class="n">worst_VS_simscore</span> <span class="o">=</span> <span class="n">VS_simscore</span>
+
+    <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">AB_simscore</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">no_opts</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">opts_diam</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">best_VS_simscore</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">worst_VS_simscore</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">t1</span><span class="o">-</span><span class="n">t0</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">inst_log</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">inst_log</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">ap</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot; Experiment: analyzing heuristic solutions. (c) A. Bochkarev, 2021&quot;</span><span class="p">,</span>
+                               <span class="n">formatter_class</span><span class="o">=</span><span class="n">ap</span><span class="o">.</span><span class="n">ArgumentDefaultsHelpFormatter</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-n&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;number of layers&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-k&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;number of instances to generate&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;inst_type&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;instance type &#39;rnd&#39; (random) or &#39;tUFL&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;rnd&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-l&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;logdest&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Logging destination (a file, or a folder for &#39;rnd&#39; type)&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">k</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Please specify a positive no of instances to generate.&quot;</span>
+    <span class="k">assert</span> <span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">n</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Please specify number of layers per instance (e.g., 5))&quot;</span>
+    <span class="k">assert</span> <span class="n">args</span><span class="o">.</span><span class="n">inst_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rnd&#39;</span><span class="p">,</span> <span class="s1">&#39;tUFL&#39;</span><span class="p">],</span> <span class="s2">&quot;wrong instance type (&#39;rnd&#39; or &#39;tUFL&#39; expected)&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;k, VS_status, AB_simscore, no_opts, opts_diam, best_VS_simscore, worst_VS_simscore, exp_time&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">k</span><span class="p">)):</span>
+        <span class="n">run_experiment</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">n</span><span class="p">),</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">logdest</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">logdest</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

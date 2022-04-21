@@ -1,0 +1,424 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>BDD_test &mdash; Align-BDD  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="BDD_equivalence" href="BDD_equivalence.html" />
+    <link rel="prev" title="experiments.tUFL_hist_sizes_control" href="experiments.tUFL_hist_sizes_control.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#reproducibility">Reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../overview.html#code-organization">Code organization</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#producing-figures">Producing figures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../overview.html#testing-framework">Testing framework</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">BDD_test</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-summary">Module summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="BDD_equivalence.html">BDD_equivalence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="varseq_test.html">varseq_test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BB_search_test.html">BB_search_test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UFLP_test.html">UFLP_test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tUFLP_test.html">tUFLP_test</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
+        
+      <li>BDD_test</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_autosummary/BDD_test.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <span class="target" id="module-BDD_test"></span><div class="section" id="bdd-test">
+<h1>BDD_test<a class="headerlink" href="#bdd-test" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-summary">
+<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this headline">¶</a></h2>
+<p>Tests some key procedures for <a class="reference internal" href="BDD.html#module-BDD" title="BDD"><code class="xref py py-mod docutils literal notranslate"><span class="pre">BDD</span></code></a> .</p>
+<p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
+<p class="centered">
+<strong>❖❖❖</strong></p><div class="section" id="implements-functions-outside-the-classes-above">
+<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD_test.gen_4BDD" title="BDD_test.gen_4BDD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen_4BDD</span></code></a>()</p></td>
+<td><p>creates a simple 4-var BDD</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD_test.save_load" title="BDD_test.save_load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_load</span></code></a>(bdd)</p></td>
+<td><p>Quickly tests the load-save functionality (for visual inspection).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD_test.show_align" title="BDD_test.show_align"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_align</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD_test.show_bruteforcing" title="BDD_test.show_bruteforcing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_bruteforcing</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD_test.show_create_render" title="BDD_test.show_create_render"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_create_render</span></code></a>()</p></td>
+<td><p>Tests the BDD creation and rendering code.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD_test.show_intersections" title="BDD_test.show_intersections"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_intersections</span></code></a>()</p></td>
+<td><p>Tests intersection function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD_test.show_rnd" title="BDD_test.show_rnd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_rnd</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD_test.show_rnd_naming" title="BDD_test.show_rnd_naming"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_rnd_naming</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD_test.show_swap_sift" title="BDD_test.show_swap_sift"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_swap_sift</span></code></a>(bdd)</p></td>
+<td><p>quick test of swap and sift operations</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD_test.show_swapping_2" title="BDD_test.show_swapping_2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_swapping_2</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD_test.test_intersect" title="BDD_test.test_intersect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_intersect</span></code></a>(i)</p></td>
+<td><p>Tests intersection function, <a class="reference internal" href="BDD.html#BDD.intersect" title="BDD.intersect"><code class="xref py py-func docutils literal notranslate"><span class="pre">BDD.intersect()</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD_test.test_load_save" title="BDD_test.test_load_save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_load_save</span></code></a>(D)</p></td>
+<td><p>Tests that load/save functionality works as intended.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD_test.test_random_swapping" title="BDD_test.test_random_swapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_random_swapping</span></code></a>(test_inst)</p></td>
+<td><p>Tests if <code class="xref py py-func docutils literal notranslate"><span class="pre">BDD.BDD.swap()</span></code> work correctly (random problems).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD_test.test_save_load_noargs" title="BDD_test.test_save_load_noargs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_save_load_noargs</span></code></a>()</p></td>
+<td><p>Tests load/save for a specific situation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD_test.test_shortest_path" title="BDD_test.test_shortest_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_shortest_path</span></code></a>(test_inst)</p></td>
+<td><p>Tests the shortest path procedure (with Gurobi model)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD_test.test_swaps_uweighted" title="BDD_test.test_swaps_uweighted"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_swaps_uweighted</span></code></a>(i)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#BDD_test.test_swaps_w" title="BDD_test.test_swaps_w"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_swaps_w</span></code></a>()</p></td>
+<td><p>Tests <code class="xref py py-func docutils literal notranslate"><span class="pre">BDD.BDD.swap()</span></code> for a weighted BDD (a simple case).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BDD_test.test_swaps_weighted" title="BDD_test.test_swaps_weighted"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_swaps_weighted</span></code></a>(i)</p></td>
+<td><p>Tests swap operation for weighted diagrams (random instances).</p></td>
+</tr>
+</tbody>
+</table>
+<p class="centered">
+<strong>❖❖❖</strong></p><p class="centered">
+<strong>Implementation details</strong></p><p class="centered">
+<strong>❖❖❖</strong></p></div>
+</div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="BDD_test.gen_4BDD">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">gen_4BDD</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#gen_4BDD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.gen_4BDD" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates a simple 4-var BDD</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.save_load">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">save_load</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bdd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#save_load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.save_load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quickly tests the load-save functionality (for visual inspection).</p>
+<p>must result in two equivalent graphs (BDDs) on the screen</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.show_align">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">show_align</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#show_align"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.show_align" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.show_bruteforcing">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">show_bruteforcing</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#show_bruteforcing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.show_bruteforcing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.show_create_render">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">show_create_render</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#show_create_render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.show_create_render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests the BDD creation and rendering code.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.show_intersections">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">show_intersections</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#show_intersections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.show_intersections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests intersection function.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.show_rnd">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">show_rnd</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#show_rnd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.show_rnd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.show_rnd_naming">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">show_rnd_naming</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#show_rnd_naming"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.show_rnd_naming" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.show_swap_sift">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">show_swap_sift</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bdd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#show_swap_sift"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.show_swap_sift" title="Permalink to this definition">¶</a></dt>
+<dd><p>quick test of swap and sift operations</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.show_swapping_2">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">show_swapping_2</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#show_swapping_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.show_swapping_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.test_intersect">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">test_intersect</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#test_intersect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.test_intersect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests intersection function, <a class="reference internal" href="BDD.html#BDD.intersect" title="BDD.intersect"><code class="xref py py-func docutils literal notranslate"><span class="pre">BDD.intersect()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.test_load_save">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">test_load_save</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#test_load_save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.test_load_save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests that load/save functionality works as intended.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.test_random_swapping">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">test_random_swapping</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#test_random_swapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.test_random_swapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests if <code class="xref py py-func docutils literal notranslate"><span class="pre">BDD.BDD.swap()</span></code> work correctly (random problems).</p>
+<p>Generates a random BDD, makes some random swaps (or sifts),
+and then checks that the function encoded by the BDD remained the same
+(that is, every set of var values result in the same terminal node for
+the original BDD and for the randomly changed BDD).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>N</strong> – no. of variables in the diagram</p></li>
+<li><p><strong>m</strong> – no. of consecutive test swaps per BDD</p></li>
+<li><p><strong>p</strong> – BDD expansion prob parameter</p></li>
+<li><p><strong>mode</strong> – <code class="docutils literal notranslate"><span class="pre">swaps</span></code> or <code class="docutils literal notranslate"><span class="pre">sifts</span></code>, determines what kind of events
+are to be generated</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Arguments are packed into a single tuple (for compatibility)</dt><dd><p>with <code class="docutils literal notranslate"><span class="pre">pytest</span></code> module.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Involves brute-force enumaration of all the 2^n possible decisions</dt><dd><p>(concerning all vars), so choose <code class="docutils literal notranslate"><span class="pre">n</span></code> wisely (&lt;=8 seems OK)</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p class="rubric">Example</p>
+<p>test_random_swapping((8,20,0.8,sys.argv[1]))</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.test_save_load_noargs">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">test_save_load_noargs</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#test_save_load_noargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.test_save_load_noargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests load/save for a specific situation.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.test_shortest_path">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">test_shortest_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#test_shortest_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.test_shortest_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests the shortest path procedure (with Gurobi model)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.test_swaps_uweighted">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">test_swaps_uweighted</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#test_swaps_uweighted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.test_swaps_uweighted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.test_swaps_w">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">test_swaps_w</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#test_swaps_w"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.test_swaps_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests <code class="xref py py-func docutils literal notranslate"><span class="pre">BDD.BDD.swap()</span></code> for a weighted BDD (a simple case).</p>
+<p>Uses a simple problem instance (<code class="docutils literal notranslate"><span class="pre">tests/simple_DD.wbdd</span></code>)
+to run a test: all paths costs and terminals must coincide
+after a series of swaps.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="BDD_test.test_swaps_weighted">
+<code class="sig-prename descclassname"><span class="pre">BDD_test.</span></code><code class="sig-name descname"><span class="pre">test_swaps_weighted</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BDD_test.html#test_swaps_weighted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BDD_test.test_swaps_weighted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests swap operation for weighted diagrams (random instances).</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

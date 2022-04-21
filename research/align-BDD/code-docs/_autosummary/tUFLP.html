@@ -1,0 +1,852 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tUFLP &mdash; Align-BDD  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="experiments" href="experiments.html" />
+    <link rel="prev" title="UFL" href="UFL.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#reproducibility">Reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../overview.html#code-organization">Code organization</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#producing-figures">Producing figures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gen_BDD_pair.html">gen_BDD_pair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solve_inst.html">solve_inst</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UFL.html">UFL</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">tUFLP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-summary">Module summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#degreekeeper">DegreeKeeper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#typesorter">TypeSorter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="experiments.html">experiments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#testing-framework">Testing framework</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
+        
+      <li>tUFLP</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_autosummary/tUFLP.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <span class="target" id="module-tUFLP"></span><div class="section" id="tuflp">
+<h1>tUFLP<a class="headerlink" href="#tuflp" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-summary">
+<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this headline">¶</a></h2>
+<p>Implements the basic machinery for Uncapacitated Facility Location
+problem with type-constraints.</p>
+<p>Building the diagrams (cover DD and type DD) and solving the
+corresponding CPP instance.</p>
+<p>Tests coverage: <a class="reference internal" href="tUFLP_test.html#module-tUFLP_test" title="tUFLP_test"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tUFLP_test</span></code></a> and <a class="reference internal" href="UFLP_test.html#module-UFLP_test" title="UFLP_test"><code class="xref py py-mod docutils literal notranslate"><span class="pre">UFLP_test</span></code></a>.</p>
+<p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
+<p class="centered">
+<strong>❖❖❖</strong></p><div class="section" id="implements-classes">
+<h3>Implements classes:<a class="headerlink" href="#implements-classes" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.DegreeKeeper" title="tUFLP.DegreeKeeper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DegreeKeeper</span></code></a>([S, next_node_type])</p></td>
+<td><p>Keeps a heap of node degrees.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.TypeSorter" title="tUFLP.TypeSorter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeSorter</span></code></a>(f_types, node_order)</p></td>
+<td><p>Sorts type blocks (to derive a good var order for the type BDD).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="implements-functions-outside-the-classes-above">
+<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.bruteforce_correct_order" title="tUFLP.bruteforce_correct_order"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bruteforce_correct_order</span></code></a>(f_types, target_order)</p></td>
+<td><p>Calculates the correct order with bruteforce.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.build_cover_DD" title="tUFLP.build_cover_DD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_cover_DD</span></code></a>(S, f[, next_node_type])</p></td>
+<td><p>Builds a BDD for the UFL problem.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.build_randomized_cover_DD" title="tUFLP.build_randomized_cover_DD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_randomized_cover_DD</span></code></a>(S, f)</p></td>
+<td><p>Builds a BDD for the typed-UFL problem.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.build_randomized_type_DD" title="tUFLP.build_randomized_type_DD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_randomized_type_DD</span></code></a>(f, f_types, k_bar)</p></td>
+<td><p>Builds a BDD encoding location-level constraints.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.build_tUFLP_MIP" title="tUFLP.build_tUFLP_MIP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_tUFLP_MIP</span></code></a>(S, f, f_types, k_bar)</p></td>
+<td><p>Builds ‘plain-vanilla’ MIP instance for typed UFLP.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.build_type_DD" title="tUFLP.build_type_DD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_type_DD</span></code></a>(f, f_types, k_bar[, …])</p></td>
+<td><p>Builds a BDD encoding location-level constraints.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.check_simple_example" title="tUFLP.check_simple_example"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_simple_example</span></code></a>()</p></td>
+<td><p>Shows a simple example (for visual inspection).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.draw_problem_dia" title="tUFLP.draw_problem_dia"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_problem_dia</span></code></a>(S, f, f_types, k_bar[, …])</p></td>
+<td><p>Draws the bipartite graph describing the problem.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.find_correct_order" title="tUFLP.find_correct_order"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_correct_order</span></code></a>(f_types, target_order)</p></td>
+<td><p>Finds the correct order with the code above.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.generate_5d_problem" title="tUFLP.generate_5d_problem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_5d_problem</span></code></a>([n])</p></td>
+<td><p>Generates a simple problem instance, with two nodes of degree 5.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.generate_d4_instance" title="tUFLP.generate_d4_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_d4_instance</span></code></a>(n)</p></td>
+<td><p>Generates a (typed) facility location instance: degree-4 nodes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.generate_organic_instance" title="tUFLP.generate_organic_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_organic_instance</span></code></a>(n)</p></td>
+<td><p>Generates a (typed) facility location instance: ‘organic’ thing.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.generate_simple_problem" title="tUFLP.generate_simple_problem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_simple_problem</span></code></a>()</p></td>
+<td><p>Generates a simple problem instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.generate_string_instance" title="tUFLP.generate_string_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_string_instance</span></code></a>(n)</p></td>
+<td><p>Generates a (typed) facility location instance: string.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.generate_test_instance" title="tUFLP.generate_test_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_test_instance</span></code></a>(n[, p])</p></td>
+<td><p>Generates a (typed) facility location instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.generate_test_instance_alt" title="tUFLP.generate_test_instance_alt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_test_instance_alt</span></code></a>(n[, p, …])</p></td>
+<td><p>Generates a (typed) facility location instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.get_score" title="tUFLP.get_score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_score</span></code></a>(A, target)</p></td>
+<td><p>Calculates no.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.make_instance" title="tUFLP.make_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_instance</span></code></a>(n)</p></td>
+<td><p>Makes a quick test instance for TypeSorter</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.make_label" title="tUFLP.make_label"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_label</span></code></a>(state)</p></td>
+<td><p>Helper: formats a node label out of the state.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.no_invs" title="tUFLP.no_invs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">no_invs</span></code></a>(order, blocks, target)</p></td>
+<td><p>Returns no.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.show_cov" title="tUFLP.show_cov"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_cov</span></code></a>(n, gen_func)</p></td>
+<td><p>Generates an instance, generates and shows a <em>cover</em> diagram.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.solve_with_BDD_MIP" title="tUFLP.solve_with_BDD_MIP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_with_BDD_MIP</span></code></a>(S, f, fc, kb)</p></td>
+<td><p>Sovles the problem by building a MIP from two BDDs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.solve_with_MIP" title="tUFLP.solve_with_MIP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_with_MIP</span></code></a>(S, f, fc, kb)</p></td>
+<td><p>Solves the problem with a naive MIP approach.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.solve_with_align_BDD" title="tUFLP.solve_with_align_BDD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_with_align_BDD</span></code></a>(S, f, fc, kb)</p></td>
+<td><p>Solves the problem by generating two BDDs, aligning them, and solving a NF.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.test_type_UFL" title="tUFLP.test_type_UFL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_type_UFL</span></code></a>()</p></td>
+<td><p>Tests the formulation for typed-UFLP (overlap DD).</p></td>
+</tr>
+</tbody>
+</table>
+<p class="centered">
+<strong>❖❖❖</strong></p><p class="centered">
+<strong>Implementation details</strong></p><p class="centered">
+<strong>❖❖❖</strong></p></div>
+</div>
+<div class="section" id="degreekeeper">
+<h2>DegreeKeeper<a class="headerlink" href="#degreekeeper" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tUFLP.DegreeKeeper">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">DegreeKeeper</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'min'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#DegreeKeeper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.DegreeKeeper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keeps a heap of node degrees.</p>
+<div class="autoclasstoc docutils container">
+<p class="rubric">Public Methods:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code>([S, next_node_type])</p></td>
+<td><p>Initializes the heap and index.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__len__</span></code>()</p></td>
+<td><p>Returns no.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__getitem__</span></code>(key)</p></td>
+<td><p>Returns a node’s degree.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.DegreeKeeper.get_next" title="tUFLP.DegreeKeeper.get_next"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next</span></code></a>()</p></td>
+<td><p>Returns the next node ID for processing.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.DegreeKeeper.decrement" title="tUFLP.DegreeKeeper.decrement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decrement</span></code></a>(j)</p></td>
+<td><p>Decrements a degree of node <cite>j</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.DegreeKeeper.push" title="tUFLP.DegreeKeeper.push"><code class="xref py py-obj docutils literal notranslate"><span class="pre">push</span></code></a>(i, d)</p></td>
+<td><p>Pushes a node <cite>i</cite> with degree <cite>d</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.DegreeKeeper.pop" title="tUFLP.DegreeKeeper.pop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code></a>()</p></td>
+<td><p>Pops a node from the heap, returns (<cite>j</cite>, <cite>degree</cite>).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.DegreeKeeper.has_freedom" title="tUFLP.DegreeKeeper.has_freedom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_freedom</span></code></a>(key)</p></td>
+<td><p>Checks whether a node can be further covered.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<dl class="py method">
+<dt id="tUFLP.DegreeKeeper.decrement">
+<code class="sig-name descname"><span class="pre">decrement</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">j</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#DegreeKeeper.decrement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.DegreeKeeper.decrement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decrements a degree of node <cite>j</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tUFLP.DegreeKeeper.get_next">
+<code class="sig-name descname"><span class="pre">get_next</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#DegreeKeeper.get_next"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.DegreeKeeper.get_next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the next node ID for processing.</p>
+<p>Currently: a one with the minimal degree.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tUFLP.DegreeKeeper.has_freedom">
+<code class="sig-name descname"><span class="pre">has_freedom</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#DegreeKeeper.has_freedom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.DegreeKeeper.has_freedom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether a node can be further covered.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tUFLP.DegreeKeeper.pop">
+<code class="sig-name descname"><span class="pre">pop</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#DegreeKeeper.pop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.DegreeKeeper.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pops a node from the heap, returns (<cite>j</cite>, <cite>degree</cite>).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tUFLP.DegreeKeeper.push">
+<code class="sig-name descname"><span class="pre">push</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#DegreeKeeper.push"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.DegreeKeeper.push" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pushes a node <cite>i</cite> with degree <cite>d</cite>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p class="centered">
+<strong>❖❖❖</strong></p></div>
+<div class="section" id="typesorter">
+<h2>TypeSorter<a class="headerlink" href="#typesorter" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tUFLP.TypeSorter">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">TypeSorter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#TypeSorter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.TypeSorter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sorts type blocks (to derive a good var order for the type BDD).</p>
+<div class="autoclasstoc docutils container">
+<p class="rubric">Public Methods:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code>(f_types, node_order)</p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tUFLP.TypeSorter.rel_weight" title="tUFLP.TypeSorter.rel_weight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rel_weight</span></code></a>(elements_in_A, elements_in_B)</p></td>
+<td><p>Calculates a ‘relative weight’ of the type.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tUFLP.TypeSorter.sort_types" title="tUFLP.TypeSorter.sort_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_types</span></code></a>()</p></td>
+<td><p>Sorts type blocks and nodes within each type.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<dl class="py method">
+<dt id="tUFLP.TypeSorter.rel_weight">
+<code class="sig-name descname"><span class="pre">rel_weight</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elements_in_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elements_in_B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#TypeSorter.rel_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.TypeSorter.rel_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates a ‘relative weight’ of the type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>elements_in_A</strong> (<em>list</em>) – elements with type A,</p></li>
+<li><p><strong>elements_in_B</strong> (<em>list</em>) – elements with type B.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>‘relative weight’ of type A (relative to B)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>RW (int)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>In fact, if RW &gt; 0, then configuration (A,B) will have fewer
+inverstions with <cite>node_order</cite> (and the other way around if
+<cite>RW</cite> &lt; 0).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tUFLP.TypeSorter.sort_types">
+<code class="sig-name descname"><span class="pre">sort_types</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#TypeSorter.sort_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.TypeSorter.sort_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sorts type blocks and nodes within each type.</p>
+<p>The aim is to have the minimum number of inversions between the resulting
+typing diagram and the <cite>node_order</cite> parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>ordered type numbers.
+customers (dict): (ordered) list of customer per type.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>types (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p class="centered">
+<strong>❖❖❖</strong></p></div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tUFLP.bruteforce_correct_order">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">bruteforce_correct_order</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#bruteforce_correct_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.bruteforce_correct_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the correct order with bruteforce.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.build_cover_DD">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">build_cover_DD</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'min'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#build_cover_DD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.build_cover_DD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds a BDD for the UFL problem.</p>
+<p>Introduces <cite>x</cite>-variables only; encodes the condition of covering
+each customer at least once (includes location costs).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>S</strong> (<em>list</em>) – neighborhood list,</p></li>
+<li><p><strong>f</strong> (<em>dict</em>) – location costs.</p></li>
+<li><p><strong>next_node_type</strong> (<em>str</em>) – <cite>min</cite>, <cite>max</cite>, or <cite>rnd</cite> – see <cite>DegreeKeeper</cite>
+docstring for details.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The resulting BDD.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>employs a DP approach with state being the Boolean</dt><dd><p>covering at each customer.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.build_randomized_cover_DD">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">build_randomized_cover_DD</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#build_randomized_cover_DD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.build_randomized_cover_DD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds a BDD for the typed-UFL problem.</p>
+<p>Introduces <cite>x</cite>-variables only; encodes the condition of covering
+each customer at least once (includes location costs).</p>
+<p><em>Processes the nodes in random order.</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>S</strong> (<em>list</em>) – neighborhood list,</p></li>
+<li><p><strong>f</strong> (<em>dict</em>) – location costs.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The resulting BDD.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>employs a DP approach with state being the Boolean</dt><dd><p>covering at each customer.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.build_randomized_type_DD">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">build_randomized_type_DD</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_bar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#build_randomized_type_DD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.build_randomized_type_DD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds a BDD encoding location-level constraints.</p>
+<p>Deals with no. locations per type and location costs.
+<em>Uses random order of types, and random order
+of nodes within each type</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> (<em>dict</em>) – location costs,</p></li>
+<li><p><strong>type</strong> (<em>dict</em>) – type codes per facility</p></li>
+<li><p><strong>k_bar</strong> (<em>np.array</em>) – max. number of locations per type.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>resulting diagram.
+nl (dict): string node labels (“states”), <cite>id</cite> -&gt; <cite>label</cite> (string).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>D (class BDD)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.build_tUFLP_MIP">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">build_tUFLP_MIP</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_bar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#build_tUFLP_MIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.build_tUFLP_MIP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds ‘plain-vanilla’ MIP instance for typed UFLP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>S</strong> (<em>list</em>) – list of customer neighborhoods,</p></li>
+<li><p><strong>f</strong> (<em>dict</em>) – facility costs,</p></li>
+<li><p><strong>f_types</strong> (<em>list</em>) – facility types,</p></li>
+<li><p><strong>k_bar</strong> (<em>list</em>) – max no. of locations per type,</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><cite>gurobipy</cite> model (<cite>gp.Model</cite>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.build_type_DD">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">build_type_DD</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_bar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preferred_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#build_type_DD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.build_type_DD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds a BDD encoding location-level constraints.</p>
+<p>Deals with no. locations per type and location costs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> (<em>dict</em>) – location costs,</p></li>
+<li><p><strong>types</strong> (<em>dict</em>) – type codes per facility</p></li>
+<li><p><strong>k_bar</strong> (<em>np.array</em>) – max. number of locations per type.</p></li>
+<li><p><strong>preferred_order</strong> (<em>list</em>) – order of nodes to align to, as possible
+(e.g., the one of the already built cover DD)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>resulting diagram.
+nl (dict): string node labels (“states”), <cite>id</cite> -&gt; <cite>label</cite> (string).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>D (class BDD)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If <cite>preferred_order</cite> is given, randomly shuffles types, but makes sensible
+order of customers within each type (corresponding to <cite>preferred_order</cite>).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.check_simple_example">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">check_simple_example</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#check_simple_example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.check_simple_example" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shows a simple example (for visual inspection).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.draw_problem_dia">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">draw_problem_dia</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_bar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'run_logs/c_problem_dia.gv'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#draw_problem_dia"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.draw_problem_dia" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws the bipartite graph describing the problem.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.find_correct_order">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">find_correct_order</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#find_correct_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.find_correct_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the correct order with the code above.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.generate_5d_problem">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">generate_5d_problem</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#generate_5d_problem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.generate_5d_problem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a simple problem instance, with two nodes of degree 5.</p>
+<p>Returns:
+S, f, f_types, k_bar.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.generate_d4_instance">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">generate_d4_instance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#generate_d4_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.generate_d4_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a (typed) facility location instance: degree-4 nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – number of nodes (customers / facilities)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>neighborhood list,
+f (dict): location costs
+f_types (list): location types,
+k_bar (list): budget per type.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>S (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.generate_organic_instance">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">generate_organic_instance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#generate_organic_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.generate_organic_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a (typed) facility location instance: ‘organic’ thing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – number of nodes (customers / facilities)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>neighborhood list,
+f (dict): location costs
+f_types (list): location types,
+k_bar (list): budget per type.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>S (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.generate_simple_problem">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">generate_simple_problem</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#generate_simple_problem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.generate_simple_problem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a simple problem instance.</p>
+<p>Returns:
+S, f, f_types, k_bar.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.generate_string_instance">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">generate_string_instance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#generate_string_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.generate_string_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a (typed) facility location instance: string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – number of nodes (customers / facilities)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>neighborhood list,
+f (dict): location costs
+f_types (list): location types,
+k_bar (list): budget per type.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>S (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.generate_test_instance">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">generate_test_instance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#generate_test_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.generate_test_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a (typed) facility location instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>) – number of nodes (customers / facilities)</p></li>
+<li><p><strong>p</strong> (<em>float</em>) – graph generation parameter
+(prob of an edge between a pair of nodes)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>neighborhood list,
+f (dict): location costs
+f_types (list): location types,
+k_bar (list): budget per type.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>S (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.generate_test_instance_alt">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">generate_test_instance_alt</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes_per_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#generate_test_instance_alt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.generate_test_instance_alt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a (typed) facility location instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>) – number of nodes (customers / facilities)</p></li>
+<li><p><strong>p</strong> (<em>float</em>) – graph generation parameter
+(prob of an edge between a pair of nodes)</p></li>
+<li><p><strong>nodes_per_type</strong> (<em>int</em>) – type generation parameter</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>neighborhood list,
+f (dict): location costs
+f_types (list): location types,
+k_bar (list): budget per type.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>S (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.get_score">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">get_score</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#get_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.get_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates no. of inversions between <cite>A</cite> and <cite>target</cite></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.make_instance">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">make_instance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#make_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.make_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a quick test instance for TypeSorter</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.make_label">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">make_label</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#make_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.make_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper: formats a node label out of the state.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.no_invs">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">no_invs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#no_invs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.no_invs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns no. inversions b/w <cite>blocks</cite> in <cite>order</cite>, with the <cite>target</cite>.</p>
+<p class="rubric">Examples</p>
+<p>1) If I have a target of [1,2,3,4,5,6,7],
+but [1,2,3], [4,5,6], and [7] have to be “glued”
+in such blocks (numbered <cite>0</cite>, <cite>1</cite>, and <cite>2</cite>), then the order
+(2,0,1) will imply the element order [7,1,2,3,4,5,6] and 6 inversions:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">no_invs</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">]],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">])</span>
+<span class="go">6</span>
+</pre></div>
+</div>
+<p>Similarly,</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">no_invs</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">],[</span><span class="mi">7</span><span class="p">]],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">])</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+<p>2) The order of variables within a block, of course, does not matter:
+&gt;&gt;&gt; no_invs((0,2,1), [[1,2,3],[6,5,4],[7]], [1,2,3,4,5,6,7])
+3</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.show_cov">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">show_cov</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gen_func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#show_cov"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.show_cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates an instance, generates and shows a <em>cover</em> diagram.</p>
+<p>Available generators:
+- generate_simple_problem
+- generate_test_instance
+- generate_string_instance
+- generate_organic_instance
+- generate_d4_instance
+- generate_5d_problem</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.solve_with_BDD_MIP">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">solve_with_BDD_MIP</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#solve_with_BDD_MIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.solve_with_BDD_MIP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sovles the problem by building a MIP from two BDDs.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.solve_with_MIP">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">solve_with_MIP</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#solve_with_MIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.solve_with_MIP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solves the problem with a naive MIP approach.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.solve_with_align_BDD">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">solve_with_align_BDD</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#solve_with_align_BDD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.solve_with_align_BDD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solves the problem by generating two BDDs, aligning them, and solving a NF.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>S</strong> (<em>list</em>) – neighborhood,</p></li>
+<li><p><strong>f</strong> (<em>dict</em>) – location costs,</p></li>
+<li><p><strong>fc</strong> (<em>list</em>) – facility types,</p></li>
+<li><p><strong>kb</strong> (<em>list</em>) – type budgets.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the resulting model.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>m (class gurobipy.Model)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tUFLP.test_type_UFL">
+<code class="sig-prename descclassname"><span class="pre">tUFLP.</span></code><code class="sig-name descname"><span class="pre">test_type_UFL</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tUFLP.html#test_type_UFL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tUFLP.test_type_UFL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests the formulation for typed-UFLP (overlap DD).</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

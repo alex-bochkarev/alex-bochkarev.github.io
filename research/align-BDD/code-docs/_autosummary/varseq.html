@@ -1,0 +1,463 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>varseq &mdash; Align-BDD  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="heuristics" href="heuristics.html" />
+    <link rel="prev" title="BDD" href="BDD.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#reproducibility">Reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../overview.html#code-organization">Code organization</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#producing-figures">Producing figures</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BDD.html">BDD</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">varseq</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-summary">Module summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">VarSeq</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="heuristics.html">heuristics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BB_search.html">BB_search</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#testing-framework">Testing framework</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
+        
+      <li>varseq</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_autosummary/varseq.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <span class="target" id="module-varseq"></span><div class="section" id="varseq">
+<h1>varseq<a class="headerlink" href="#varseq" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-summary">
+<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this headline">¶</a></h2>
+<p>Implements weighted variable sequences data structure.</p>
+<p>Mostly mirrors the corresponding key methods of <a class="reference internal" href="BDD.html#BDD.BDD" title="BDD.BDD"><code class="xref py py-class docutils literal notranslate"><span class="pre">BDD.BDD</span></code></a>
+class.</p>
+<p>Tests coverage: <a class="reference internal" href="varseq_test.html#module-varseq_test" title="varseq_test"><code class="xref py py-mod docutils literal notranslate"><span class="pre">varseq_test</span></code></a></p>
+<p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
+<p class="centered">
+<strong>❖❖❖</strong></p><div class="section" id="implements-classes">
+<h3>Implements classes:<a class="headerlink" href="#implements-classes" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VarSeq</span></code></a>(layer_vars, layer_sizes)</p></td>
+<td><p>Implements weighted variable sequence data structure.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="implements-functions-outside-the-classes-above">
+<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#varseq.non_dominated" title="varseq.non_dominated"><code class="xref py py-obj docutils literal notranslate"><span class="pre">non_dominated</span></code></a>(e, A, B)</p></td>
+<td><p>Checks if the element “e” is non-dominated.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="centered">
+<strong>❖❖❖</strong></p><p class="centered">
+<strong>Implementation details</strong></p><p class="centered">
+<strong>❖❖❖</strong></p></div>
+</div>
+<div class="section" id="id1">
+<h2>VarSeq<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="varseq.VarSeq">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">varseq.</span></code><code class="sig-name descname"><span class="pre">VarSeq</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_sizes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements weighted variable sequence data structure.</p>
+<div class="autoclasstoc docutils container">
+<p class="rubric">Public Methods:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code>(layer_vars, layer_sizes)</p></td>
+<td><p>Class constructor.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#varseq.VarSeq.generate_weights" title="varseq.VarSeq.generate_weights"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_weights</span></code></a>(N)</p></td>
+<td><p>Generates a random valid sequence of <code class="docutils literal notranslate"><span class="pre">N</span></code> weights.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#varseq.VarSeq.random" title="varseq.VarSeq.random"><code class="xref py py-obj docutils literal notranslate"><span class="pre">random</span></code></a>([vars, N])</p></td>
+<td><p>Generates a random variable sequence.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#varseq.VarSeq.size" title="varseq.VarSeq.size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">size</span></code></a>()</p></td>
+<td><p>Returns the total sequence size (sum of element weights).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#varseq.VarSeq.var_size" title="varseq.VarSeq.var_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">var_size</span></code></a>(var)</p></td>
+<td><p>Returns the element weight (given its label <code class="docutils literal notranslate"><span class="pre">var</span></code>).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#varseq.VarSeq.S" title="varseq.VarSeq.S"><code class="xref py py-obj docutils literal notranslate"><span class="pre">S</span></code></a>(a, j)</p></td>
+<td><p>Returns cost of sliding element <code class="docutils literal notranslate"><span class="pre">a</span></code> (label) to position <code class="docutils literal notranslate"><span class="pre">j</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#varseq.VarSeq.slide" title="varseq.VarSeq.slide"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slide</span></code></a>(a, j[, inplace])</p></td>
+<td><p>Performs a sift of element <code class="docutils literal notranslate"><span class="pre">a</span></code> (label) to position <code class="docutils literal notranslate"><span class="pre">j</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__str__</span></code>()</p></td>
+<td><p>Converts the object to a string (used to print a sequence).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__len__</span></code>()</p></td>
+<td><p>Returns a sequence length (number of elements)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#varseq.VarSeq.count_inversions_to" title="varseq.VarSeq.count_inversions_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_inversions_to</span></code></a>(to_what)</p></td>
+<td><p>Counts inversions with another list (or <a class="reference internal" href="#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">VarSeq</span></code></a>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#varseq.VarSeq.greedy_sort" title="varseq.VarSeq.greedy_sort"><code class="xref py py-obj docutils literal notranslate"><span class="pre">greedy_sort</span></code></a>([to_what])</p></td>
+<td><p>Revises the <a class="reference internal" href="#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">VarSeq</span></code></a> to a given order of labels <code class="docutils literal notranslate"><span class="pre">to_what</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#varseq.VarSeq.align_to" title="varseq.VarSeq.align_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">align_to</span></code></a>([to_what])</p></td>
+<td><p>Revises the varseq to given variable order in <span class="math notranslate nohighlight">\(O(N)\)</span> time.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#varseq.VarSeq.OA_bruteforce" title="varseq.VarSeq.OA_bruteforce"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OA_bruteforce</span></code></a>(with_what)</p></td>
+<td><p>Enumerates all possible alignments with another sequence.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#varseq.VarSeq.is_aligned" title="varseq.VarSeq.is_aligned"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_aligned</span></code></a>(to_what)</p></td>
+<td><p>Helper function: checks if varseq is aligned with <code class="docutils literal notranslate"><span class="pre">to_what</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<dl class="py method">
+<dt id="varseq.VarSeq.OA_bruteforce">
+<code class="sig-name descname"><span class="pre">OA_bruteforce</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">with_what</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.OA_bruteforce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.OA_bruteforce" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enumerates all possible alignments with another sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>with_what</strong> (<a class="reference internal" href="#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">VarSeq</span></code></a>) – target ordering.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>[<code class="docutils literal notranslate"><span class="pre">&lt;no.</span> <span class="pre">of</span> <span class="pre">optima&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;list</span> <span class="pre">of</span> <span class="pre">A-aligned&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;list</span> <span class="pre">of</span> <span class="pre">B-aligned&gt;</span></code>]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>Having the returned object <code class="docutils literal notranslate"><span class="pre">res</span></code>, <code class="docutils literal notranslate"><span class="pre">res[0]</span></code> gives the
+number of optima. Then, assuming it is at least 3,
+<code class="docutils literal notranslate"><span class="pre">res[1][2]</span></code> gives A-aligned in the third optimum,
+<code class="docutils literal notranslate"><span class="pre">res[2][2]</span></code> gives B-aligned in the third optimum.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="varseq.VarSeq.S">
+<code class="sig-name descname"><span class="pre">S</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.S"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.S" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns cost of sliding element <code class="docutils literal notranslate"><span class="pre">a</span></code> (label) to position <code class="docutils literal notranslate"><span class="pre">j</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="varseq.VarSeq.align_to">
+<code class="sig-name descname"><span class="pre">align_to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_what</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.align_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.align_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Revises the varseq to given variable order in <span class="math notranslate nohighlight">\(O(N)\)</span> time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>to_what</strong> – a list/tuple/np.darray of target var names,</p></li>
+<li><p><strong>a variable sequence</strong> (<em>or</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a revised variable sequence</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">VarSeq</span></code></a></p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The original sequence in unchanged (the operation is NOT in-place!)</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="varseq.VarSeq.count_inversions_to">
+<code class="sig-name descname"><span class="pre">count_inversions_to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_what</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.count_inversions_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.count_inversions_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Counts inversions with another list (or <a class="reference internal" href="#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">VarSeq</span></code></a>).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="varseq.VarSeq.generate_weights">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">generate_weights</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.generate_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.generate_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a random valid sequence of <code class="docutils literal notranslate"><span class="pre">N</span></code> weights.</p>
+<p>That is, respects the requirement: <span class="math notranslate nohighlight">\(n_{i+1} \leq 2n_i\)</span>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="varseq.VarSeq.greedy_sort">
+<code class="sig-name descname"><span class="pre">greedy_sort</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_what</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.greedy_sort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.greedy_sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Revises the <a class="reference internal" href="#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">VarSeq</span></code></a> to a given order of labels <code class="docutils literal notranslate"><span class="pre">to_what</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>to_what</strong> (list / <a class="reference internal" href="#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">VarSeq</span></code></a>) – target order of variables
+(or a varseq where it can be extracted from.)</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A naive implementation / cross-check, “sift-align” procedure, <span class="math notranslate nohighlight">\(O(N^2)\)</span>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="varseq.VarSeq.is_aligned">
+<code class="sig-name descname"><span class="pre">is_aligned</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_what</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.is_aligned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.is_aligned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function: checks if varseq is aligned with <code class="docutils literal notranslate"><span class="pre">to_what</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="varseq.VarSeq.random">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">random</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a random variable sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>an object representing a weighted
+variable sequence with <cite>N</cite> variables and random element
+weights. If no variable labels are given (in <code class="docutils literal notranslate"><span class="pre">vars</span></code>),
+uses a random permutation of integer labels 1,…,N.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">VarSeq</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="varseq.VarSeq.size">
+<code class="sig-name descname"><span class="pre">size</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the total sequence size (sum of element weights).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="varseq.VarSeq.slide">
+<code class="sig-name descname"><span class="pre">slide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.slide"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.slide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a sift of element <code class="docutils literal notranslate"><span class="pre">a</span></code> (label) to position <code class="docutils literal notranslate"><span class="pre">j</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a revised copy of a variable sequence
+or a self-pointer (if <code class="docutils literal notranslate"><span class="pre">inplace</span></code> = <em>True</em>)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">VarSeq</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="varseq.VarSeq.var_size">
+<code class="sig-name descname"><span class="pre">var_size</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.var_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.var_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the element weight (given its label <code class="docutils literal notranslate"><span class="pre">var</span></code>).</p>
+</dd></dl>
+
+</dd></dl>
+
+<p class="centered">
+<strong>❖❖❖</strong></p></div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="varseq.non_dominated">
+<code class="sig-prename descclassname"><span class="pre">varseq.</span></code><code class="sig-name descname"><span class="pre">non_dominated</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#non_dominated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.non_dominated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the element “e” is non-dominated.</p>
+<p>Considering <code class="docutils literal notranslate"><span class="pre">e</span></code> as a candidate for the last position
+in the target alignment of <a class="reference internal" href="#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">VarSeq</span></code></a> -s <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code>,
+check if it is non-dominated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><em>True</em> = non-dominated, <em>False</em> = dominated.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

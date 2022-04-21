@@ -1,0 +1,1357 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>BDD &mdash; Align-BDD  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#reproducibility">Reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#code-organization">Code organization</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>BDD</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for BDD</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Implements the Binary Decision Diagram data type.</span>
+
+<span class="sd">Defines the &quot;original&quot; BDD-related machinery (as opposed to the</span>
+<span class="sd">simplification defined in :py:class:`varseq.VarSeq`), including</span>
+<span class="sd">actual simultaneous variable reordering (inspired by Rudell&#39;93) and</span>
+<span class="sd">other BDD alignment-related functions, along with technical utilities</span>
+<span class="sd">(such as load/save to file, etc.). A simple auxiliary class</span>
+<span class="sd">:py:class:`node` keeps the necessary data related to BDD nodes.</span>
+
+<span class="sd">Tests coverage: :py:mod:`BDD_test`</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">random</span> <span class="k">as</span> <span class="n">rnd</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">choice</span> <span class="k">as</span> <span class="n">rnd_choose</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">pytest</span>
+
+<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">iters</span>
+<span class="kn">from</span> <span class="nn">graphviz</span> <span class="kn">import</span> <span class="n">Digraph</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="c1"># Module-level constants</span>
+<span class="n">GSIFTS_MAX_INCREASE_MUL</span> <span class="o">=</span> <span class="mi">100000</span>  <span class="c1"># max increase of the BDD size (e.g., 100 times) during greedy sifts</span>
+<span class="n">WEIGHT_TOL</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># number of decimal points for the arc weights tolerance (swap_up)</span>
+<span class="n">C_MAX</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># max edge cost (for random generation, non-inclusive)</span>
+
+<span class="c1"># special node IDs (see the node class docstring)</span>
+<span class="n">NROOT</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">NTRUE</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="n">NFALSE</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
+<span class="c1">######################################################################</span>
+
+<div class="viewcode-block" id="simscore"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.simscore">[docs]</a><span class="k">def</span> <span class="nf">simscore</span><span class="p">(</span><span class="n">seq_A</span><span class="p">,</span> <span class="n">seq_B</span><span class="p">,</span> <span class="n">p_B</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculates a &#39;similarity score&#39; between `A` and `B`.</span>
+
+<span class="sd">    The function has nothing to do with other data structures,</span>
+<span class="sd">    technically: it just calculates the normalized number of</span>
+<span class="sd">    inversions between the two ordered lists of variables</span>
+<span class="sd">    (which we call &#39;similarity score&#39;).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        seq_A (list): sequence A</span>
+<span class="sd">        seq_B (list): sequence B to compare</span>
+<span class="sd">        p_B (dict): dict of element positions in B (default: None, will be built)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        number (between 0 and 1): share of possible inversions.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; simscore([1,2,3], [1,2,3])</span>
+<span class="sd">        1.0</span>
+
+<span class="sd">        &gt;&gt;&gt; simscore([1,2,3], [3,2,1])</span>
+<span class="sd">        0.0</span>
+
+<span class="sd">        &gt;&gt;&gt; simscore([1,2,3], [1,3,2])</span>
+<span class="sd">        0.6666666666666667</span>
+
+<span class="sd">        &gt;&gt;&gt; simscore([1,2,3,4,5,6,7], [5,6,3,4,2,7,1])</span>
+<span class="sd">        0.33333333333333337</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq_A</span><span class="p">)</span>
+    <span class="n">no_inversions</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">p_B</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">p_B</span> <span class="o">=</span> <span class="p">{</span><span class="n">seq_B</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)}</span>
+
+    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">seq_A</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">seq_B</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">p_B</span><span class="p">[</span><span class="n">seq_A</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">&gt;</span> <span class="n">p_B</span><span class="p">[</span><span class="n">seq_A</span><span class="p">[</span><span class="n">j</span><span class="p">]]:</span>
+                <span class="n">no_inversions</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">no_inversions</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="node"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.node">[docs]</a><span class="k">class</span> <span class="nc">node</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a BDD node, with the following attributes.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        id: an integer node ID</span>
+<span class="sd">        hi: a pointer to the ``hi``-node</span>
+<span class="sd">        lo: a pointer to the ``lo``-node</span>
+<span class="sd">        layer: layer number (id)</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        There are special node IDs:</span>
+<span class="sd">        ``0``   for the root, </span>
+<span class="sd">        ``-1``  for True sink, </span>
+<span class="sd">        ``-2``  for the False sink.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">hi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A simple class constructor.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hi</span> <span class="o">=</span> <span class="n">hi</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lo</span> <span class="o">=</span> <span class="n">lo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer</span> <span class="o">=</span> <span class="n">layer</span>
+
+<div class="viewcode-block" id="node.link"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.node.link">[docs]</a>    <span class="k">def</span> <span class="nf">link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_whom</span><span class="p">,</span> <span class="n">arc</span><span class="o">=</span><span class="s2">&quot;hi&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function: links the node to another one.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">arc</span> <span class="o">==</span> <span class="s2">&quot;hi&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hi</span> <span class="o">=</span> <span class="n">to_whom</span>
+        <span class="k">elif</span> <span class="n">arc</span> <span class="o">==</span> <span class="s2">&quot;lo&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lo</span> <span class="o">=</span> <span class="n">to_whom</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: wrong arc specifier while creating an edge -- </span><span class="si">{}</span><span class="s2"> (expected &#39;hi&#39; or &#39;lo&#39;)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arc</span><span class="p">))</span></div></div>
+
+
+<span class="c1">######################################################################</span>
+<div class="viewcode-block" id="BDD"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD">[docs]</a><span class="k">class</span> <span class="nc">BDD</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Encodes a BDD and implements layer-ordering (revision) methods.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        N (int): number of variables (equals number of layers - 1)</span>
+<span class="sd">        layers (list): a list of layers (sets/hashes), including {T, F}-nodes</span>
+<span class="sd">        nodes (dict): a set/hash of nodes, key by node ID</span>
+<span class="sd">        vars (list): variables associated with layers</span>
+<span class="sd">        T,F (node): pointers to `True` and `False` sink nodes</span>
+<span class="sd">        weighted (bool): a flag whether arcs have weights</span>
+<span class="sd">        weights (dict): arc weights, keys: `(id_from, id_to, arc_type)`</span>
+<span class="sd">                        (with the latter either &#39;hi&#39;, or &#39;lo&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Defines an empty BDD with N variables.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            N (int): number of variables ( = number of layers except the terminal),</span>
+<span class="sd">            vars (list): variable names (strings or ints),</span>
+<span class="sd">            weighted (bool): a flag for weighted BDD (assigning arc weights).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">vars</span><span class="p">:</span>
+            <span class="nb">vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vars</span> <span class="o">=</span> <span class="nb">vars</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span> <span class="o">=</span> <span class="n">weighted</span>
+        <span class="k">if</span> <span class="n">weighted</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">=</span> <span class="n">node</span><span class="p">(</span><span class="n">NTRUE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">F</span> <span class="o">=</span> <span class="n">node</span><span class="p">(</span><span class="n">NFALSE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">F</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_id</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">av_node_ids</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">var_pos</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">))]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">NTRUE</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">NFALSE</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">F</span><span class="p">})</span>
+
+    <span class="c1"># some helper functions</span>
+
+<div class="viewcode-block" id="BDD.link"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.link">[docs]</a>    <span class="k">def</span> <span class="nf">link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">etype</span><span class="o">=</span><span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a link between two nodes in the BDD.</span>
+
+<span class="sd">        (Saving auxiliary info as appropriate)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">           parent (int): parent node id</span>
+<span class="sd">           child (int): child node id</span>
+<span class="sd">           etype (str): edge type, ``hi`` or ``lo`` (default ``hi``)</span>
+<span class="sd">           edge_weight (float): edge weight (default 0.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">parent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">child</span><span class="p">],</span> <span class="n">etype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">parent</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">etype</span><span class="p">)]</span> <span class="o">=</span> <span class="n">edge_weight</span></div>
+
+<div class="viewcode-block" id="BDD.llink"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.llink">[docs]</a>    <span class="k">def</span> <span class="nf">llink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">etype</span><span class="o">=</span><span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a link between two nodes.</span>
+
+<span class="sd">        A version of :py:func:`BDD.BDD.link` that takes</span>
+<span class="sd">        :py:class:`BDD.node` objects as arguments instead of node</span>
+<span class="sd">        IDs.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parent</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">etype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">parent</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">child</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">etype</span><span class="p">)]</span> <span class="o">=</span> <span class="n">edge_weight</span></div>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns no of variables (layers, except the terminal).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BDD.n"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.n">[docs]</a>    <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns size of the i-th layer.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="BDD.p"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.p">[docs]</a>    <span class="k">def</span> <span class="nf">p</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns position (0-based layer index) of variable ``a``.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_pos</span><span class="p">[</span><span class="n">a</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="BDD.size"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.size">[docs]</a>    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the size of the BDD (total no. of nodes).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span></div>
+
+<div class="viewcode-block" id="BDD.new_node_name"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.new_node_name">[docs]</a>    <span class="k">def</span> <span class="nf">new_node_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a unique name for the next node to be created.</span>
+
+<span class="sd">        Picks the one to re-cycle after some node deletions, when available;</span>
+<span class="sd">        when it is not -- just takes the ``max_id+1`` (adjusting the ``max_id``)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">av_node_ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">av_node_ids</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_id</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_id</span></div>
+
+<div class="viewcode-block" id="BDD.dump_gv"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.dump_gv">[docs]</a>    <span class="k">def</span> <span class="nf">dump_gv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layerCapt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">x_prefix</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">node_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Exports the BDD to the Graphviz format (``.dot``).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            layerCapt (bool): whether to generate layer captions.</span>
+<span class="sd">            x_prefix (str): a prefix to be shown for layer name (default &#39;x&#39;)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a Digraph object (see ``graphviz`` package).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">Digraph</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">g</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;cluster_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">layer</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">NTRUE</span><span class="p">:</span>
+                        <span class="n">s</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">NTRUE</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;T&quot;</span><span class="p">,</span><span class="n">fillcolor</span> <span class="o">=</span> <span class="s2">&quot;orange&quot;</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;filled&quot;</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">NFALSE</span><span class="p">:</span>
+                        <span class="n">s</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">NFALSE</span><span class="p">),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="n">fillcolor</span> <span class="o">=</span> <span class="s2">&quot;gray&quot;</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;filled&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">node_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">s</span><span class="o">.</span><span class="n">node</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">s</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">node_labels</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">i</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">layerCapt</span><span class="p">:</span>
+                        <span class="n">s</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x_prefix</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">, sz=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;lightgrey&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">s</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;lightgrey&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">s</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">layer</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">n</span><span class="o">.</span><span class="n">hi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+                        <span class="n">elabel</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s1">&#39;hi&#39;</span><span class="p">)]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">elabel</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                    <span class="n">g</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="n">elabel</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+                        <span class="n">elabel</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s1">&#39;lo&#39;</span><span class="p">)]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">elabel</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                    <span class="n">g</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">elabel</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">g</span></div>
+
+<div class="viewcode-block" id="BDD.addnode"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.addnode">[docs]</a>    <span class="k">def</span> <span class="nf">addnode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_node</span><span class="p">,</span> <span class="n">arc</span><span class="o">=</span><span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">node_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds a node and updates aux info as necessary.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">node_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">node_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_node_name</span><span class="p">()</span>
+
+        <span class="n">newnode</span> <span class="o">=</span> <span class="n">node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">parent_node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">newnode</span><span class="o">.</span><span class="n">layer</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">newnode</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">arc</span> <span class="o">==</span> <span class="s2">&quot;hi&quot;</span><span class="p">:</span>
+            <span class="n">parent_node</span><span class="o">.</span><span class="n">hi</span> <span class="o">=</span> <span class="n">newnode</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">parent_node</span><span class="o">.</span><span class="n">layer</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">newnode</span><span class="p">)</span>
+            <span class="n">newnode</span><span class="o">.</span><span class="n">layer</span> <span class="o">=</span> <span class="n">parent_node</span><span class="o">.</span><span class="n">layer</span><span class="o">+</span><span class="mi">1</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">parent_node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                              <span class="n">parent_node</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s1">&#39;hi&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">edge_weight</span>
+
+        <span class="k">elif</span> <span class="n">arc</span> <span class="o">==</span> <span class="s2">&quot;lo&quot;</span><span class="p">:</span>
+            <span class="n">parent_node</span><span class="o">.</span><span class="n">lo</span> <span class="o">=</span> <span class="n">newnode</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">parent_node</span><span class="o">.</span><span class="n">layer</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">newnode</span><span class="p">)</span>
+            <span class="n">newnode</span><span class="o">.</span><span class="n">layer</span> <span class="o">=</span> <span class="n">parent_node</span><span class="o">.</span><span class="n">layer</span><span class="o">+</span><span class="mi">1</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">parent_node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                              <span class="n">parent_node</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s1">&#39;lo&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">edge_weight</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: Wrong arc type: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">(allowed values are &#39;hi&#39; and &#39;lo&#39;)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arc</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">newnode</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">newnode</span><span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">newnode</span></div>
+
+<div class="viewcode-block" id="BDD.swap_up"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.swap_up">[docs]</a>    <span class="k">def</span> <span class="nf">swap_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Swaps the layer with the one immediately above it (in-place).</span>
+
+<span class="sd">        (by *index* ! in-place operation)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            layer_idx (int): number (0-based index) of the layer to be &#39;&#39;bubbled up&#39;&#39;</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            Operation takes O (`no-of-nodes in the upper layer`)</span>
+<span class="sd">            time. Drops the layer being swapped. Then iterates</span>
+<span class="sd">            through the nodes of the layer immediately above it and</span>
+<span class="sd">            creates nodes as necessary (re-cycling new nodes to avoid</span>
+<span class="sd">            redundancy: a quasi-reduced BDD keeps this property)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">layer_idx</span> <span class="o">&gt;=</span> <span class="mi">1</span>  <span class="c1"># otherwise there&#39;s no layer to swap to</span>
+        <span class="k">assert</span> <span class="n">layer_idx</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span>  <span class="c1"># can&#39;t swap-up the last layer</span>
+
+        <span class="n">new_nodes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer_idx</span><span class="p">]:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">av_node_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer_idx</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="n">prev_layer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer_idx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">F</span> <span class="ow">in</span> <span class="n">prev_layer</span><span class="p">:</span>
+                <span class="c1"># iterating through the nodes of the upper layer</span>
+
+                <span class="c1"># save the pointers</span>
+                <span class="n">F_hi_hi</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">hi</span>
+                <span class="n">F_hi_lo</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">lo</span>
+                <span class="n">F_lo_hi</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">hi</span>
+                <span class="n">F_lo_lo</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">lo</span>
+
+                <span class="c1"># creating the &quot;hi&quot;-node</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">F_hi_hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F_lo_hi</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="ow">in</span> <span class="n">new_nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">F_hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+                    <span class="n">F_hi</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">F_hi_hi</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+                    <span class="n">F_hi</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">F_lo_hi</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                    <span class="n">new_nodes</span><span class="o">.</span><span class="n">update</span><span class="p">({(</span><span class="n">F_hi</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F_hi</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">):</span> <span class="n">F_hi</span><span class="p">})</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">F_hi</span> <span class="o">=</span> <span class="n">new_nodes</span><span class="p">[(</span><span class="n">F_hi_hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                    <span class="n">F_lo_hi</span><span class="o">.</span><span class="n">id</span><span class="p">)]</span>  <span class="c1"># re-cycle the old node</span>
+                    <span class="n">F</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">F_hi</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+
+                <span class="c1"># creating the &quot;lo&quot;-node</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">F_hi_lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F_lo_lo</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="ow">in</span> <span class="n">new_nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">F_lo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                    <span class="n">F_lo</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">F_hi_lo</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+                    <span class="n">F_lo</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">F_lo_lo</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                    <span class="n">new_nodes</span><span class="o">.</span><span class="n">update</span><span class="p">({(</span><span class="n">F_lo</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F_lo</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">):</span> <span class="n">F_lo</span><span class="p">})</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">F_lo</span> <span class="o">=</span> <span class="n">new_nodes</span><span class="p">[(</span><span class="n">F_hi_lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                    <span class="n">F_lo_lo</span><span class="o">.</span><span class="n">id</span><span class="p">)]</span>  <span class="c1"># re-cycle the old node</span>
+                    <span class="n">F</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">F_lo</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer_idx</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">new_nodes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># weighted version (with arc costs)</span>
+            <span class="n">old_weights</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">F</span> <span class="ow">in</span> <span class="n">prev_layer</span><span class="p">:</span>
+                <span class="c1"># save the pointers</span>
+                <span class="n">F_hi_hi</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">hi</span>
+                <span class="n">F_hi_lo</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">lo</span>
+                <span class="n">F_lo_hi</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">hi</span>
+                <span class="n">F_lo_lo</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">lo</span>
+
+                <span class="c1"># calculating the necessary costs</span>
+                <span class="n">cF_hi</span> <span class="o">=</span> <span class="n">old_weights</span><span class="p">[(</span><span class="n">F</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span>
+                <span class="n">cF_lo</span> <span class="o">=</span> <span class="n">old_weights</span><span class="p">[(</span><span class="n">F</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]</span>
+                <span class="n">cF_hi_hi</span> <span class="o">=</span> <span class="n">old_weights</span><span class="p">[(</span><span class="n">F</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span>
+                <span class="n">cF_lo_hi</span> <span class="o">=</span> <span class="n">old_weights</span><span class="p">[(</span><span class="n">F</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span>
+                <span class="n">cF_hi_lo</span> <span class="o">=</span> <span class="n">old_weights</span><span class="p">[(</span><span class="n">F</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]</span>
+                <span class="n">cF_lo_lo</span> <span class="o">=</span> <span class="n">old_weights</span><span class="p">[(</span><span class="n">F</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]</span>
+
+                <span class="n">cH_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">cF_hi</span> <span class="o">+</span> <span class="n">cF_hi_hi</span><span class="p">,</span> <span class="n">cF_lo</span> <span class="o">+</span> <span class="n">cF_lo_hi</span><span class="p">),</span>
+                                  <span class="n">decimals</span><span class="o">=</span><span class="n">WEIGHT_TOL</span><span class="p">)</span>
+                <span class="n">cH_hi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">((</span><span class="n">cF_hi</span> <span class="o">+</span> <span class="n">cF_hi_hi</span><span class="p">)</span> <span class="o">-</span> <span class="n">cH_min</span><span class="p">,</span>
+                                 <span class="n">decimals</span><span class="o">=</span><span class="n">WEIGHT_TOL</span><span class="p">)</span>
+                <span class="n">cH_lo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">((</span><span class="n">cF_lo</span> <span class="o">+</span> <span class="n">cF_lo_hi</span><span class="p">)</span> <span class="o">-</span> <span class="n">cH_min</span><span class="p">,</span>
+                                 <span class="n">decimals</span><span class="o">=</span><span class="n">WEIGHT_TOL</span><span class="p">)</span>
+
+                <span class="n">cL_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">cF_hi</span> <span class="o">+</span> <span class="n">cF_hi_lo</span><span class="p">,</span> <span class="n">cF_lo</span> <span class="o">+</span> <span class="n">cF_lo_lo</span><span class="p">),</span>
+                                  <span class="n">decimals</span><span class="o">=</span><span class="n">WEIGHT_TOL</span><span class="p">)</span>
+                <span class="n">cL_hi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">((</span><span class="n">cF_hi</span> <span class="o">+</span> <span class="n">cF_hi_lo</span><span class="p">)</span> <span class="o">-</span> <span class="n">cL_min</span><span class="p">,</span>
+                                 <span class="n">decimals</span><span class="o">=</span><span class="n">WEIGHT_TOL</span><span class="p">)</span>
+                <span class="n">cL_lo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">((</span><span class="n">cF_lo</span> <span class="o">+</span> <span class="n">cF_lo_lo</span><span class="p">)</span> <span class="o">-</span> <span class="n">cL_min</span><span class="p">,</span>
+                                 <span class="n">decimals</span><span class="o">=</span><span class="n">WEIGHT_TOL</span><span class="p">)</span>
+
+                <span class="c1"># ----------------------------------------------------</span>
+                <span class="c1"># creating the &quot;hi&quot;-node</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">F_hi_hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F_lo_hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                        <span class="n">cH_hi</span><span class="p">,</span> <span class="n">cH_lo</span><span class="p">)</span> <span class="ow">in</span> <span class="n">new_nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">F_hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">cH_min</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">F_hi</span><span class="p">,</span> <span class="n">F_hi_hi</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">cH_hi</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">F_hi</span><span class="p">,</span> <span class="n">F_lo_hi</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">cH_lo</span><span class="p">)</span>
+                    <span class="n">new_nodes</span><span class="o">.</span><span class="n">update</span><span class="p">({(</span><span class="n">F_hi</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F_hi</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                       <span class="n">cH_hi</span><span class="p">,</span> <span class="n">cH_lo</span><span class="p">):</span> <span class="n">F_hi</span><span class="p">})</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">F_hi</span> <span class="o">=</span> <span class="n">new_nodes</span><span class="p">[(</span><span class="n">F_hi_hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F_lo_hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                      <span class="n">cH_hi</span><span class="p">,</span> <span class="n">cH_lo</span><span class="p">)]</span>  <span class="c1"># re-cycle the old node</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">F_hi</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">cH_min</span><span class="p">)</span>
+
+                <span class="c1"># ----------------------------------------------------</span>
+                <span class="c1"># creating the &quot;lo&quot;-node</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="n">F_hi_lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F_lo_lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                        <span class="n">cL_hi</span><span class="p">,</span> <span class="n">cL_lo</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">F_lo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">cL_min</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">F_lo</span><span class="p">,</span> <span class="n">F_hi_lo</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">cL_hi</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">F_lo</span><span class="p">,</span> <span class="n">F_lo_lo</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">cL_lo</span><span class="p">)</span>
+
+                    <span class="n">new_nodes</span><span class="o">.</span><span class="n">update</span><span class="p">({(</span><span class="n">F_hi_lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F_lo_lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                       <span class="n">cL_hi</span><span class="p">,</span> <span class="n">cL_lo</span><span class="p">):</span> <span class="n">F_lo</span><span class="p">})</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># re-cycle the old node</span>
+                    <span class="n">F_lo</span> <span class="o">=</span> <span class="n">new_nodes</span><span class="p">[(</span><span class="n">F_hi_lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">F_lo_lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">cL_hi</span><span class="p">,</span> <span class="n">cL_lo</span><span class="p">)]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">F_lo</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">cL_min</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer_idx</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">new_nodes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="c1"># NOTE: old nodes in the source layer must be (physically) deleted</span>
+        <span class="c1"># by the Python garbage collection</span>
+
+        <span class="c1"># rename layers and update aux structures as necessary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">var_pos</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">layer_idx</span><span class="p">]:</span> <span class="n">layer_idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">layer_idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span> <span class="n">layer_idx</span>
+        <span class="p">})</span>
+
+        <span class="n">v_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">layer_idx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">layer_idx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">layer_idx</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">layer_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">v_1</span></div>
+
+<div class="viewcode-block" id="BDD.sift"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.sift">[docs]</a>    <span class="k">def</span> <span class="nf">sift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sifts variable ``var`` (by name) to (0-based) position ``pos``.</span>
+
+<span class="sd">        Uses :py:func:`BDD.sift` under the hood, in-place operation.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">pos</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+        <span class="k">assert</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span>
+
+        <span class="k">if</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
+            <span class="c1"># this is a sift-up</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">pos</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">swap_up</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="n">pos</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
+            <span class="c1"># a trivial case -- nothing to do</span>
+            <span class="k">return</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># this is a sift-down</span>
+            <span class="k">while</span> <span class="n">pos</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">swap_up</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">(</span><span class="n">var</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BDD.gsifts"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.gsifts">[docs]</a>    <span class="k">def</span> <span class="nf">gsifts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">with_whom</span><span class="p">,</span> <span class="n">start_order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Performs greedy sifts to align with ``with_whom``.</span>
+
+<span class="sd">        Runs a simplistic implementation of Rudell&#39;93</span>
+<span class="sd">        sifting alorithm extension to minimize \|A\|+\|B\|</span>
+
+<span class="sd">        starts with aligning to ``self`` or ``start_order`` (if given)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">start_order</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">start_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">start_order</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">i</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">with_whom</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">start_order</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">i</span><span class="p">)</span>
+
+        <span class="c1"># now the pair is aligned, but possibly huge</span>
+        <span class="c1"># let us see if we can compress it:</span>
+
+        <span class="n">processed_vars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">processed_vars</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">in</span> <span class="n">processed_vars</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># skip processed variables</span>
+
+            <span class="n">best_pos</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">active_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">best_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">with_whom</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+
+            <span class="n">cur_size</span> <span class="o">=</span> <span class="n">best_size</span>
+
+            <span class="c1"># try moving the var down</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+                <span class="c1">#if self.size()+with_whom.size() &gt; cur_size*GSIFTS_MAX_INCREASE_MUL:</span>
+                <span class="c1">#    break</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">swap_up</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+                <span class="n">with_whom</span><span class="o">.</span><span class="n">swap_up</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+                <span class="n">cur_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">with_whom</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">cur_size</span> <span class="o">&lt;</span> <span class="n">best_size</span><span class="p">:</span>
+                    <span class="n">best_size</span> <span class="o">=</span> <span class="n">cur_size</span>
+                    <span class="n">best_pos</span> <span class="o">=</span> <span class="n">j</span>
+
+            <span class="c1"># try moving the var up</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">active_var</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">with_whom</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">active_var</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">cur_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">with_whom</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>
+                <span class="c1">#if self.size()+with_whom.size() &gt; cur_size*GSIFTS_MAX_INCREASE_MUL:</span>
+                <span class="c1">#    break</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">swap_up</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+                <span class="n">with_whom</span><span class="o">.</span><span class="n">swap_up</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+                <span class="n">cur_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">with_whom</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">cur_size</span> <span class="o">&lt;</span> <span class="n">best_size</span><span class="p">:</span>
+                    <span class="n">best_size</span> <span class="o">=</span> <span class="n">cur_size</span>
+                    <span class="n">best_pos</span> <span class="o">=</span> <span class="n">j</span><span class="o">-</span><span class="mi">1</span>
+
+            <span class="c1"># now choose the best position for the variable</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">active_var</span><span class="p">,</span> <span class="n">best_pos</span><span class="p">)</span>
+            <span class="n">with_whom</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">active_var</span><span class="p">,</span> <span class="n">best_pos</span><span class="p">)</span>
+
+            <span class="n">processed_vars</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">active_var</span><span class="p">)</span></div>
+
+    <span class="c1"># file manipulation procedures</span>
+<div class="viewcode-block" id="BDD.save"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Saves a BDD to a text file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (string): destination file name.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            File format is as follows.</span>
+
+<span class="sd">                - File header, the first two lines</span>
+<span class="sd">                    | N= `&lt;no-of-layers&gt;`</span>
+<span class="sd">                    | vars= `&lt;comma-separated layer labels&gt;`</span>
+
+<span class="sd">                - Then, one node description = one line of the format:</span>
+<span class="sd">                    `id` : `hi` , `lo`</span>
+
+<span class="sd">            where ``id`` is node&#39;s ID, ``hi`` and ``lo`` are IDs of</span>
+<span class="sd">            the nodes corresponding to one- and zero- pointers of the</span>
+<span class="sd">            node ``ID``. The procedure performs breadth-first search</span>
+<span class="sd">            and just saves all the nodes.</span>
+
+<span class="sd">            Three nodes have reserved ID values:</span>
+
+<span class="sd">                - **Root** node: 0</span>
+<span class="sd">                - **True** terminal: -1</span>
+<span class="sd">                - **False** terminal: -2</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>  <span class="c1"># a deque of node IDs to explore (FIFO)</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># set of visited (saved) nodes (by ID)</span>
+
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;N=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">)))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;vars=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">])))</span>
+
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">n_id</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+                <span class="c1"># this is a new node</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n_id</span><span class="p">]</span><span class="o">.</span><span class="n">hi</span> <span class="ow">is</span> <span class="kc">None</span>
+                        <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n_id</span><span class="p">]</span><span class="o">.</span><span class="n">hi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="n">n_hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n_id</span><span class="p">]</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span>
+                    <span class="n">n_lo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n_id</span><span class="p">]</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_id</span><span class="p">,</span> <span class="n">n_hi</span><span class="p">,</span> <span class="n">n_lo</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">n_hi</span> <span class="ow">in</span> <span class="n">V</span> <span class="ow">or</span> <span class="n">n_hi</span> <span class="ow">in</span> <span class="n">S</span> <span class="ow">or</span> <span class="n">n_hi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                        <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n_hi</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">n_lo</span> <span class="ow">in</span> <span class="n">V</span> <span class="ow">or</span> <span class="n">n_lo</span> <span class="ow">in</span> <span class="n">S</span> <span class="ow">or</span> <span class="n">n_lo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                        <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n_lo</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:None,None</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_id</span><span class="p">))</span>
+
+                <span class="n">V</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">n_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BDD.load"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Loads a BDD from a (text) file.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            The format is described in :py:func:`save`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="k">while</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;#&quot;</span> <span class="ow">or</span> <span class="n">line</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+            <span class="k">assert</span> <span class="n">line</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;N=&#39;</span>
+            <span class="n">N</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+            <span class="k">assert</span> <span class="n">N</span> <span class="o">&gt;</span> <span class="mi">1</span>
+
+            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="n">line</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;vars=&#39;</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="n">N</span><span class="o">-</span><span class="mi">1</span>
+
+            <span class="c1"># initialize the attributes</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">line</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">var_pos</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span> <span class="o">=</span> <span class="n">weighted</span>
+            <span class="k">if</span> <span class="n">weighted</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+            <span class="n">current_layer</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">next_layer</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">while</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">weighted</span><span class="p">:</span>
+                    <span class="nb">id</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+                    <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+                    <span class="n">w_hi</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">w_lo</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">id</span><span class="p">,</span> <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+
+                <span class="n">hi_id</span><span class="p">,</span> <span class="n">lo_id</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                <span class="nb">id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">id</span> <span class="o">!=</span> <span class="n">NTRUE</span> <span class="ow">and</span> <span class="nb">id</span> <span class="o">!=</span> <span class="n">NFALSE</span><span class="p">:</span>
+                    <span class="n">hi_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hi_id</span><span class="p">)</span>
+                    <span class="n">lo_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lo_id</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">weighted</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="nb">id</span><span class="p">,</span> <span class="n">hi_id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">w_hi</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="nb">id</span><span class="p">,</span> <span class="n">lo_id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">w_lo</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">next_layer</span><span class="p">:</span>
+                    <span class="n">current_layer</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">next_layer</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+                <span class="k">elif</span> <span class="nb">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">node_id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">id</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WARNING: during load, just added an orphan node with id: </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">hi_id</span> <span class="ow">in</span> <span class="n">next_layer</span><span class="p">:</span>
+                    <span class="n">F_hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">hi_id</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">F_hi</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+                        <span class="n">e_w</span> <span class="o">=</span> <span class="n">w_hi</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">e_w</span> <span class="o">=</span> <span class="mf">0.0</span>
+                    <span class="n">F_hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="nb">id</span><span class="p">],</span>
+                                        <span class="s2">&quot;hi&quot;</span><span class="p">,</span>
+                                        <span class="n">node_id</span><span class="o">=</span><span class="n">hi_id</span><span class="p">,</span>
+                                        <span class="n">edge_weight</span><span class="o">=</span><span class="n">e_w</span><span class="p">)</span>
+                    <span class="n">next_layer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">hi_id</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">lo_id</span> <span class="ow">in</span> <span class="n">next_layer</span><span class="p">:</span>
+                    <span class="n">F_lo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">lo_id</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">F_lo</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+                        <span class="n">e_w</span> <span class="o">=</span> <span class="n">w_lo</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">e_w</span> <span class="o">=</span> <span class="mf">0.0</span>
+                    <span class="n">F_lo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="nb">id</span><span class="p">],</span>
+                                        <span class="s2">&quot;lo&quot;</span><span class="p">,</span>
+                                        <span class="n">node_id</span><span class="o">=</span><span class="n">lo_id</span><span class="p">,</span>
+                                        <span class="n">edge_weight</span><span class="o">=</span><span class="n">e_w</span><span class="p">)</span>
+                    <span class="n">next_layer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">lo_id</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">current_layer</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: a node with no source at layer </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span>
+                              <span class="nb">format</span><span class="p">(</span><span class="n">current_layer</span><span class="p">))</span>
+
+                    <span class="n">F</span> <span class="o">=</span> <span class="n">node</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">F_hi</span><span class="p">,</span> <span class="n">F_lo</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">current_layer</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="nb">id</span><span class="p">:</span> <span class="n">F</span><span class="p">})</span>
+
+                <span class="k">if</span> <span class="nb">id</span> <span class="o">==</span> <span class="n">NTRUE</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="nb">id</span> <span class="o">==</span> <span class="n">NFALSE</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+
+                <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_id</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">av_node_ids</span> <span class="o">=</span> <span class="n">deque</span><span class="p">([</span>
+                    <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_id</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                <span class="p">])</span></div>
+
+<div class="viewcode-block" id="BDD.random"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.random">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates a random BDD with `N` variables (N+1 layers).</span>
+
+<span class="sd">        Layers are numbered with consecutive integers by default,</span>
+<span class="sd">        starting with ``1``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            N (int):   number of variables (results in N+1 layers, incl. T,F)</span>
+<span class="sd">            p (float):   tree size parameter</span>
+<span class="sd">                    0 will generate a non-random exponential-sized diagram,</span>
+<span class="sd">                    1 will result in a single node per layer.</span>
+<span class="sd">            weighted (bool): whether to generate a weighted diagram.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A generated :py:class:`BDD`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bdd</span> <span class="o">=</span> <span class="n">BDD</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="n">weighted</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">N</span> <span class="o">&gt;</span> <span class="mi">1</span>
+        <span class="n">bdd</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">parent_node</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># create a root node</span>
+
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+            <span class="c1"># generate nodes (and edges) for the layer</span>
+
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">bdd</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">ch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="n">C_MAX</span><span class="p">)</span>
+                <span class="n">cl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="n">C_MAX</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">rnd</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">p</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">bdd</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">newnode</span> <span class="o">=</span> <span class="n">bdd</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">arc</span><span class="o">=</span><span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">ch</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">bdd</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">rnd_choose</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">bdd</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer</span><span class="p">]))</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                             <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">ch</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">rnd</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">p</span><span class="p">:</span>
+                    <span class="n">newnode</span> <span class="o">=</span> <span class="n">bdd</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">arc</span><span class="o">=</span><span class="s2">&quot;lo&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">cl</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">bdd</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">rnd_choose</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">bdd</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer</span><span class="p">]))</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                           <span class="s2">&quot;lo&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">cl</span><span class="p">)</span>
+
+        <span class="c1"># separately process the last layer</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">bdd</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]:</span>
+            <span class="n">bdd</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">rnd_choose</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">bdd</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                     <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="n">C_MAX</span><span class="p">))</span>
+            <span class="n">bdd</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">rnd_choose</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">bdd</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                     <span class="s2">&quot;lo&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="n">C_MAX</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">bdd</span></div>
+
+<div class="viewcode-block" id="BDD.profile"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.profile">[docs]</a>    <span class="k">def</span> <span class="nf">profile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a BDD &quot;profile&quot; -- an (almost) BFS-ordered list of nodes.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            This is used to determine, e.g., if the generated</span>
+<span class="sd">            instance is unique. A &#39;profile&#39; is a string of the format</span>
+<span class="sd">            ``&lt;vars&gt;``:``&lt;BFS-nodes&gt;``, where:</span>
+
+<span class="sd">            - ``&lt;vars&gt;``      :  comma-separated variable names by layer;</span>
+<span class="sd">            - ``&lt;BFS-nodes&gt;`` :  comma-separated list of node-numbers (not IDs!)</span>
+<span class="sd">              in a BFS-traverse order</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">node_nums</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">cur_node</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">node_nums</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">cur_node</span><span class="p">})</span>
+            <span class="n">Q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cur_node</span><span class="p">))</span>
+            <span class="n">cur_node</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span><span class="p">]</span>
+
+        <span class="k">while</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Q</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">successor</span> <span class="ow">in</span> <span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">successor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="n">successor</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">node_nums</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">node_nums</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">successor</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">cur_node</span><span class="p">})</span>
+                    <span class="n">cur_node</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="n">p</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">node_nums</span><span class="p">[</span><span class="n">successor</span><span class="o">.</span><span class="n">id</span><span class="p">]))</span>
+                <span class="k">if</span> <span class="n">successor</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">V</span><span class="p">:</span>
+                    <span class="n">Q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">successor</span><span class="p">)</span>
+                    <span class="n">V</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">successor</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span></div>
+
+<div class="viewcode-block" id="BDD.show"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="nb">dir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span><span class="p">,</span>
+             <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;showfunc.dot&quot;</span><span class="p">,</span>
+             <span class="n">layerCapt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+             <span class="n">x_prefix</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
+             <span class="n">node_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Shows the diagram on the screen (saving the auxiliary pdf).</span>
+
+<span class="sd">        Generates a ``.dot`` file and compiles it to ``.pdf``.</span>
+<span class="sd">        Requires ``graphviz`` (``dot`` program)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dir (str): directory to place files (default: ``tmp``)</span>
+<span class="sd">            filename (str): `.dot` filename (default: ``showfunc.dot``)</span>
+<span class="sd">            layerCapt (bool): whether to show layer captions (default: ``True``)</span>
+<span class="sd">            x_prefix(str): a prefix for variable captions (default: ``x``)</span>
+<span class="sd">            node_labels(dict): node labels to display (optional).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dump_gv</span><span class="p">(</span><span class="n">layerCapt</span><span class="p">,</span> <span class="n">x_prefix</span><span class="p">,</span> <span class="n">node_labels</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span>
+                                               <span class="n">directory</span><span class="o">=</span><span class="nb">dir</span><span class="p">,</span>
+                                               <span class="n">cleanup</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BDD.align_to"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.align_to">[docs]</a>    <span class="k">def</span> <span class="nf">align_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vars_order</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Revises the BDD to a given order.</span>
+
+<span class="sd">        (with a series of consecutive sifts)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">aligned</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">aligned</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vars_order</span><span class="p">)):</span>
+            <span class="n">aligned</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">vars_order</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">i</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">aligned</span></div>
+
+<div class="viewcode-block" id="BDD.OA_bruteforce"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.OA_bruteforce">[docs]</a>    <span class="k">def</span> <span class="nf">OA_bruteforce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">with_what</span><span class="p">,</span> <span class="n">LR</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Finds the best (smallest) alignment with BDD ``with_what``.</span>
+
+<span class="sd">        Uses brute-force enumeration of all possible orders.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            with_what (BDD): target diagram.</span>
+<span class="sd">            LR (bool): if set, layer-reduces each candidate BDD.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A tuple of values</span>
+
+<span class="sd">                - alternatives (int): number of alternative optima</span>
+<span class="sd">                - A_aligned (list): of A-aligned (in each optimum)</span>
+<span class="sd">                - B_aligned (list): of B-aligned (in respective optimum)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># generate all possible permutations</span>
+        <span class="n">perms</span> <span class="o">=</span> <span class="n">iters</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+        <span class="n">min_size</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+        <span class="n">A_aligned</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">B_aligned</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">alternatives</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">perms</span><span class="p">:</span>
+            <span class="n">A_c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">perm</span><span class="p">))</span>
+            <span class="n">B_c</span> <span class="o">=</span> <span class="n">with_what</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">perm</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">LR</span><span class="p">:</span>
+                <span class="n">A_c</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+                <span class="n">B_c</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">min_size</span> <span class="o">&gt;</span> <span class="n">A_c</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B_c</span><span class="o">.</span><span class="n">size</span><span class="p">():</span>
+                <span class="n">A_aligned</span> <span class="o">=</span> <span class="p">[</span><span class="n">A_c</span><span class="p">]</span>
+                <span class="n">B_aligned</span> <span class="o">=</span> <span class="p">[</span><span class="n">B_c</span><span class="p">]</span>
+                <span class="n">min_size</span> <span class="o">=</span> <span class="n">A_c</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">B_c</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+                <span class="n">alternatives</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">min_size</span> <span class="o">==</span> <span class="n">A_c</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B_c</span><span class="o">.</span><span class="n">size</span><span class="p">():</span>
+                <span class="n">A_aligned</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">A_c</span><span class="p">)</span>
+                <span class="n">B_aligned</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">B_c</span><span class="p">)</span>
+                <span class="n">alternatives</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">alternatives</span><span class="p">,</span> <span class="n">A_aligned</span><span class="p">,</span> <span class="n">B_aligned</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="BDD.is_reduced"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.is_reduced">[docs]</a>    <span class="k">def</span> <span class="nf">is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if the BDD is quasi-reduced (no &quot;redundant&quot; nodes).&quot;&quot;&quot;</span>
+        <span class="n">checked_nodes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="ow">in</span> <span class="n">checked_nodes</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">checked_nodes</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">n</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BDD.make_reduced"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.make_reduced">[docs]</a>    <span class="k">def</span> <span class="nf">make_reduced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Makes the BDD quasi-reduced.</span>
+
+<span class="sd">        Swaps each layer back and forth, starting from the last one,</span>
+<span class="sd">        (which makes sure the results is quasi-reduced due to</span>
+<span class="sd">        :py:func:`BDD.BDD.swap` implementation.)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">swap_up</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">swap_up</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BDD.rename_vars"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.rename_vars">[docs]</a>    <span class="k">def</span> <span class="nf">rename_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ren_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function: renames variables.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ren_dict (dict): a dict of &lt;= :py:attr:`BDD.N` labels</span>
+<span class="sd">                in the form {``before``: ``after``}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ren_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2"> is not in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">new_vars</span> <span class="o">=</span> <span class="p">[(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">ren_dict</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ren_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="n">v</span><span class="p">)(</span><span class="n">v</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vars</span> <span class="o">=</span> <span class="n">new_vars</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">var_pos</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">))]))</span></div>
+
+<div class="viewcode-block" id="BDD.shuffle_vars"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.shuffle_vars">[docs]</a>    <span class="k">def</span> <span class="nf">shuffle_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Randomly renames the variables (shuffles their order).&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rename_vars</span><span class="p">(</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">))))</span></div>
+
+<div class="viewcode-block" id="BDD.is_aligned"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.is_aligned">[docs]</a>    <span class="k">def</span> <span class="nf">is_aligned</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_what</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if the BDD is aligned with ``to_what``.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="n">to_what</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span></div>
+
+    <span class="c1"># functions related to testing equivalence and finding truth tables</span>
+<div class="viewcode-block" id="BDD.get_value"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Finds the terminal node (T or F) -- an endpoint for ``x``.</span>
+
+<span class="sd">        Returns a terminal node ID corresponding to the variable choices in ``x``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x (dict): of {var_name: value}, where value is in {0,1}.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A tuple of values</span>
+
+<span class="sd">                - terminal (bool or `-1`):</span>
+<span class="sd">                    terminal node corresponding to the path</span>
+<span class="sd">                    implied by x, encoded as Boolean (or -1 if error)</span>
+
+<span class="sd">                - cost (float):</span>
+<span class="sd">                    if the BDD is weighted, cost of the path.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="n">node</span><span class="p">,)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+                    <span class="n">cost</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">lo</span>
+            <span class="k">elif</span> <span class="n">x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+                    <span class="n">cost</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">hi</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;Wrong value (</span><span class="si">{}</span><span class="s2">) for variabe </span><span class="si">{}</span><span class="s2">: 0 or 1 expected&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="n">cost</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">F</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="n">cost</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error not a True or False node reached!&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;node is </span><span class="si">{}</span><span class="s2">, T is </span><span class="si">{}</span><span class="s2">, F is </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">F</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span></div>
+
+<div class="viewcode-block" id="BDD.truth_table"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.truth_table">[docs]</a>    <span class="k">def</span> <span class="nf">truth_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a &quot;truth table&quot; for the encoded Boolean function.</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        ``pandas`` dataframe: column numbers correspond to</span>
+<span class="sd">        variable names with two additional columns: ``Terminal`` for</span>
+<span class="sd">        the function value (of Boolean type) and ``Cost`` if the</span>
+<span class="sd">        diagram is :py:attr:`BDD.weighted`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tt</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x_num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">binary_repr</span><span class="p">(</span><span class="n">x_num</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">))]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+                <span class="n">tt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="n">x</span><span class="p">)))])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="n">x</span><span class="p">))))</span>
+            <span class="n">ind</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">binary_repr</span><span class="p">(</span><span class="n">x_num</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;Terminal&quot;</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">ind</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span>
+                                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;Terminal&quot;</span><span class="p">,</span> <span class="s2">&quot;Cost&quot;</span><span class="p">],</span>
+                                <span class="n">index</span><span class="o">=</span><span class="n">ind</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BDD.is_equivalent"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.is_equivalent">[docs]</a>    <span class="k">def</span> <span class="nf">is_equivalent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if two BDDs (A and B) are equivalent.</span>
+
+<span class="sd">        Equivalent in the sense that they define the same Boolean</span>
+<span class="sd">        function and the corresponding path costs coincide. Checks:</span>
+
+<span class="sd">            - if the corresponding truth tables coincide.</span>
+<span class="sd">            - (if the BDD is weighted) if all paths have the same costs.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A tuple of</span>
+
+<span class="sd">                - result (bool): whether the diagrams are equivalent,</span>
+<span class="sd">                - message (str): information regarding the difference, if found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span> <span class="o">==</span> <span class="n">B</span><span class="o">.</span><span class="n">weighted</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">tt_self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">truth_table</span><span class="p">()</span>
+        <span class="n">tt_B</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">truth_table</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+            <span class="n">tt_B</span> <span class="o">=</span> <span class="n">tt_B</span><span class="p">[[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Terminal&#39;</span><span class="p">,</span> <span class="s1">&#39;Cost&#39;</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tt_B</span> <span class="o">=</span> <span class="n">tt_B</span><span class="p">[[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Terminal&#39;</span><span class="p">]]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+            <span class="n">tt_B</span><span class="p">[</span><span class="s1">&#39;new_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">tt_B</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tt_B</span><span class="p">[</span><span class="s1">&#39;new_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">tt_B</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="n">tt_B</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;new_index&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tt_self</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Terminal&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">tt_B</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;Terminal&#39;</span><span class="p">]:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">INFO: Discrepancy found. For x=</span><span class="si">{}</span><span class="s2">, value(self)=</span><span class="si">{}</span><span class="s2">, value(B)=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">idx</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Terminal&#39;</span><span class="p">],</span> <span class="n">tt_B</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;Terminal&#39;</span><span class="p">])</span>
+                <span class="k">return</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="n">msg</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;Cost&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">tt_B</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;Cost&#39;</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="n">WEIGHT_TOL</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">INFO: Discrepancy found. For x=</span><span class="si">{}</span><span class="s2">, cost(self)=</span><span class="si">{}</span><span class="s2">, cost(B)=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">idx</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Cost&#39;</span><span class="p">],</span> <span class="n">tt_B</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;Cost&#39;</span><span class="p">])</span>
+                    <span class="k">return</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="n">msg</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="n">msg</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="BDD.shortest_path"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.shortest_path">[docs]</a>    <span class="k">def</span> <span class="nf">shortest_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Finds a shortest-path in O(`no-of-nodes`) time.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: node labels (using node IDs as keys)</span>
+<span class="sd">            corresponding to a shortest path from the current node to</span>
+<span class="sd">            **True** terminal.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            Expects the diagram to be :py:attr:`BDD.weighted`. (An</span>
+<span class="sd">            unweighted version, in terms of &#39;number of hops&#39;, does</span>
+<span class="sd">            not make any sense for a quasi-reduced BDD: the answer</span>
+<span class="sd">            would be ``len(self)``.)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted</span>
+
+        <span class="n">node_labels</span> <span class="o">=</span> <span class="p">{</span><span class="n">NTRUE</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">))):</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">L</span><span class="p">]:</span>
+                <span class="n">node_label</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">node_labels</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">node_label</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span>
+
+                <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">node_labels</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">node_label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">node_label</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">node_label</span><span class="p">,</span>
+                                         <span class="n">node_labels</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">node_label</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]</span>
+
+                <span class="k">if</span> <span class="n">node_label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">node_labels</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">node_label</span><span class="p">})</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">node_labels</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">node_labels</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;∞&quot;</span>
+
+        <span class="k">return</span> <span class="n">node_labels</span></div>
+
+<div class="viewcode-block" id="BDD.simscore"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.BDD.simscore">[docs]</a>    <span class="k">def</span> <span class="nf">simscore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes a simscore with another diagram, `B` (see :py:func:`simscore`).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">simscore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="n">B</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="n">B</span><span class="o">.</span><span class="n">var_pos</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="intersect"><a class="viewcode-back" href="../_autosummary/BDD.html#BDD.intersect">[docs]</a><span class="k">def</span> <span class="nf">intersect</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Produces an intersection BDD of ``A`` and ``B``.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        BDDs need to be order-associated (same vars in the same order).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        :py:class:`BDD` : an intersection BDD.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">A</span><span class="o">.</span><span class="n">vars</span> <span class="o">==</span> <span class="n">B</span><span class="o">.</span><span class="n">vars</span>
+    <span class="k">assert</span> <span class="n">A</span><span class="o">.</span><span class="n">weighted</span> <span class="o">==</span> <span class="n">B</span><span class="o">.</span><span class="n">weighted</span>
+
+    <span class="n">weighted</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">weighted</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">BDD</span><span class="p">(</span><span class="nb">vars</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">vars</span><span class="p">),</span> <span class="n">weighted</span><span class="o">=</span><span class="n">weighted</span><span class="p">)</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">parent_node</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">current_layer</span> <span class="o">=</span> <span class="p">{(</span><span class="n">NROOT</span><span class="p">,</span> <span class="n">NROOT</span><span class="p">):</span> <span class="n">root</span><span class="p">}</span>
+
+    <span class="c1"># for all layers but the last one</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">new_layer</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">current_layer</span><span class="p">:</span>
+            <span class="n">niA</span><span class="p">,</span> <span class="n">niB</span> <span class="o">=</span> <span class="n">n</span>
+            <span class="n">nA</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">niA</span><span class="p">]</span>
+            <span class="n">nB</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">niB</span><span class="p">]</span>
+            <span class="n">nC</span> <span class="o">=</span> <span class="n">current_layer</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+            <span class="c1"># yes-arc</span>
+            <span class="n">new_yes</span> <span class="o">=</span> <span class="p">(</span><span class="n">nA</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">nB</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">wA</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">nA</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">nA</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span>
+            <span class="n">wB</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">nB</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">nB</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="n">new_yes</span> <span class="ow">in</span> <span class="n">new_layer</span><span class="p">:</span>
+                <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">nC</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">new_layer</span><span class="p">[</span><span class="n">new_yes</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                       <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">wA</span><span class="o">+</span><span class="n">wB</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_layer</span><span class="p">[</span><span class="n">new_yes</span><span class="p">]</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">nC</span><span class="p">,</span>
+                                               <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">wA</span><span class="o">+</span><span class="n">wB</span><span class="p">)</span>
+            <span class="c1"># no-arc</span>
+            <span class="n">new_no</span> <span class="o">=</span> <span class="p">(</span><span class="n">nA</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">nB</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">wA</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">nA</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">nA</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]</span>
+            <span class="n">wB</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">nB</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">nB</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="n">new_no</span> <span class="ow">in</span> <span class="n">new_layer</span><span class="p">:</span>
+                <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">nC</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">new_layer</span><span class="p">[</span><span class="n">new_no</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                       <span class="s2">&quot;lo&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">wA</span><span class="o">+</span><span class="n">wB</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_layer</span><span class="p">[</span><span class="n">new_no</span><span class="p">]</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">nC</span><span class="p">,</span>
+                                              <span class="s2">&quot;lo&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">wA</span><span class="o">+</span><span class="n">wB</span><span class="p">)</span>
+
+        <span class="n">current_layer</span> <span class="o">=</span> <span class="n">new_layer</span>
+
+    <span class="c1"># a special case of the last layer</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">current_layer</span><span class="p">:</span>
+        <span class="n">niA</span><span class="p">,</span> <span class="n">niB</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="n">nA</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">niA</span><span class="p">]</span>
+        <span class="n">nB</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">niB</span><span class="p">]</span>
+        <span class="n">nC</span> <span class="o">=</span> <span class="n">current_layer</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+        <span class="c1"># yes-arc</span>
+        <span class="n">wA</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">nA</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">nA</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span>
+        <span class="n">wB</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">nB</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">nB</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">nA</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">NTRUE</span> <span class="ow">and</span> <span class="n">nB</span><span class="o">.</span><span class="n">hi</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">NTRUE</span><span class="p">:</span>
+            <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">nC</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">NTRUE</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">wA</span><span class="o">+</span><span class="n">wB</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">nC</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">NFALSE</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">wA</span><span class="o">+</span><span class="n">wB</span><span class="p">)</span>
+        <span class="c1"># no-arc</span>
+        <span class="n">wA</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">nA</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">nA</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]</span>
+        <span class="n">wB</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">weights</span><span class="p">[(</span><span class="n">nB</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">nB</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">nA</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">NTRUE</span> <span class="ow">and</span> <span class="n">nB</span><span class="o">.</span><span class="n">lo</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">NTRUE</span><span class="p">:</span>
+            <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">nC</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">NTRUE</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">wA</span><span class="o">+</span><span class="n">wB</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">C</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">nC</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">NFALSE</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">wA</span><span class="o">+</span><span class="n">wB</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">C</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
