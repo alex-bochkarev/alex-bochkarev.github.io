@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>jUFLP_utils &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gen_BDD_pair" href="gen_BDD_pair.html" />
+    <link rel="prev" title="jUFLP_cavemen" href="jUFLP_cavemen.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          </a>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../overview.html#code-organization">Code organization</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#producing-figures">Producing figures</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BDD.html">BDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="varseq.html">varseq</a></li>
+<li class="toctree-l3"><a class="reference internal" href="heuristics.html">heuristics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BB_search.html">BB_search</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UFLP_fullDD.html">UFLP_fullDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UFLPOrder.html">UFLPOrder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jUFLP_cavemen.html">jUFLP_cavemen</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">jUFLP_utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-summary">Module summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#testing-framework">Testing framework</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
+      <li>jUFLP_utils</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/jUFLP_utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <span class="target" id="module-jUFLP_utils"></span><section id="juflp-utils">
+<h1>jUFLP_utils<a class="headerlink" href="#juflp-utils" title="Permalink to this heading"></a></h1>
+<section id="module-summary">
+<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this heading"></a></h2>
+<p>Utility / helper functions for j-UFLP: used save / load / draw instances.</p>
+<p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
+<p class="centered">
+<strong>❖❖❖</strong></p><section id="implements-functions-outside-the-classes-above">
+<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#jUFLP_utils.draw_jUFLP_inst" title="jUFLP_utils.draw_jUFLP_inst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_jUFLP_inst</span></code></a>(i1, i2, link[, filename])</p></td>
+<td><p>Saves an instance to a <code class="docutils literal notranslate"><span class="pre">.dot</span></code> file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#jUFLP_utils.load_inst" title="jUFLP_utils.load_inst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_inst</span></code></a>(filename)</p></td>
+<td><p>Loads a jUFLP instance from <code class="docutils literal notranslate"><span class="pre">.json</span></code> file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#jUFLP_utils.save_inst" title="jUFLP_utils.save_inst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_inst</span></code></a>(i1, i2, join_map, filename)</p></td>
+<td><p>Saves the jUFLP instance to <code class="docutils literal notranslate"><span class="pre">.json</span></code> file.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="centered">
+<strong>❖❖❖</strong></p><p class="centered">
+<strong>Implementation details</strong></p><p class="centered">
+<strong>❖❖❖</strong></p></section>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_utils.draw_jUFLP_inst">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_utils.</span></span><span class="sig-name descname"><span class="pre">draw_jUFLP_inst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tmp/jUFLP.dot'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_utils.html#draw_jUFLP_inst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_utils.draw_jUFLP_inst" title="Permalink to this definition"></a></dt>
+<dd><p>Saves an instance to a <code class="docutils literal notranslate"><span class="pre">.dot</span></code> file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_utils.load_inst">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_utils.</span></span><span class="sig-name descname"><span class="pre">load_inst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_utils.html#load_inst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_utils.load_inst" title="Permalink to this definition"></a></dt>
+<dd><p>Loads a jUFLP instance from <code class="docutils literal notranslate"><span class="pre">.json</span></code> file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>[[S,f,c,caves], [S2,f2,c2,caves], jmap]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_utils.save_inst">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_utils.</span></span><span class="sig-name descname"><span class="pre">save_inst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_utils.html#save_inst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_utils.save_inst" title="Permalink to this definition"></a></dt>
+<dd><p>Saves the jUFLP instance to <code class="docutils literal notranslate"><span class="pre">.json</span></code> file.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

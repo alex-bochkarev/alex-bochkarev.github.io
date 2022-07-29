@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>experiments.align_narrow_DDs &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Align-BDD
+          </a>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#raw-data-formats">Raw data formats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#code-organization">Code organization</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Align-BDD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>experiments.align_narrow_DDs</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for experiments.align_narrow_DDs</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Trying to figure if the heuristic performs worse for narrow DDs.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">BDD</span> <span class="kn">import</span> <span class="n">BDD</span><span class="p">,</span> <span class="n">intersect</span>
+<span class="kn">from</span> <span class="nn">varseq</span> <span class="kn">import</span> <span class="n">VarSeq</span>
+<span class="kn">from</span> <span class="nn">BB_search</span> <span class="kn">import</span> <span class="n">BBSearch</span>
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../_autosummary/experiments.align_narrow_DDs.html#experiments.align_narrow_DDs.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;p=pA/pB: N, A_width, B_width, sim_AB, intVS_size, intA_size&quot;</span><span class="p">)</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">pA</span> <span class="o">=</span> <span class="mf">0.80</span>
+    <span class="n">pB</span> <span class="o">=</span> <span class="mf">0.15</span>
+
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">15</span><span class="p">):</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">BDD</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">pA</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">BDD</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">pB</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">B</span><span class="o">.</span><span class="n">rename_vars</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)],</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)]))))</span>
+
+        <span class="n">A</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+        <span class="n">B</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+
+        <span class="n">Bpp</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">intA</span> <span class="o">=</span> <span class="n">intersect</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">Bpp</span><span class="p">)</span>
+        <span class="n">intA</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+
+        <span class="n">vs_A</span> <span class="o">=</span> <span class="n">VarSeq</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">A</span><span class="o">.</span><span class="n">layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="n">vs_B</span> <span class="o">=</span> <span class="n">VarSeq</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">B</span><span class="o">.</span><span class="n">layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">vs_A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">vs_B</span><span class="o">.</span><span class="n">layer_var</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;A:</span><span class="si">{</span><span class="n">vs_A</span><span class="o">.</span><span class="n">layer_var</span><span class="si">}</span><span class="s2">, B:</span><span class="si">{</span><span class="n">vs_B</span><span class="o">.</span><span class="n">layer_var</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">b</span> <span class="o">=</span> <span class="n">BBSearch</span><span class="p">(</span><span class="n">vs_A</span><span class="p">,</span> <span class="n">vs_B</span><span class="p">)</span>
+
+        <span class="c1"># bb.TIMEOUT_ITERATIONS=5000</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;optimal&quot;</span> <span class="ow">or</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;timeout&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;status: </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">Ap</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">Bp</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">intVS</span> <span class="o">=</span> <span class="n">intersect</span><span class="p">(</span><span class="n">Ap</span><span class="p">,</span> <span class="n">Bp</span><span class="p">)</span>
+        <span class="n">intVS</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;p=</span><span class="si">{</span><span class="n">pA</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">pB</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">A</span><span class="o">.</span><span class="n">width</span><span class="p">()</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">B</span><span class="o">.</span><span class="n">width</span><span class="p">()</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">A</span><span class="o">.</span><span class="n">simscore</span><span class="p">(</span><span class="n">B</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">intVS</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">intA</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

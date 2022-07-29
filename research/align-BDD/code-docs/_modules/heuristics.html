@@ -1,164 +1,86 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>heuristics &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> Align-BDD
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../overview.html#reproducibility">Reproducibility</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html#code-organization">Code organization</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Align-BDD</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content style-external-links">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html">Docs</a> &raquo;</li>
-        
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="index.html">Module code</a> &raquo;</li>
-        
       <li>heuristics</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for heuristics</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Implements several heuristics</span>
-<span class="sd">to be used with a separate script.</span>
+<span class="sd">to be used with a separate script to generate ``.csv`` logs.</span>
+
+<span class="sd">Heuristics for the original problem generally have ``orig_`` prefix</span>
+<span class="sd">in the name, for the simplified problem -- ``simpl_`` prefix.</span>
 
 <span class="sd">The module also contains some code related to possible further</span>
 <span class="sd">research and testing.</span>
-
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="c1"># TODO: review the legacy code / consider moving</span>
-
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">requests</span> <span class="c1"># needed for Telegram</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">opt_parser</span> <span class="k">as</span> <span class="nn">als</span>
 <span class="kn">import</span> <span class="nn">varseq</span> <span class="k">as</span> <span class="nn">vs</span>
 <span class="kn">import</span> <span class="nn">BB_search</span> <span class="k">as</span> <span class="nn">BB</span>
-<span class="kn">import</span> <span class="nn">BDD</span> <span class="k">as</span> <span class="nn">BDD</span>
 
 <span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span><span class="p">,</span> <span class="n">copy</span>
@@ -168,55 +90,59 @@
 <span class="kn">import</span> <span class="nn">pstats</span>
 
 
-<div class="viewcode-block" id="toA"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.toA">[docs]</a><span class="k">def</span> <span class="nf">toA</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+<div class="viewcode-block" id="toA"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.toA">[docs]</a><span class="k">def</span> <span class="nf">toA</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Helper: align to ``A`` heuristic.&quot;&quot;&quot;</span>
     <span class="n">Bp</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span><span class="n">A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="toB"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.toB">[docs]</a><span class="k">def</span> <span class="nf">toB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+
+<div class="viewcode-block" id="toB"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.toB">[docs]</a><span class="k">def</span> <span class="nf">toB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Helper: align to ``B`` heuristic.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">toA</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="n">A</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">toA</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span></div>
+
 
 <span class="c1"># min { toA, toB}</span>
-<div class="viewcode-block" id="minAB"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.minAB">[docs]</a><span class="k">def</span> <span class="nf">minAB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+<div class="viewcode-block" id="minAB"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.minAB">[docs]</a><span class="k">def</span> <span class="nf">minAB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Best of A and B heuristic (simplified problem).&quot;&quot;&quot;</span>
-    <span class="n">sA</span><span class="p">,</span><span class="n">vA</span> <span class="o">=</span> <span class="n">toA</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
-    <span class="n">sB</span><span class="p">,</span><span class="n">vB</span> <span class="o">=</span> <span class="n">toA</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">sA</span><span class="p">,</span> <span class="n">vA</span> <span class="o">=</span> <span class="n">toA</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+    <span class="n">sB</span><span class="p">,</span> <span class="n">vB</span> <span class="o">=</span> <span class="n">toA</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">sA</span><span class="o">&lt;=</span><span class="n">sB</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">sA</span><span class="p">,</span><span class="n">vA</span>
+    <span class="k">if</span> <span class="n">sA</span> <span class="o">&lt;=</span> <span class="n">sB</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sA</span><span class="p">,</span> <span class="n">vA</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">sB</span><span class="p">,</span><span class="n">vB</span></div>
+        <span class="k">return</span> <span class="n">sB</span><span class="p">,</span> <span class="n">vB</span></div>
 
-<div class="viewcode-block" id="simpl_greedy_swaps"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_greedy_swaps">[docs]</a><span class="k">def</span> <span class="nf">simpl_greedy_swaps</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+
+<div class="viewcode-block" id="simpl_greedy_swaps"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_greedy_swaps">[docs]</a><span class="k">def</span> <span class="nf">simpl_greedy_swaps</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;finds a good alignment target with greedy swaps</span>
 
 <span class="sd">    Makes swaps while it can improve the objective</span>
 <span class="sd">    (picking the best improvement at each step)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">cur_size</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">minAB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
-    <span class="n">T</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">T</span><span class="p">,[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">))])</span>
+    <span class="n">cur_size</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">minAB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">))])</span>
     <span class="n">improvement_possible</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">while</span> <span class="n">improvement_possible</span><span class="p">:</span>
         <span class="n">improvement_possible</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">Tp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-            <span class="n">a</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-            <span class="n">Ap</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-            <span class="n">Bp</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">Ap</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">Bp</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">cur_size</span><span class="p">:</span>
                 <span class="n">cur_size</span> <span class="o">=</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-                <span class="n">Tp</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">Tp</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="n">improvement_possible</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">T</span> <span class="o">=</span> <span class="n">Tp</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span><span class="n">T</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">T</span><span class="p">]</span></div>
 
-<span class="c1"># gr sifts</span>
-<div class="viewcode-block" id="simpl_greedy_sifts"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_greedy_sifts">[docs]</a><span class="k">def</span> <span class="nf">simpl_greedy_sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">passes</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+
+<span class="c1"># greedy sifts</span>
+<div class="viewcode-block" id="simpl_greedy_sifts"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_greedy_sifts">[docs]</a><span class="k">def</span> <span class="nf">simpl_greedy_sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">passes</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Finds a good alignment target with greedy sifts</span>
 
 <span class="sd">    Makes sifts while it can improve the objective</span>
@@ -224,8 +150,8 @@
 <span class="sd">    picking the best improvement at each step.</span>
 <span class="sd">    (one pass = examining all the variables)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">cur_size</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">minAB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
-    <span class="n">T</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">T</span><span class="p">,[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">))])</span>
+    <span class="n">cur_size</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">minAB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">))])</span>
     <span class="n">improvement_possible</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">pass_no</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -237,48 +163,54 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)):</span>
             <span class="n">a</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)):</span>
-                <span class="n">Ap</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
-                <span class="n">Bp</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
+                <span class="n">Ap</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
+                <span class="n">Bp</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
 
                 <span class="k">if</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">cur_size</span><span class="p">:</span>
                     <span class="n">cur_size</span> <span class="o">=</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-                    <span class="n">Tp</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
+                    <span class="n">Tp</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
                     <span class="n">improvement_possible</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">T</span> <span class="o">=</span> <span class="n">Tp</span>
         <span class="k">if</span> <span class="n">pass_no</span> <span class="o">==</span> <span class="n">passes</span><span class="p">:</span>
             <span class="k">break</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span><span class="n">T</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">T</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="simpl_gsifts_1p"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_gsifts_1p">[docs]</a><span class="k">def</span> <span class="nf">simpl_gsifts_1p</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+
+<div class="viewcode-block" id="simpl_gsifts_1p"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_gsifts_1p">[docs]</a><span class="k">def</span> <span class="nf">simpl_gsifts_1p</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Greedy sifts: one pass.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">simpl_greedy_sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">passes</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">simpl_greedy_sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">passes</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="simpl_gsifts_2p"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_gsifts_2p">[docs]</a><span class="k">def</span> <span class="nf">simpl_gsifts_2p</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+
+<div class="viewcode-block" id="simpl_gsifts_2p"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_gsifts_2p">[docs]</a><span class="k">def</span> <span class="nf">simpl_gsifts_2p</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Greedy sifts: two passes.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">simpl_greedy_sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">passes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">simpl_greedy_sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">passes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="simpl_gsifts_inf"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_gsifts_inf">[docs]</a><span class="k">def</span> <span class="nf">simpl_gsifts_inf</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+
+<div class="viewcode-block" id="simpl_gsifts_inf"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_gsifts_inf">[docs]</a><span class="k">def</span> <span class="nf">simpl_gsifts_inf</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Greedy sifts: all passes.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">simpl_greedy_sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">passes</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">simpl_greedy_sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">passes</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="simpl_gsifts_3p"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_gsifts_3p">[docs]</a><span class="k">def</span> <span class="nf">simpl_gsifts_3p</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+
+<div class="viewcode-block" id="simpl_gsifts_3p"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_gsifts_3p">[docs]</a><span class="k">def</span> <span class="nf">simpl_gsifts_3p</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Greedy sifts: three passes.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">simpl_greedy_sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">passes</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">simpl_greedy_sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">passes</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="simpl_5random"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_5random">[docs]</a><span class="k">def</span> <span class="nf">simpl_5random</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+
+<div class="viewcode-block" id="simpl_5random"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_5random">[docs]</a><span class="k">def</span> <span class="nf">simpl_5random</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Implements &#39;Best of 5 random orders&#39; heuristic.&quot;&quot;&quot;</span>
     <span class="n">best_size</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
         <span class="n">o</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span>
         <span class="n">Ap</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
         <span class="n">Bp</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">best_size</span><span class="o">&lt;</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">&lt;</span><span class="n">best_size</span><span class="p">:</span>
-            <span class="n">best_size</span> <span class="o">=</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">best_size</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">best_size</span><span class="p">:</span>
+            <span class="n">best_size</span> <span class="o">=</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
             <span class="n">best_o</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">Ap</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">best_size</span><span class="p">,</span> <span class="n">best_o</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="simpl_greedy_2sifts"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_greedy_2sifts">[docs]</a><span class="k">def</span> <span class="nf">simpl_greedy_2sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span> <span class="n">passes</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+
+<div class="viewcode-block" id="simpl_greedy_2sifts"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_greedy_2sifts">[docs]</a><span class="k">def</span> <span class="nf">simpl_greedy_2sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">passes</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Finds a good alignment target with greedy pairs of sifts.</span>
 
 <span class="sd">    Makes sifts while it can improve the objective,</span>
@@ -286,8 +218,8 @@
 <span class="sd">    picking the best improvement at each step.</span>
 <span class="sd">    (one pass = examining all the variables.)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">cur_size</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">minAB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
-    <span class="n">T</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">T</span><span class="p">,[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">))])</span>
+    <span class="n">cur_size</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">minAB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">))])</span>
     <span class="n">improvement_possible</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">pass_no</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -302,33 +234,35 @@
                 <span class="k">for</span> <span class="n">i2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)):</span>
                     <span class="n">a2</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i2</span><span class="p">]</span>
                     <span class="k">for</span> <span class="n">j2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)):</span>
-                        <span class="n">Ap</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span><span class="n">j1</span><span class="p">)</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span><span class="n">j2</span><span class="p">))</span>
-                        <span class="n">Bp</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span><span class="n">j1</span><span class="p">)</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span><span class="n">j2</span><span class="p">))</span>
+                        <span class="n">Ap</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">j1</span><span class="p">)</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span> <span class="n">j2</span><span class="p">))</span>
+                        <span class="n">Bp</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">j1</span><span class="p">)</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span> <span class="n">j2</span><span class="p">))</span>
 
                         <span class="k">if</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">cur_size</span><span class="p">:</span>
                             <span class="n">cur_size</span> <span class="o">=</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-                            <span class="n">Tp</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span><span class="n">j1</span><span class="p">)</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span><span class="n">j2</span><span class="p">)</span>
+                            <span class="n">Tp</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">j1</span><span class="p">)</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span> <span class="n">j2</span><span class="p">)</span>
                             <span class="n">improvement_possible</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">T</span> <span class="o">=</span> <span class="n">Tp</span>
         <span class="k">if</span> <span class="n">pass_no</span> <span class="o">==</span> <span class="n">passes</span><span class="p">:</span>
             <span class="k">break</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span><span class="n">T</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">T</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="simpl_g2sifts_1p"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_g2sifts_1p">[docs]</a><span class="k">def</span> <span class="nf">simpl_g2sifts_1p</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+
+<div class="viewcode-block" id="simpl_g2sifts_1p"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_g2sifts_1p">[docs]</a><span class="k">def</span> <span class="nf">simpl_g2sifts_1p</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Experimental: greedy pairs of sifts (simplified problem), one pass.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">simpl_greedy_2sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">simpl_greedy_2sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="simpl_g2sifts_2p"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_g2sifts_2p">[docs]</a><span class="k">def</span> <span class="nf">simpl_g2sifts_2p</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+
+<div class="viewcode-block" id="simpl_g2sifts_2p"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.simpl_g2sifts_2p">[docs]</a><span class="k">def</span> <span class="nf">simpl_g2sifts_2p</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Experimental: greedy pairs of sifts (simplified problem), two passes.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">simpl_greedy_2sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">simpl_greedy_2sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
+
 
 <span class="c1">######################################################################</span>
-<span class="c1">## an optimized version</span>
-<span class="c1"># TODO: invent</span>
-<div class="viewcode-block" id="fastslide"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.fastslide">[docs]</a><span class="k">def</span> <span class="nf">fastslide</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">p</span><span class="p">):</span>
+<span class="c1">## an optimized version for ``sift`` operation.</span>
+<div class="viewcode-block" id="fastslide"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.fastslide">[docs]</a><span class="k">def</span> <span class="nf">fastslide</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;An experimental function implementing faster &#39;sift&#39; operation.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">X</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">==</span><span class="n">a</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">X</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">==</span> <span class="n">a</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">X</span>
 
     <span class="n">X</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X</span><span class="p">]</span>
@@ -336,13 +270,13 @@
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)):</span>
         <span class="k">if</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">a</span> <span class="ow">and</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="n">i</span><span class="p">:</span>
-            <span class="k">continue</span> <span class="c1"># nothing to do, yet</span>
+            <span class="k">continue</span>  <span class="c1"># nothing to do, yet</span>
 
         <span class="k">elif</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">a</span><span class="p">:</span>
             <span class="c1"># so, p&gt;i -- slide down</span>
             <span class="n">j</span> <span class="o">=</span> <span class="n">i</span>
             <span class="k">while</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">:</span>
-                <span class="n">X</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">X</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
                 <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
 
             <span class="n">X</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span>
@@ -352,8 +286,8 @@
             <span class="c1"># so, p(a)&gt;i -- slide up</span>
             <span class="n">buf1</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span>
-            <span class="n">j</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
-            <span class="k">while</span> <span class="n">X</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">!=</span><span class="n">a</span><span class="p">:</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">while</span> <span class="n">X</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="n">a</span><span class="p">:</span>
                 <span class="n">buf2</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
                 <span class="n">X</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">buf1</span>
                 <span class="n">buf1</span> <span class="o">=</span> <span class="n">buf2</span>
@@ -364,13 +298,14 @@
 
     <span class="k">return</span> <span class="n">X</span></div>
 
-<div class="viewcode-block" id="fast_greedy_sifts"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.fast_greedy_sifts">[docs]</a><span class="k">def</span> <span class="nf">fast_greedy_sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+
+<div class="viewcode-block" id="fast_greedy_sifts"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.fast_greedy_sifts">[docs]</a><span class="k">def</span> <span class="nf">fast_greedy_sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Finds a good alignment target with greedy sifts.</span>
 
 <span class="sd">    Makes sifts while it can improve the objective</span>
 <span class="sd">    (picking the best improvement at each step)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">cur_size</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">minAB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
+    <span class="n">cur_size</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">minAB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
     <span class="n">improvement_possible</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">no_of_ops</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -381,29 +316,30 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)):</span>
             <span class="n">a</span> <span class="o">=</span> <span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)):</span>
-                <span class="n">Tpp</span> <span class="o">=</span> <span class="n">fastslide</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
+                <span class="n">Tpp</span> <span class="o">=</span> <span class="n">fastslide</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
                 <span class="n">Ap</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">Tpp</span><span class="p">)</span>
                 <span class="n">Bp</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">Tpp</span><span class="p">)</span>
 
-                <span class="n">no_of_ops</span> <span class="o">+=</span> <span class="mi">2</span><span class="o">*</span><span class="nb">abs</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+                <span class="n">no_of_ops</span> <span class="o">+=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
                 <span class="n">cand_size</span> <span class="o">=</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">cand_size</span> <span class="o">&lt;</span> <span class="n">cur_size</span><span class="p">:</span>
                     <span class="n">cur_size</span> <span class="o">=</span> <span class="n">cand_size</span>
                     <span class="n">Tp</span> <span class="o">=</span> <span class="n">Tpp</span>
-                    <span class="n">no_of_ops</span> <span class="o">+=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">j</span><span class="p">)</span>
+                    <span class="n">no_of_ops</span> <span class="o">+=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">)</span>
                     <span class="n">improvement_possible</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">T</span> <span class="o">=</span> <span class="n">Tp</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span><span class="n">no_of_ops</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">no_of_ops</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="fast_greedy_2sifts"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.fast_greedy_2sifts">[docs]</a><span class="k">def</span> <span class="nf">fast_greedy_2sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+
+<div class="viewcode-block" id="fast_greedy_2sifts"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.fast_greedy_2sifts">[docs]</a><span class="k">def</span> <span class="nf">fast_greedy_2sifts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;finds a good alignment target with greedy pairs of sifts</span>
 
 <span class="sd">    Makes sifts while it can improve the objective</span>
 <span class="sd">    (picking the best improvement at each step)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">cur_size</span><span class="p">,</span> <span class="n">T</span>  <span class="o">=</span> <span class="n">minAB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
+    <span class="n">cur_size</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">minAB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
     <span class="n">improvement_possible</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">no_of_ops</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -411,46 +347,49 @@
         <span class="c1"># print(&quot;obj:{}&quot;.format(cur_size))</span>
         <span class="n">improvement_possible</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">Tp</span> <span class="o">=</span> <span class="n">T</span>
-        <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
             <span class="n">a1</span> <span class="o">=</span> <span class="n">T</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">j1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i1</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)):</span>
-                <span class="n">Tpi</span> <span class="o">=</span> <span class="n">fastslide</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">a1</span><span class="p">,</span><span class="n">j1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)):</span>
+                <span class="n">Tpi</span> <span class="o">=</span> <span class="n">fastslide</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">j1</span><span class="p">)</span>
 
-                <span class="k">for</span> <span class="n">i2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i1</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
                     <span class="n">a2</span> <span class="o">=</span> <span class="n">T</span><span class="p">[</span><span class="n">i2</span><span class="p">]</span>
-                    <span class="k">for</span> <span class="n">j2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i2</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)):</span>
-                        <span class="n">Tpp</span> <span class="o">=</span> <span class="n">fastslide</span><span class="p">(</span><span class="n">Tpi</span><span class="p">,</span><span class="n">a2</span><span class="p">,</span><span class="n">j2</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">j2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)):</span>
+                        <span class="n">Tpp</span> <span class="o">=</span> <span class="n">fastslide</span><span class="p">(</span><span class="n">Tpi</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">j2</span><span class="p">)</span>
                         <span class="n">Ap</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">Tpp</span><span class="p">)</span>
                         <span class="n">Bp</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">Tpp</span><span class="p">)</span>
-                        <span class="n">no_of_ops</span> <span class="o">+=</span> <span class="mi">2</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+                        <span class="n">no_of_ops</span> <span class="o">+=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
                         <span class="n">cand_size</span> <span class="o">=</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
                         <span class="k">if</span> <span class="n">cand_size</span> <span class="o">&lt;</span> <span class="n">cur_size</span><span class="p">:</span>
                             <span class="n">cur_size</span> <span class="o">=</span> <span class="n">cand_size</span>
                             <span class="n">Tp</span> <span class="o">=</span> <span class="n">Tpp</span>
-                            <span class="n">no_of_ops</span> <span class="o">+=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">i1</span><span class="o">-</span><span class="n">j1</span><span class="p">)</span><span class="o">+</span><span class="nb">abs</span><span class="p">(</span><span class="n">i2</span><span class="o">-</span><span class="n">j2</span><span class="p">)</span>
+                            <span class="n">no_of_ops</span> <span class="o">+=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">i1</span> <span class="o">-</span> <span class="n">j1</span><span class="p">)</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">i2</span> <span class="o">-</span> <span class="n">j2</span><span class="p">)</span>
                             <span class="n">improvement_possible</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">T</span> <span class="o">=</span> <span class="n">Tp</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span><span class="n">no_of_ops</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">no_of_ops</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="orig_simpl"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_simpl">[docs]</a><span class="k">def</span> <span class="nf">orig_simpl</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">simpl</span><span class="p">):</span>
+<div class="viewcode-block" id="orig_simpl"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_simpl">[docs]</a><span class="k">def</span> <span class="nf">orig_simpl</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">simpl</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A heuristic for the **original** problem involving simplified problem.&quot;&quot;&quot;</span>
-    <span class="n">Ap</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">);</span> <span class="n">Bp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
-    <span class="n">Ap</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">simpl</span><span class="p">[</span><span class="s2">&quot;simpl_BB&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">Bp</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">simpl</span><span class="p">[</span><span class="s2">&quot;simpl_BB&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">Ap</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">Bp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+    <span class="n">Ap</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">simpl</span><span class="p">[</span><span class="s2">&quot;simpl_BB&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">Bp</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">simpl</span><span class="p">[</span><span class="s2">&quot;simpl_BB&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">Ap</span><span class="o">.</span><span class="n">is_aligned</span><span class="p">(</span><span class="n">Bp</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span><span class="n">simpl</span><span class="p">[</span><span class="s2">&quot;simpl_BB&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">simpl</span><span class="p">[</span><span class="s2">&quot;simpl_BB&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">]]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">simpl</span><span class="p">[</span><span class="s2">&quot;simpl_BB&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">simpl</span><span class="p">[</span><span class="s2">&quot;simpl_BB&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">]]</span></div>
 
 
-<div class="viewcode-block" id="orig_gsifts1p"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_gsifts1p">[docs]</a><span class="k">def</span> <span class="nf">orig_gsifts1p</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">simpl</span><span class="p">):</span>
+<div class="viewcode-block" id="orig_gsifts1p"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_gsifts1p">[docs]</a><span class="k">def</span> <span class="nf">orig_gsifts1p</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">simpl</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Greedy sifts heuristic for the **original** problem.&quot;&quot;&quot;</span>
-    <span class="n">ApA</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">);</span><span class="n">BpA</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
-    <span class="n">ApB</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">);</span><span class="n">BpB</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+    <span class="n">ApA</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">BpA</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+    <span class="n">ApB</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">BpB</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
     <span class="n">ApB</span><span class="o">.</span><span class="n">gsifts</span><span class="p">(</span><span class="n">BpB</span><span class="p">)</span>
     <span class="n">BpA</span><span class="o">.</span><span class="n">gsifts</span><span class="p">(</span><span class="n">ApA</span><span class="p">)</span>
-    <span class="n">sA</span> <span class="o">=</span> <span class="n">ApA</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">BpA</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-    <span class="n">sB</span> <span class="o">=</span> <span class="n">ApB</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">BpB</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="n">sA</span> <span class="o">=</span> <span class="n">ApA</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">BpA</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="n">sB</span> <span class="o">=</span> <span class="n">ApB</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">BpB</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
 
     <span class="c1"># make sure sequences are aligned</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">ApA</span><span class="o">.</span><span class="n">is_aligned</span><span class="p">(</span><span class="n">BpA</span><span class="p">):</span>
@@ -458,125 +397,137 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">ApB</span><span class="o">.</span><span class="n">is_aligned</span><span class="p">(</span><span class="n">BpB</span><span class="p">):</span>
         <span class="n">sB</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
-    <span class="k">if</span> <span class="n">sA</span> <span class="o">&lt;=</span> <span class="n">sB</span> <span class="ow">and</span> <span class="n">sA</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">sA</span> <span class="o">&lt;=</span> <span class="n">sB</span> <span class="ow">and</span> <span class="n">sA</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">sA</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ApA</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span>
-    <span class="k">elif</span> <span class="n">sB</span> <span class="o">&lt;</span> <span class="n">sA</span> <span class="ow">and</span> <span class="n">sB</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">sB</span> <span class="o">&lt;</span> <span class="n">sA</span> <span class="ow">and</span> <span class="n">sB</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">sB</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ApB</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">ApA</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ApA</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="orig_bestAB"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_bestAB">[docs]</a><span class="k">def</span> <span class="nf">orig_bestAB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">simpl</span><span class="p">):</span>
+
+<div class="viewcode-block" id="orig_bestAB"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_bestAB">[docs]</a><span class="k">def</span> <span class="nf">orig_bestAB</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">simpl</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Best of ``A`` and ``B`` (original problem).&quot;&quot;&quot;</span>
-    <span class="n">Ap</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">);</span> <span class="n">Bp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
-    <span class="n">Ap</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">Bp</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">B</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">():</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">B</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span><span class="mi">0</span><span class="p">,</span><span class="n">Ap</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span>
+    <span class="n">Ap</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">Bp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+    <span class="n">Ap</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">Bp</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Ap</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span><span class="mi">0</span><span class="p">,</span><span class="n">Bp</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Bp</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="orig_5random"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_5random">[docs]</a><span class="k">def</span> <span class="nf">orig_5random</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">simpl</span><span class="p">):</span>
+
+<div class="viewcode-block" id="orig_5random"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_5random">[docs]</a><span class="k">def</span> <span class="nf">orig_5random</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">simpl</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Five random orders (original problem).&quot;&quot;&quot;</span>
     <span class="n">best_size</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
-        <span class="n">Ap</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">);</span>
-        <span class="n">Bp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">);</span>
+        <span class="n">Ap</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+        <span class="n">Bp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
         <span class="n">o</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
-        <span class="n">Ap</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">o</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">Bp</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">o</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">best_size</span><span class="o">&lt;</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">&lt;</span><span class="n">best_size</span><span class="p">:</span>
-            <span class="n">best_size</span> <span class="o">=</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="n">Ap</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Bp</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">best_size</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">best_size</span><span class="p">:</span>
+            <span class="n">best_size</span> <span class="o">=</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
             <span class="n">best_o</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">Ap</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">best_size</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">best_o</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="orig_interleaved"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_interleaved">[docs]</a><span class="k">def</span> <span class="nf">orig_interleaved</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">simpl</span><span class="p">):</span>
+
+<div class="viewcode-block" id="orig_interleaved"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_interleaved">[docs]</a><span class="k">def</span> <span class="nf">orig_interleaved</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">simpl</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Experimental heuristic (further research).&quot;&quot;&quot;</span>
     <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
     <span class="n">Nlast</span> <span class="o">=</span> <span class="n">N</span>
-    <span class="n">Ac</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">);</span> <span class="n">Bc</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">);</span>
+    <span class="n">Ac</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">Bc</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nlast</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">Ac</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">Bc</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
             <span class="k">continue</span>
 
-        <span class="n">vsA</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">Ac</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">:],</span> <span class="p">[</span><span class="n">Ac</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">N</span><span class="p">)])</span>
-        <span class="n">vsB</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">Bc</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">:],</span> <span class="p">[</span><span class="n">Bc</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">N</span><span class="p">)])</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">BB</span><span class="o">.</span><span class="n">BBSearch</span><span class="p">(</span><span class="n">vsA</span><span class="p">,</span><span class="n">vsB</span><span class="p">)</span>
+        <span class="n">vsA</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">Ac</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">:],</span> <span class="p">[</span><span class="n">Ac</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">N</span><span class="p">)])</span>
+        <span class="n">vsB</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">Bc</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">:],</span> <span class="p">[</span><span class="n">Bc</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">N</span><span class="p">)])</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">BB</span><span class="o">.</span><span class="n">BBSearch</span><span class="p">(</span><span class="n">vsA</span><span class="p">,</span> <span class="n">vsB</span><span class="p">)</span>
         <span class="n">b</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
         <span class="n">cand_var</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">Ac</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">cand_var</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
-        <span class="n">Bc</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">cand_var</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">Ac</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">cand_var</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">Bc</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">cand_var</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
 
     <span class="n">i</span> <span class="o">=</span> <span class="n">Nlast</span>
-    <span class="n">vsAF</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">Ac</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">:],</span> <span class="p">[</span><span class="n">Ac</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">N</span><span class="p">)])</span>
-    <span class="n">vsBF</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">Bc</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">:],</span> <span class="p">[</span><span class="n">Bc</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">N</span><span class="p">)])</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="n">BB</span><span class="o">.</span><span class="n">BBSearch</span><span class="p">(</span><span class="n">vsAF</span><span class="p">,</span><span class="n">vsBF</span><span class="p">)</span>
+    <span class="n">vsAF</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">Ac</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">:],</span> <span class="p">[</span><span class="n">Ac</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">N</span><span class="p">)])</span>
+    <span class="n">vsBF</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">Bc</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">:],</span> <span class="p">[</span><span class="n">Bc</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">N</span><span class="p">)])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">BB</span><span class="o">.</span><span class="n">BBSearch</span><span class="p">(</span><span class="n">vsAF</span><span class="p">,</span> <span class="n">vsBF</span><span class="p">)</span>
     <span class="n">b</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nlast</span><span class="p">,</span><span class="n">N</span><span class="p">):</span>
-        <span class="n">cand_var</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">Nlast</span><span class="p">]</span>
-        <span class="n">Ac</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">cand_var</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
-        <span class="n">Bc</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">cand_var</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nlast</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+        <span class="n">cand_var</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">Nlast</span><span class="p">]</span>
+        <span class="n">Ac</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">cand_var</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">Bc</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">cand_var</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
 
     <span class="k">assert</span> <span class="n">Ac</span><span class="o">.</span><span class="n">is_aligned</span><span class="p">(</span><span class="n">Bc</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="n">Ac</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">Bc</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span><span class="mi">0</span><span class="p">,</span><span class="n">Ac</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">Ac</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bc</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Ac</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="orig_meta"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_meta">[docs]</a><span class="k">def</span> <span class="nf">orig_meta</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">simpl</span><span class="p">):</span>
+
+<div class="viewcode-block" id="orig_meta"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_meta">[docs]</a><span class="k">def</span> <span class="nf">orig_meta</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">simpl</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Another experimental heuristic (further research).&quot;&quot;&quot;</span>
     <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-    <span class="n">Ac</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">);</span> <span class="n">Bc</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">);</span>
+    <span class="n">Ac</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">Bc</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
     <span class="n">vsA</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">Ac</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="n">Ac</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
     <span class="n">vsB</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">Bc</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="n">Bc</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="n">BB</span><span class="o">.</span><span class="n">BBSearch</span><span class="p">(</span><span class="n">vsA</span><span class="p">,</span><span class="n">vsB</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">BB</span><span class="o">.</span><span class="n">BBSearch</span><span class="p">(</span><span class="n">vsA</span><span class="p">,</span> <span class="n">vsB</span><span class="p">)</span>
     <span class="n">b</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
 
     <span class="n">Ac</span><span class="o">.</span><span class="n">gsifts</span><span class="p">(</span><span class="n">Bc</span><span class="p">,</span> <span class="n">start_order</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span>
 
     <span class="k">assert</span> <span class="n">Ac</span><span class="o">.</span><span class="n">is_aligned</span><span class="p">(</span><span class="n">Bc</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">Ac</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">Bc</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span><span class="mi">0</span><span class="p">,</span><span class="n">Ac</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">Ac</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bc</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Ac</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="orig_interleave_when_diverge"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_interleave_when_diverge">[docs]</a><span class="k">def</span> <span class="nf">orig_interleave_when_diverge</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">simpl</span><span class="p">):</span>
+
+<div class="viewcode-block" id="orig_interleave_when_diverge"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_interleave_when_diverge">[docs]</a><span class="k">def</span> <span class="nf">orig_interleave_when_diverge</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">simpl</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Another experimental heuristic (further research).&quot;&quot;&quot;</span>
     <span class="n">ALLOWANCE</span> <span class="o">=</span> <span class="mf">0.99</span>
-    <span class="n">Ap</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">);</span> <span class="n">Bp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+    <span class="n">Ap</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">Bp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
     <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Ap</span><span class="p">)</span>
     <span class="n">vsA</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
     <span class="n">vsB</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="n">B</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
 
     <span class="n">simpl_order</span> <span class="o">=</span> <span class="n">simpl</span><span class="p">[</span><span class="s2">&quot;simpl_BB&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">while</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">N</span><span class="p">:</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">Ap</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">Bp</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">continue</span>
-        <span class="n">Ap</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">simpl_order</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">)</span>
-        <span class="n">Bp</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">simpl_order</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">)</span>
-        <span class="n">vsA</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">simpl_order</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">vsB</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">simpl_order</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">ALLOWANCE</span> <span class="o">*</span> <span class="p">(</span><span class="n">vsA</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">vsB</span><span class="o">.</span><span class="n">size</span><span class="p">()))</span> <span class="ow">and</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">8</span><span class="p">:</span>
+        <span class="n">Ap</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">simpl_order</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">Bp</span><span class="o">.</span><span class="n">sift</span><span class="p">(</span><span class="n">simpl_order</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">vsA</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">simpl_order</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">i</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">vsB</span><span class="o">.</span><span class="n">slide</span><span class="p">(</span><span class="n">simpl_order</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">i</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">ALLOWANCE</span> <span class="o">*</span>
+            <span class="p">(</span><span class="n">vsA</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">vsB</span><span class="o">.</span><span class="n">size</span><span class="p">()))</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">:</span>
             <span class="c1"># we diverged too much -- need to re-solve</span>
             <span class="c1"># rebuild varseqs</span>
             <span class="n">vsA</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">Ap</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="n">Ap</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
             <span class="n">vsB</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">Bp</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="n">Bp</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
             <span class="c1"># solve the simplified problem</span>
-            <span class="n">b</span> <span class="o">=</span> <span class="n">BB</span><span class="o">.</span><span class="n">BBSearch</span><span class="p">(</span><span class="n">vsA</span><span class="p">,</span><span class="n">vsB</span><span class="p">)</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">BB</span><span class="o">.</span><span class="n">BBSearch</span><span class="p">(</span><span class="n">vsA</span><span class="p">,</span> <span class="n">vsB</span><span class="p">)</span>
             <span class="n">b</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
             <span class="n">simpl_order</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span>
 
         <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">assert</span> <span class="n">Ap</span><span class="o">.</span><span class="n">is_aligned</span><span class="p">(</span><span class="n">Bp</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span><span class="n">simpl</span><span class="p">[</span><span class="s2">&quot;simpl_BB&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">simpl_order</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">simpl</span><span class="p">[</span><span class="s2">&quot;simpl_BB&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">simpl_order</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="orig_rnd_starts"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_rnd_starts">[docs]</a><span class="k">def</span> <span class="nf">orig_rnd_starts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">simpl</span><span class="p">):</span>
+
+<div class="viewcode-block" id="orig_rnd_starts"><a class="viewcode-back" href="../_autosummary/heuristics.html#heuristics.orig_rnd_starts">[docs]</a><span class="k">def</span> <span class="nf">orig_rnd_starts</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">simpl</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Another experimental heuristic (further research).&quot;&quot;&quot;</span>
-    <span class="n">best_o</span> <span class="o">=</span> <span class="n">simpl</span><span class="p">[</span><span class="s2">&quot;simpl_BB&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="c1"># retrieve opt order</span>
-    <span class="n">best_size</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">best_o</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">best_o</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="n">best_o</span> <span class="o">=</span> <span class="n">simpl</span><span class="p">[</span><span class="s2">&quot;simpl_BB&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># retrieve opt order</span>
+    <span class="n">best_size</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">best_o</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span>
+        <span class="n">best_o</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
 
     <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
-        <span class="n">Ap</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">);</span>
-        <span class="n">Bp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">);</span>
+        <span class="n">Ap</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+        <span class="n">Bp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
 
         <span class="n">Ap</span> <span class="o">=</span> <span class="n">Ap</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">vars</span><span class="p">))</span>
         <span class="n">Bp</span> <span class="o">=</span> <span class="n">Bp</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">vars</span><span class="p">))</span>
@@ -584,45 +535,47 @@
         <span class="n">vsA</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">Ap</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="n">Ap</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
         <span class="n">vsB</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">Bp</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="n">Bp</span><span class="o">.</span><span class="n">n</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
         <span class="c1"># solve the simplified problem</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">BB</span><span class="o">.</span><span class="n">BBSearch</span><span class="p">(</span><span class="n">vsA</span><span class="p">,</span><span class="n">vsB</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">BB</span><span class="o">.</span><span class="n">BBSearch</span><span class="p">(</span><span class="n">vsA</span><span class="p">,</span> <span class="n">vsB</span><span class="p">)</span>
         <span class="n">b</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
         <span class="n">simpl_order</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span>
         <span class="n">Ap</span> <span class="o">=</span> <span class="n">Ap</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">simpl_order</span><span class="p">)</span>
         <span class="n">Bp</span> <span class="o">=</span> <span class="n">Bp</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">simpl_order</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">&lt;</span> <span class="n">best_size</span><span class="p">:</span>
-            <span class="n">best_size</span> <span class="o">=</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">&lt;</span> <span class="n">best_size</span><span class="p">:</span>
+            <span class="n">best_size</span> <span class="o">=</span> <span class="n">Ap</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span> <span class="n">Bp</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
             <span class="n">best_o</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">Ap</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">[</span><span class="n">best_size</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">best_o</span><span class="p">]</span></div>
+
 
 <span class="c1"># heuristic structure</span>
 <span class="c1"># CODE - FUNC - LEGEND</span>
 <span class="n">SIMPL_HEU</span> <span class="o">=</span> <span class="p">[</span>
     <span class="c1"># [&quot;simpl_toA&quot;,toA, &quot;align to A&quot;],</span>
     <span class="c1"># [&quot;simpl_toB&quot;,toB, &quot;align to B&quot;],</span>
-    <span class="p">[</span><span class="s2">&quot;simpl_minAB&quot;</span><span class="p">,</span><span class="n">minAB</span><span class="p">,</span> <span class="s2">&quot;Best of A and B&quot;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s2">&quot;simpl_gswaps&quot;</span><span class="p">,</span><span class="n">simpl_greedy_swaps</span><span class="p">,</span><span class="s2">&quot;Greedy swaps&quot;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s2">&quot;simpl_5random&quot;</span><span class="p">,</span><span class="n">simpl_5random</span><span class="p">,</span><span class="s2">&quot;Best/five random orders&quot;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s2">&quot;simpl_gsifts_1p&quot;</span><span class="p">,</span><span class="n">simpl_gsifts_1p</span><span class="p">,</span><span class="s2">&quot;Greedy sifts (one pass)&quot;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s2">&quot;simpl_gsifts_2p&quot;</span><span class="p">,</span><span class="n">simpl_gsifts_2p</span><span class="p">,</span><span class="s2">&quot;Greedy sifts (two passes)&quot;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s2">&quot;simpl_gsifts_inf&quot;</span><span class="p">,</span><span class="n">simpl_gsifts_inf</span><span class="p">,</span><span class="s2">&quot;Greedy sifts (all)&quot;</span><span class="p">]</span>
+    <span class="p">[</span><span class="s2">&quot;simpl_minAB&quot;</span><span class="p">,</span> <span class="n">minAB</span><span class="p">,</span> <span class="s2">&quot;Best of A and B&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;simpl_gswaps&quot;</span><span class="p">,</span> <span class="n">simpl_greedy_swaps</span><span class="p">,</span> <span class="s2">&quot;Greedy swaps&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;simpl_5random&quot;</span><span class="p">,</span> <span class="n">simpl_5random</span><span class="p">,</span> <span class="s2">&quot;Best/five random orders&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;simpl_gsifts_1p&quot;</span><span class="p">,</span> <span class="n">simpl_gsifts_1p</span><span class="p">,</span> <span class="s2">&quot;Greedy sifts (one pass)&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;simpl_gsifts_2p&quot;</span><span class="p">,</span> <span class="n">simpl_gsifts_2p</span><span class="p">,</span> <span class="s2">&quot;Greedy sifts (two passes)&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;simpl_gsifts_inf&quot;</span><span class="p">,</span> <span class="n">simpl_gsifts_inf</span><span class="p">,</span> <span class="s2">&quot;Greedy sifts (all)&quot;</span><span class="p">]</span>
     <span class="c1"># [&quot;simpl_g2sifts_1p&quot;,simpl_g2sifts_1p,&quot;greedy 2-sifts (1 pass)&quot;]</span>
 <span class="p">]</span>
 <span class="sd">&quot;&quot;&quot;List of heuristics for the **simplified** problem.&quot;&quot;&quot;</span>
 
-
 <span class="n">ORIG_HEU</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">[</span><span class="s2">&quot;orig_simpl&quot;</span><span class="p">,</span><span class="n">orig_simpl</span><span class="p">,</span><span class="s2">&quot;Simplified problem&quot;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s2">&quot;orig_gsifts1p&quot;</span><span class="p">,</span><span class="n">orig_gsifts1p</span><span class="p">,</span><span class="s2">&quot;Greedy BDD sifts (one pass)&quot;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s2">&quot;orig_bestAB&quot;</span><span class="p">,</span><span class="n">orig_bestAB</span><span class="p">,</span><span class="s2">&quot;Best of A and B&quot;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s2">&quot;orig_5random&quot;</span><span class="p">,</span><span class="n">orig_5random</span><span class="p">,</span><span class="s2">&quot;Best of five random orders&quot;</span><span class="p">]</span>
+    <span class="p">[</span><span class="s2">&quot;orig_simpl&quot;</span><span class="p">,</span> <span class="n">orig_simpl</span><span class="p">,</span> <span class="s2">&quot;Simplified problem&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;orig_gsifts1p&quot;</span><span class="p">,</span> <span class="n">orig_gsifts1p</span><span class="p">,</span> <span class="s2">&quot;Greedy BDD sifts (one pass)&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;orig_bestAB&quot;</span><span class="p">,</span> <span class="n">orig_bestAB</span><span class="p">,</span> <span class="s2">&quot;Best of A and B&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;orig_5random&quot;</span><span class="p">,</span> <span class="n">orig_5random</span><span class="p">,</span> <span class="s2">&quot;Best of five random orders&quot;</span><span class="p">]</span>
     <span class="c1"># [&quot;orig_ild&quot;,orig_interleave_when_diverge,&quot;interleave-when-diverge&quot;],</span>
     <span class="c1">#[&quot;orig_simpl_rnd&quot;,orig_rnd_starts,&quot;Simplified problem w/randomized starts&quot;]</span>
     <span class="c1"># [&quot;orig_meta&quot;,orig_meta,&quot;greedy sifts + simplified problem&quot;]</span>
 <span class="p">]</span>
 <span class="sd">&quot;&quot;&quot;List of heuristics for the **original** problem.&quot;&quot;&quot;</span>
 
+<span class="c1"># NOTE: Legacy code below may no longer work</span>
+<span class="c1">#       (i.e., the file is to be used with experiment scripts only)</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
@@ -631,14 +584,17 @@
 
     <span class="n">inst_dir</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;inst_no,opt_obj,&quot;</span><span class="o">+</span><span class="s2">&quot;_obj,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">heu_description</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;_obj&quot;</span><span class="o">+</span> <span class="s2">&quot;,&quot;</span><span class="o">+</span><span class="s2">&quot;_steps,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">heu_description</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;_steps&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;inst_no,opt_obj,&quot;</span> <span class="o">+</span> <span class="s2">&quot;_obj,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">heu_description</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_obj&quot;</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span>
+          <span class="s2">&quot;_steps,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">heu_description</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_steps&quot;</span><span class="p">)</span>
 
     <span class="n">pr</span> <span class="o">=</span> <span class="n">cProfile</span><span class="o">.</span><span class="n">Profile</span><span class="p">()</span>
-    <span class="n">tg_sendtext</span><span class="p">(</span><span class="s2">&quot;LOCAL JOB: heuristics testing started, instance dir: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">inst_dir</span><span class="p">))</span>
+    <span class="n">tg_sendtext</span><span class="p">(</span>
+        <span class="s2">&quot;LOCAL JOB: heuristics testing started, instance dir: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">inst_dir</span><span class="p">))</span>
     <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">pr</span><span class="o">.</span><span class="n">enable</span><span class="p">()</span>
 
-    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">glob</span><span class="p">(</span><span class="n">inst_dir</span><span class="o">+</span><span class="s2">&quot;vs*.md&quot;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">glob</span><span class="p">(</span><span class="n">inst_dir</span> <span class="o">+</span> <span class="s2">&quot;vs*.md&quot;</span><span class="p">):</span>
         <span class="n">inst_no</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">inst_no</span> <span class="o">=</span> <span class="n">inst_no</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/vs&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
@@ -652,60 +608,49 @@
         <span class="n">steps</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">heuristics</span><span class="p">:</span>
-            <span class="n">T</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span><span class="n">st</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
+            <span class="n">T</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">st</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
             <span class="n">objs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
             <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">st</span><span class="p">))</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="n">inst_no</span><span class="o">+</span><span class="s2">&quot;,&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">As_aligned</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">inst</span><span class="o">.</span><span class="n">Bs_aligned</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">())</span><span class="o">+</span><span class="s2">&quot;,&quot;</span><span class="o">+</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;,&quot;</span><span class="o">+</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">steps</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">inst_no</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">As_aligned</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">+</span>
+                                  <span class="n">inst</span><span class="o">.</span><span class="n">Bs_aligned</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span>
+              <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">steps</span><span class="p">))</span>
 
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-        <span class="n">n</span><span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="n">pr</span><span class="o">.</span><span class="n">disable</span><span class="p">()</span>
     <span class="n">ps</span> <span class="o">=</span> <span class="n">pstats</span><span class="o">.</span><span class="n">Stats</span><span class="p">(</span><span class="n">pr</span><span class="p">)</span><span class="o">.</span><span class="n">sort_stats</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="n">ps</span><span class="o">.</span><span class="n">dump_stats</span><span class="p">(</span><span class="s2">&quot;./run_profile.dmp&quot;</span><span class="p">)</span>
     <span class="n">tg_sendtext</span><span class="p">(</span><span class="s2">&quot;LOCAL (heuristics): done. </span><span class="si">{}</span><span class="s2"> files processed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
-
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
-
-    </p>
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

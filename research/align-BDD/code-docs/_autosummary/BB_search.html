@@ -1,84 +1,45 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BB_search &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="gen_BDD_pair" href="gen_BDD_pair.html" />
+    <link rel="next" title="UFLP_fullDD" href="UFLP_fullDD.html" />
     <link rel="prev" title="heuristics" href="heuristics.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> Align-BDD
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../overview.html#reproducibility">Reproducibility</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../overview.html#code-organization">Code organization</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../overview.html#producing-figures">Producing figures</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a><ul class="current">
@@ -92,6 +53,10 @@
 <li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="UFLP_fullDD.html">UFLP_fullDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UFLPOrder.html">UFLPOrder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jUFLP_cavemen.html">jUFLP_cavemen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jUFLP_utils.html">jUFLP_utils</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a></li>
@@ -100,83 +65,44 @@
 </li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Align-BDD</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content style-external-links">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html">Docs</a> &raquo;</li>
-        
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
-        
       <li>BB_search</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="../_sources/_autosummary/BB_search.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <span class="target" id="module-BB_search"></span><div class="section" id="bb-search">
-<h1>BB_search<a class="headerlink" href="#bb-search" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-summary">
-<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this headline">¶</a></h2>
+             
+  <span class="target" id="module-BB_search"></span><section id="bb-search">
+<h1>BB_search<a class="headerlink" href="#bb-search" title="Permalink to this heading"></a></h1>
+<section id="module-summary">
+<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this heading"></a></h2>
 <p>A branch-and-bound search scheme
 implementation for the align-sequences problem:
 alignts two <a class="reference internal" href="varseq.html#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">varseq.VarSeq</span></code></a> objects.</p>
 <p>Tests coverage: <a class="reference internal" href="BB_search_test.html#module-BB_search_test" title="BB_search_test"><code class="xref py py-mod docutils literal notranslate"><span class="pre">BB_search_test</span></code></a>.</p>
 <p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
 <p class="centered">
-<strong>❖❖❖</strong></p><div class="section" id="implements-classes">
-<h3>Implements classes:<a class="headerlink" href="#implements-classes" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
+<strong>❖❖❖</strong></p><section id="implements-classes">
+<h3>Implements classes:<a class="headerlink" href="#implements-classes" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -185,15 +111,15 @@ alignts two <a class="reference internal" href="varseq.html#varseq.VarSeq" title
 <tr class="row-odd"><td><p><a class="reference internal" href="#BB_search.BBSearch" title="BB_search.BBSearch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BBSearch</span></code></a>(A, B)</p></td>
 <td><p>Implements the search tree.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#BB_search.SearchNode" title="BB_search.SearchNode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchNode</span></code></a>(name, parent, Aresid, Bresid, …)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#BB_search.SearchNode" title="BB_search.SearchNode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchNode</span></code></a>(name, parent, Aresid, Bresid, ...)</p></td>
 <td><p>Implements search tree node.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="implements-functions-outside-the-classes-above">
-<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
+</section>
+<section id="implements-functions-outside-the-classes-above">
+<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -228,29 +154,29 @@ alignts two <a class="reference internal" href="varseq.html#varseq.VarSeq" title
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="attributes-defined-in-the-module">
-<h3>Attributes defined in the module:<a class="headerlink" href="#attributes-defined-in-the-module" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="attributes-defined-in-the-module">
+<h3>Attributes defined in the module:<a class="headerlink" href="#attributes-defined-in-the-module" title="Permalink to this heading"></a></h3>
 <dl class="py data">
-<dt id="BB_search.LOWER_BOUNDS">
-<code class="sig-prename descclassname"><span class="pre">BB_search.</span></code><code class="sig-name descname"><span class="pre">LOWER_BOUNDS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[['LB_first',</span> <span class="pre">&lt;function</span> <span class="pre">LB_first_aligned&gt;,</span> <span class="pre">'min</span> <span class="pre">size</span> <span class="pre">first</span> <span class="pre">element</span> <span class="pre">aligned'],</span> <span class="pre">['LB_last',</span> <span class="pre">&lt;function</span> <span class="pre">LB_last_aligned&gt;,</span> <span class="pre">'min</span> <span class="pre">size</span> <span class="pre">last</span> <span class="pre">element</span> <span class="pre">aligned'],</span> <span class="pre">['LB_levels',</span> <span class="pre">&lt;function</span> <span class="pre">LB_by_level&gt;,</span> <span class="pre">'inversions-driven</span> <span class="pre">LB']]</span></em><a class="headerlink" href="#BB_search.LOWER_BOUNDS" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.LOWER_BOUNDS">
+<span class="sig-prename descclassname"><span class="pre">BB_search.</span></span><span class="sig-name descname"><span class="pre">LOWER_BOUNDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[['LB_first',</span> <span class="pre">&lt;function</span> <span class="pre">LB_first_aligned&gt;,</span> <span class="pre">'min</span> <span class="pre">size</span> <span class="pre">first</span> <span class="pre">element</span> <span class="pre">aligned'],</span> <span class="pre">['LB_last',</span> <span class="pre">&lt;function</span> <span class="pre">LB_last_aligned&gt;,</span> <span class="pre">'min</span> <span class="pre">size</span> <span class="pre">last</span> <span class="pre">element</span> <span class="pre">aligned'],</span> <span class="pre">['LB_levels',</span> <span class="pre">&lt;function</span> <span class="pre">LB_by_level&gt;,</span> <span class="pre">'inversions-driven</span> <span class="pre">LB']]</span></em><a class="headerlink" href="#BB_search.LOWER_BOUNDS" title="Permalink to this definition"></a></dt>
 <dd><p>List of lower bounds to examine (used in a separate experiment).</p>
 </dd></dl>
 
 <p class="centered">
 <strong>❖❖❖</strong></p><p class="centered">
 <strong>Implementation details</strong></p><p class="centered">
-<strong>❖❖❖</strong></p></div>
-</div>
-<div class="section" id="bbsearch">
-<h2>BBSearch<a class="headerlink" href="#bbsearch" title="Permalink to this headline">¶</a></h2>
+<strong>❖❖❖</strong></p></section>
+</section>
+<section id="bbsearch">
+<h2>BBSearch<a class="headerlink" href="#bbsearch" title="Permalink to this heading"></a></h2>
 <dl class="py class">
-<dt id="BB_search.BBSearch">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">BB_search.</span></code><code class="sig-name descname"><span class="pre">BBSearch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#BBSearch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.BBSearch" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.BBSearch">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">BB_search.</span></span><span class="sig-name descname"><span class="pre">BBSearch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#BBSearch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.BBSearch" title="Permalink to this definition"></a></dt>
 <dd><p>Implements the search tree.</p>
 <dl class="py attribute">
-<dt>
-<code class="sig-name descname"><span class="pre">A,</span> <span class="pre">B</span></code></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">A,</span> <span class="pre">B</span></span></dt>
 <dd><p>first sequence,</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -260,8 +186,8 @@ alignts two <a class="reference internal" href="varseq.html#varseq.VarSeq" title
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="BB_search.BBSearch.step">
-<code class="sig-name descname"><span class="pre">step</span></code><a class="headerlink" href="#BB_search.BBSearch.step" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.BBSearch.step">
+<span class="sig-name descname"><span class="pre">step</span></span><a class="headerlink" href="#BB_search.BBSearch.step" title="Permalink to this definition"></a></dt>
 <dd><p>current step number,</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -271,8 +197,8 @@ alignts two <a class="reference internal" href="varseq.html#varseq.VarSeq" title
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="BB_search.BBSearch.tree_size">
-<code class="sig-name descname"><span class="pre">tree_size</span></code><a class="headerlink" href="#BB_search.BBSearch.tree_size" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.BBSearch.tree_size">
+<span class="sig-name descname"><span class="pre">tree_size</span></span><a class="headerlink" href="#BB_search.BBSearch.tree_size" title="Permalink to this definition"></a></dt>
 <dd><p>current number of nodes in the tree,</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -282,8 +208,8 @@ alignts two <a class="reference internal" href="varseq.html#varseq.VarSeq" title
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="BB_search.BBSearch.verbose">
-<code class="sig-name descname"><span class="pre">verbose</span></code><a class="headerlink" href="#BB_search.BBSearch.verbose" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.BBSearch.verbose">
+<span class="sig-name descname"><span class="pre">verbose</span></span><a class="headerlink" href="#BB_search.BBSearch.verbose" title="Permalink to this definition"></a></dt>
 <dd><p>debug information printing flag,</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -293,8 +219,8 @@ alignts two <a class="reference internal" href="varseq.html#varseq.VarSeq" title
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="BB_search.BBSearch.logging">
-<code class="sig-name descname"><span class="pre">logging</span></code><a class="headerlink" href="#BB_search.BBSearch.logging" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.BBSearch.logging">
+<span class="sig-name descname"><span class="pre">logging</span></span><a class="headerlink" href="#BB_search.BBSearch.logging" title="Permalink to this definition"></a></dt>
 <dd><p>log bounds flag,</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -304,8 +230,8 @@ alignts two <a class="reference internal" href="varseq.html#varseq.VarSeq" title
 </dd></dl>
 
 <dl class="py attribute">
-<dt>
-<code class="sig-name descname"><span class="pre">logs_UB,</span> <span class="pre">logs_LB</span></code></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">logs_UB,</span> <span class="pre">logs_LB</span></span></dt>
 <dd><p>upper/lower bounds by step (if <code class="docutils literal notranslate"><span class="pre">verbose</span></code>),</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -315,8 +241,8 @@ alignts two <a class="reference internal" href="varseq.html#varseq.VarSeq" title
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="BB_search.BBSearch.logs_step">
-<code class="sig-name descname"><span class="pre">logs_step</span></code><a class="headerlink" href="#BB_search.BBSearch.logs_step" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.BBSearch.logs_step">
+<span class="sig-name descname"><span class="pre">logs_step</span></span><a class="headerlink" href="#BB_search.BBSearch.logs_step" title="Permalink to this definition"></a></dt>
 <dd><p>step numbers (if <code class="docutils literal notranslate"><span class="pre">verbose</span></code>),</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -326,8 +252,8 @@ alignts two <a class="reference internal" href="varseq.html#varseq.VarSeq" title
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="BB_search.BBSearch.status">
-<code class="sig-name descname"><span class="pre">status</span></code><a class="headerlink" href="#BB_search.BBSearch.status" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.BBSearch.status">
+<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#BB_search.BBSearch.status" title="Permalink to this definition"></a></dt>
 <dd><p>search status,</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -337,8 +263,8 @@ alignts two <a class="reference internal" href="varseq.html#varseq.VarSeq" title
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="BB_search.BBSearch.root">
-<code class="sig-name descname"><span class="pre">root</span></code><a class="headerlink" href="#BB_search.BBSearch.root" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.BBSearch.root">
+<span class="sig-name descname"><span class="pre">root</span></span><a class="headerlink" href="#BB_search.BBSearch.root" title="Permalink to this definition"></a></dt>
 <dd><p>root node,</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -348,8 +274,8 @@ alignts two <a class="reference internal" href="varseq.html#varseq.VarSeq" title
 </dd></dl>
 
 <dl class="py attribute">
-<dt>
-<code class="sig-name descname"><span class="pre">Ap_cand,</span> <span class="pre">Bp_cand</span></code></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Ap_cand,</span> <span class="pre">Bp_cand</span></span></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">A</span></code> / <code class="docutils literal notranslate"><span class="pre">B</span></code> aligned to the current candidate optimum,</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -359,8 +285,8 @@ alignts two <a class="reference internal" href="varseq.html#varseq.VarSeq" title
 </dd></dl>
 
 <dl class="py attribute">
-<dt>
-<code class="sig-name descname"><span class="pre">node_cand,</span> <span class="pre">cand_parent</span></code></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">node_cand,</span> <span class="pre">cand_parent</span></span></dt>
 <dd><p>node corresponding to the current candidate and its parent,</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -370,8 +296,8 @@ alignts two <a class="reference internal" href="varseq.html#varseq.VarSeq" title
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="BB_search.BBSearch.open_nodes">
-<code class="sig-name descname"><span class="pre">open_nodes</span></code><a class="headerlink" href="#BB_search.BBSearch.open_nodes" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.BBSearch.open_nodes">
+<span class="sig-name descname"><span class="pre">open_nodes</span></span><a class="headerlink" href="#BB_search.BBSearch.open_nodes" title="Permalink to this definition"></a></dt>
 <dd><p>list of nodes to process during the search,
 each entry is a tuple (<code class="docutils literal notranslate"><span class="pre">&lt;lower</span> <span class="pre">bound&gt;</span></code>,``SearchNode``).</p>
 <dl class="field-list simple">
@@ -383,7 +309,7 @@ each entry is a tuple (<code class="docutils literal notranslate"><span class="p
 
 <div class="autoclasstoc docutils container">
 <p class="rubric">Public Methods:</p>
-<table class="longtable docutils align-default">
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -412,26 +338,26 @@ each entry is a tuple (<code class="docutils literal notranslate"><span class="p
 </div>
 <hr class="docutils" />
 <dl class="py method">
-<dt id="BB_search.BBSearch.current_best">
-<code class="sig-name descname"><span class="pre">current_best</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#BBSearch.current_best"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.BBSearch.current_best" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.BBSearch.current_best">
+<span class="sig-name descname"><span class="pre">current_best</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#BBSearch.current_best"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.BBSearch.current_best" title="Permalink to this definition"></a></dt>
 <dd><p>Returns current upper bound (best objective seen).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="BB_search.BBSearch.dump">
-<code class="sig-name descname"><span class="pre">dump</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#BBSearch.dump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.BBSearch.dump" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.BBSearch.dump">
+<span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#BBSearch.dump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.BBSearch.dump" title="Permalink to this definition"></a></dt>
 <dd><p>Technical: dump the tree into a DOT-file (graphivz).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="BB_search.BBSearch.make_graph_gap">
-<code class="sig-name descname"><span class="pre">make_graph_gap</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trueOpt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#BBSearch.make_graph_gap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.BBSearch.make_graph_gap" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.BBSearch.make_graph_gap">
+<span class="sig-name descname"><span class="pre">make_graph_gap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trueOpt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#BBSearch.make_graph_gap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.BBSearch.make_graph_gap" title="Permalink to this definition"></a></dt>
 <dd><p>figure: produces an LB/UB vs step no. figure</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="BB_search.BBSearch.search">
-<code class="sig-name descname"><span class="pre">search</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#BBSearch.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.BBSearch.search" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.BBSearch.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#BBSearch.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.BBSearch.search" title="Permalink to this definition"></a></dt>
 <dd><p>Performs BB search (the main procedure).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -450,24 +376,24 @@ to the candidate (optimum if <code class="docutils literal notranslate"><span cl
 </dd></dl>
 
 <dl class="py method">
-<dt id="BB_search.BBSearch.set_logging">
-<code class="sig-name descname"><span class="pre">set_logging</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#BBSearch.set_logging"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.BBSearch.set_logging" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.BBSearch.set_logging">
+<span class="sig-name descname"><span class="pre">set_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#BBSearch.set_logging"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.BBSearch.set_logging" title="Permalink to this definition"></a></dt>
 <dd><p>Sets up the logging process for BB search.</p>
 </dd></dl>
 
 </dd></dl>
 
 <p class="centered">
-<strong>❖❖❖</strong></p></div>
-<div class="section" id="searchnode">
-<h2>SearchNode<a class="headerlink" href="#searchnode" title="Permalink to this headline">¶</a></h2>
+<strong>❖❖❖</strong></p></section>
+<section id="searchnode">
+<h2>SearchNode<a class="headerlink" href="#searchnode" title="Permalink to this heading"></a></h2>
 <dl class="py class">
-<dt id="BB_search.SearchNode">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">BB_search.</span></code><code class="sig-name descname"><span class="pre">SearchNode</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Aresid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bresid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A_tail_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B_tail_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#SearchNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.SearchNode" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.SearchNode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">BB_search.</span></span><span class="sig-name descname"><span class="pre">SearchNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Aresid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bresid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A_tail_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B_tail_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#SearchNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.SearchNode" title="Permalink to this definition"></a></dt>
 <dd><p>Implements search tree node.</p>
 <dl class="py attribute">
-<dt id="BB_search.SearchNode.name">
-<code class="sig-name descname"><span class="pre">name</span></code><a class="headerlink" href="#BB_search.SearchNode.name" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.SearchNode.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#BB_search.SearchNode.name" title="Permalink to this definition"></a></dt>
 <dd><p>node name,</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -477,8 +403,8 @@ to the candidate (optimum if <code class="docutils literal notranslate"><span cl
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="BB_search.SearchNode.parent">
-<code class="sig-name descname"><span class="pre">parent</span></code><a class="headerlink" href="#BB_search.SearchNode.parent" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.SearchNode.parent">
+<span class="sig-name descname"><span class="pre">parent</span></span><a class="headerlink" href="#BB_search.SearchNode.parent" title="Permalink to this definition"></a></dt>
 <dd><p>parent node,</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -488,8 +414,8 @@ to the candidate (optimum if <code class="docutils literal notranslate"><span cl
 </dd></dl>
 
 <dl class="py attribute">
-<dt>
-<code class="sig-name descname"><span class="pre">A,</span> <span class="pre">B</span></code></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">A,</span> <span class="pre">B</span></span></dt>
 <dd><p>sequences to align,</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -499,8 +425,8 @@ to the candidate (optimum if <code class="docutils literal notranslate"><span cl
 </dd></dl>
 
 <dl class="py attribute">
-<dt>
-<code class="sig-name descname"><span class="pre">Ar,</span> <span class="pre">Br</span></code></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Ar,</span> <span class="pre">Br</span></span></dt>
 <dd><p>not-yet-aligned parts of <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -510,8 +436,8 @@ to the candidate (optimum if <code class="docutils literal notranslate"><span cl
 </dd></dl>
 
 <dl class="py attribute">
-<dt>
-<code class="sig-name descname"><span class="pre">A_tail_start,</span> <span class="pre">B_tail_start</span></code></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">A_tail_start,</span> <span class="pre">B_tail_start</span></span></dt>
 <dd><p>position for the already-aligned tail start.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -521,8 +447,8 @@ to the candidate (optimum if <code class="docutils literal notranslate"><span cl
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="BB_search.SearchNode.status">
-<code class="sig-name descname"><span class="pre">status</span></code><a class="headerlink" href="#BB_search.SearchNode.status" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.SearchNode.status">
+<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#BB_search.SearchNode.status" title="Permalink to this definition"></a></dt>
 <dd><p>node type (see the note below),</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -532,8 +458,8 @@ to the candidate (optimum if <code class="docutils literal notranslate"><span cl
 </dd></dl>
 
 <dl class="py attribute">
-<dt>
-<code class="sig-name descname"><span class="pre">tree_UB,</span> <span class="pre">tree_LB</span></code></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">tree_UB,</span> <span class="pre">tree_LB</span></span></dt>
 <dd><p>current (tree) upper / lower bound,</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -543,8 +469,8 @@ to the candidate (optimum if <code class="docutils literal notranslate"><span cl
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="BB_search.SearchNode.best_obj">
-<code class="sig-name descname"><span class="pre">best_obj</span></code><a class="headerlink" href="#BB_search.SearchNode.best_obj" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.SearchNode.best_obj">
+<span class="sig-name descname"><span class="pre">best_obj</span></span><a class="headerlink" href="#BB_search.SearchNode.best_obj" title="Permalink to this definition"></a></dt>
 <dd><p>current best objective seen,</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -563,7 +489,7 @@ to the candidate (optimum if <code class="docutils literal notranslate"><span cl
 </div>
 <div class="autoclasstoc docutils container">
 <p class="rubric">Public Data Attributes:</p>
-<details><summary>Inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">NodeMixin</span></code></summary><table class="longtable docutils align-default">
+<details><summary>Inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">NodeMixin</span></code></summary><table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -616,13 +542,13 @@ to the candidate (optimum if <code class="docutils literal notranslate"><span cl
 </details></div>
 <div class="autoclasstoc docutils container">
 <p class="rubric">Public Methods:</p>
-<table class="longtable docutils align-default">
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code>(name, parent, Aresid, Bresid, …)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code>(name, parent, Aresid, Bresid, ...)</p></td>
 <td><p>Class constructor</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#BB_search.SearchNode.size" title="BB_search.SearchNode.size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">size</span></code></a>()</p></td>
@@ -635,11 +561,11 @@ to the candidate (optimum if <code class="docutils literal notranslate"><span cl
 <td><p>Returns a lower bound for the current search tree node.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__lt__</span></code>(other)</p></td>
-<td><p>A special methods used to break ties (if LBs are equal) – randomly.</p></td>
+<td><p>A special methods used to break ties (if LBs are equal) -- randomly.</p></td>
 </tr>
 </tbody>
 </table>
-<details><summary>Inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">NodeMixin</span></code></summary><table class="longtable docutils align-default">
+<details><summary>Inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">NodeMixin</span></code></summary><table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -653,7 +579,7 @@ to the candidate (optimum if <code class="docutils literal notranslate"><span cl
 </details></div>
 <div class="autoclasstoc docutils container">
 <p class="rubric">Private Data Attributes:</p>
-<details><summary>Inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">NodeMixin</span></code></summary><table class="longtable docutils align-default">
+<details><summary>Inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">NodeMixin</span></code></summary><table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -670,7 +596,7 @@ to the candidate (optimum if <code class="docutils literal notranslate"><span cl
 </details></div>
 <div class="autoclasstoc docutils container">
 <p class="rubric">Private Methods:</p>
-<details><summary>Inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">NodeMixin</span></code></summary><table class="longtable docutils align-default">
+<details><summary>Inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">NodeMixin</span></code></summary><table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -717,125 +643,113 @@ to the candidate (optimum if <code class="docutils literal notranslate"><span cl
 </details></div>
 <hr class="docutils" />
 <dl class="py method">
-<dt id="BB_search.SearchNode.calculate_LB">
-<code class="sig-name descname"><span class="pre">calculate_LB</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#SearchNode.calculate_LB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.SearchNode.calculate_LB" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.SearchNode.calculate_LB">
+<span class="sig-name descname"><span class="pre">calculate_LB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#SearchNode.calculate_LB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.SearchNode.calculate_LB" title="Permalink to this definition"></a></dt>
 <dd><p>Returns a lower bound for the current search tree node.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="BB_search.SearchNode.calculate_UB">
-<code class="sig-name descname"><span class="pre">calculate_UB</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fast'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#SearchNode.calculate_UB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.SearchNode.calculate_UB" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.SearchNode.calculate_UB">
+<span class="sig-name descname"><span class="pre">calculate_UB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fast'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#SearchNode.calculate_UB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.SearchNode.calculate_UB" title="Permalink to this definition"></a></dt>
 <dd><p>Returns an upper bound for the specific node.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="BB_search.SearchNode.size">
-<code class="sig-name descname"><span class="pre">size</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#SearchNode.size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.SearchNode.size" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.SearchNode.size">
+<span class="sig-name descname"><span class="pre">size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#SearchNode.size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.SearchNode.size" title="Permalink to this definition"></a></dt>
 <dd><p>Returns node size (total no. of nodes in both diagrams).</p>
 </dd></dl>
 
 </dd></dl>
 
 <p class="centered">
-<strong>❖❖❖</strong></p></div>
-<div class="section" id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<strong>❖❖❖</strong></p></section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
 <dl class="py function">
-<dt id="BB_search.LB_by_level">
-<code class="sig-prename descclassname"><span class="pre">BB_search.</span></code><code class="sig-name descname"><span class="pre">LB_by_level</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#LB_by_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.LB_by_level" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.LB_by_level">
+<span class="sig-prename descclassname"><span class="pre">BB_search.</span></span><span class="sig-name descname"><span class="pre">LB_by_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#LB_by_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.LB_by_level" title="Permalink to this definition"></a></dt>
 <dd><p>LB: Inversions-driven heuristic.</p>
 <p>The one based on the lemma presented in the paper.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="BB_search.LB_by_level_complicated">
-<code class="sig-prename descclassname"><span class="pre">BB_search.</span></code><code class="sig-name descname"><span class="pre">LB_by_level_complicated</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#LB_by_level_complicated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.LB_by_level_complicated" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.LB_by_level_complicated">
+<span class="sig-prename descclassname"><span class="pre">BB_search.</span></span><span class="sig-name descname"><span class="pre">LB_by_level_complicated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#LB_by_level_complicated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.LB_by_level_complicated" title="Permalink to this definition"></a></dt>
 <dd><p>LB: Another variant of the inversions-driven heuristic (improved)</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="BB_search.LB_current">
-<code class="sig-prename descclassname"><span class="pre">BB_search.</span></code><code class="sig-name descname"><span class="pre">LB_current</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#LB_current"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.LB_current" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.LB_current">
+<span class="sig-prename descclassname"><span class="pre">BB_search.</span></span><span class="sig-name descname"><span class="pre">LB_current</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#LB_current"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.LB_current" title="Permalink to this definition"></a></dt>
 <dd><p>LB: current size (before the alignment).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="BB_search.LB_first_aligned">
-<code class="sig-prename descclassname"><span class="pre">BB_search.</span></code><code class="sig-name descname"><span class="pre">LB_first_aligned</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#LB_first_aligned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.LB_first_aligned" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.LB_first_aligned">
+<span class="sig-prename descclassname"><span class="pre">BB_search.</span></span><span class="sig-name descname"><span class="pre">LB_first_aligned</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#LB_first_aligned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.LB_first_aligned" title="Permalink to this definition"></a></dt>
 <dd><p>LB: min current size after aligning the first element only.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="BB_search.LB_last_aligned">
-<code class="sig-prename descclassname"><span class="pre">BB_search.</span></code><code class="sig-name descname"><span class="pre">LB_last_aligned</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#LB_last_aligned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.LB_last_aligned" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.LB_last_aligned">
+<span class="sig-prename descclassname"><span class="pre">BB_search.</span></span><span class="sig-name descname"><span class="pre">LB_last_aligned</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#LB_last_aligned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.LB_last_aligned" title="Permalink to this definition"></a></dt>
 <dd><p>LB: min current size after aligning the last element (enumeration).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="BB_search.LB_lvl_compl_symm">
-<code class="sig-prename descclassname"><span class="pre">BB_search.</span></code><code class="sig-name descname"><span class="pre">LB_lvl_compl_symm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#LB_lvl_compl_symm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.LB_lvl_compl_symm" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.LB_lvl_compl_symm">
+<span class="sig-prename descclassname"><span class="pre">BB_search.</span></span><span class="sig-name descname"><span class="pre">LB_lvl_compl_symm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#LB_lvl_compl_symm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.LB_lvl_compl_symm" title="Permalink to this definition"></a></dt>
 <dd><p>LB: Symmetric version of the previous one.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="BB_search.LB_lvl_symm">
-<code class="sig-prename descclassname"><span class="pre">BB_search.</span></code><code class="sig-name descname"><span class="pre">LB_lvl_symm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#LB_lvl_symm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.LB_lvl_symm" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.LB_lvl_symm">
+<span class="sig-prename descclassname"><span class="pre">BB_search.</span></span><span class="sig-name descname"><span class="pre">LB_lvl_symm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#LB_lvl_symm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.LB_lvl_symm" title="Permalink to this definition"></a></dt>
 <dd><p>Symmetric version of the <a class="reference internal" href="#BB_search.LB_by_level" title="BB_search.LB_by_level"><code class="xref py py-func docutils literal notranslate"><span class="pre">LB_by_level()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="BB_search.nodeattrfunc">
-<code class="sig-prename descclassname"><span class="pre">BB_search.</span></code><code class="sig-name descname"><span class="pre">nodeattrfunc</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#nodeattrfunc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.nodeattrfunc" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.nodeattrfunc">
+<span class="sig-prename descclassname"><span class="pre">BB_search.</span></span><span class="sig-name descname"><span class="pre">nodeattrfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#nodeattrfunc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.nodeattrfunc" title="Permalink to this definition"></a></dt>
 <dd><p>Helper: Generates node attributes for graphviz export.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="BB_search.nodenamefunc">
-<code class="sig-prename descclassname"><span class="pre">BB_search.</span></code><code class="sig-name descname"><span class="pre">nodenamefunc</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#nodenamefunc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.nodenamefunc" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="BB_search.nodenamefunc">
+<span class="sig-prename descclassname"><span class="pre">BB_search.</span></span><span class="sig-name descname"><span class="pre">nodenamefunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/BB_search.html#nodenamefunc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BB_search.nodenamefunc" title="Permalink to this definition"></a></dt>
 <dd><p>Helper: Generates node names for graphviz export.</p>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
-
-    </p>
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

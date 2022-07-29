@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UFLP_fullDD &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="UFLPOrder" href="UFLPOrder.html" />
+    <link rel="prev" title="BB_search" href="BB_search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          </a>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../overview.html#code-organization">Code organization</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#producing-figures">Producing figures</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BDD.html">BDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="varseq.html">varseq</a></li>
+<li class="toctree-l3"><a class="reference internal" href="heuristics.html">heuristics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BB_search.html">BB_search</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">UFLP_fullDD</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-summary">Module summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="UFLPOrder.html">UFLPOrder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jUFLP_cavemen.html">jUFLP_cavemen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jUFLP_utils.html">jUFLP_utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#testing-framework">Testing framework</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
+      <li>UFLP_fullDD</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/UFLP_fullDD.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <span class="target" id="module-UFLP_fullDD"></span><section id="uflp-fulldd">
+<h1>UFLP_fullDD<a class="headerlink" href="#uflp-fulldd" title="Permalink to this heading"></a></h1>
+<section id="module-summary">
+<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this heading"></a></h2>
+<p>Solves UFLP using a DD-based approach.</p>
+<p>The core function, <a class="reference internal" href="#UFLP_fullDD.create_cover_DD" title="UFLP_fullDD.create_cover_DD"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_cover_DD()</span></code></a>, implements
+the BDD-building procedure to encode a j-UFLP sub-instance
+(i.e., a UFLP problem with overlap costs).</p>
+<p>Related: a good order of variables is found with <a class="reference internal" href="UFLPOrder.html#module-UFLPOrder" title="UFLPOrder"><code class="xref py py-mod docutils literal notranslate"><span class="pre">UFLPOrder</span></code></a> module.</p>
+<p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
+<p class="centered">
+<strong>❖❖❖</strong></p><section id="implements-functions-outside-the-classes-above">
+<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#UFLP_fullDD.calc_cost" title="UFLP_fullDD.calc_cost"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_cost</span></code></a>(pts_list, state, prev_state, ...)</p></td>
+<td><p>Helper: calculates the added cost during the BDD creation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#UFLP_fullDD.create_cover_DD" title="UFLP_fullDD.create_cover_DD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_cover_DD</span></code></a>(S, f, c, node_order)</p></td>
+<td><p>Generates a BDD for an UFLP with cavemen structure.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#UFLP_fullDD.make_label" title="UFLP_fullDD.make_label"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_label</span></code></a>(state)</p></td>
+<td><p>Helper: formats a node label according to the <code class="docutils literal notranslate"><span class="pre">state</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#UFLP_fullDD.run_fullDD_simple" title="UFLP_fullDD.run_fullDD_simple"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_fullDD_simple</span></code></a>()</p></td>
+<td><p>Creates a diagram for a simple UFLP instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#UFLP_fullDD.test_cost_calc" title="UFLP_fullDD.test_cost_calc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_cost_calc</span></code></a>()</p></td>
+<td><p>Tests <a class="reference internal" href="#UFLP_fullDD.calc_cost" title="UFLP_fullDD.calc_cost"><code class="xref py py-func docutils literal notranslate"><span class="pre">UFLP_fullDD.calc_cost()</span></code></a> function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#UFLP_fullDD.test_full_DD" title="UFLP_fullDD.test_full_DD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_full_DD</span></code></a>(inst)</p></td>
+<td><p>Tests the full-DD-based approach against a MiP.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="centered">
+<strong>❖❖❖</strong></p><p class="centered">
+<strong>Implementation details</strong></p><p class="centered">
+<strong>❖❖❖</strong></p></section>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="UFLP_fullDD.calc_cost">
+<span class="sig-prename descclassname"><span class="pre">UFLP_fullDD.</span></span><span class="sig-name descname"><span class="pre">calc_cost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pts_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prev_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_decision</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLP_fullDD.html#calc_cost"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLP_fullDD.calc_cost" title="Permalink to this definition"></a></dt>
+<dd><p>Helper: calculates the added cost during the BDD creation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>S</strong> – UFLP instance parameters,</p></li>
+<li><p><strong>f</strong> – UFLP instance parameters,</p></li>
+<li><p><strong>c</strong> – UFLP instance parameters,</p></li>
+<li><p><strong>pts_list</strong> (<em>list</em>) – points to generate cost for,</p></li>
+<li><p><strong>state</strong> – the new state</p></li>
+<li><p><strong>last_decision</strong> (<em>tuple</em>) – a var (int) - value(int) pair.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Added cost according to the <code class="docutils literal notranslate"><span class="pre">state</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="UFLP_fullDD.create_cover_DD">
+<span class="sig-prename descclassname"><span class="pre">UFLP_fullDD.</span></span><span class="sig-name descname"><span class="pre">create_cover_DD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLP_fullDD.html#create_cover_DD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLP_fullDD.create_cover_DD" title="Permalink to this definition"></a></dt>
+<dd><p>Generates a BDD for an UFLP with cavemen structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>S</strong> – instance params (see <code class="xref py py-func docutils literal notranslate"><span class="pre">darkcloud.gen_caveman_inst()</span></code>),</p></li>
+<li><p><strong>f</strong> – instance params (see <code class="xref py py-func docutils literal notranslate"><span class="pre">darkcloud.gen_caveman_inst()</span></code>),</p></li>
+<li><p><strong>c</strong> – instance params (see <code class="xref py py-func docutils literal notranslate"><span class="pre">darkcloud.gen_caveman_inst()</span></code>),</p></li>
+<li><p><strong>node_order</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – order of nodes to add.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>resulting diagram</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>B (class BDD)</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Implements ‘forgetting’ nodes along the way.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="UFLP_fullDD.make_label">
+<span class="sig-prename descclassname"><span class="pre">UFLP_fullDD.</span></span><span class="sig-name descname"><span class="pre">make_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLP_fullDD.html#make_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLP_fullDD.make_label" title="Permalink to this definition"></a></dt>
+<dd><p>Helper: formats a node label according to the <code class="docutils literal notranslate"><span class="pre">state</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="UFLP_fullDD.run_fullDD_simple">
+<span class="sig-prename descclassname"><span class="pre">UFLP_fullDD.</span></span><span class="sig-name descname"><span class="pre">run_fullDD_simple</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLP_fullDD.html#run_fullDD_simple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLP_fullDD.run_fullDD_simple" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a diagram for a simple UFLP instance.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="UFLP_fullDD.test_cost_calc">
+<span class="sig-prename descclassname"><span class="pre">UFLP_fullDD.</span></span><span class="sig-name descname"><span class="pre">test_cost_calc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLP_fullDD.html#test_cost_calc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLP_fullDD.test_cost_calc" title="Permalink to this definition"></a></dt>
+<dd><p>Tests <a class="reference internal" href="#UFLP_fullDD.calc_cost" title="UFLP_fullDD.calc_cost"><code class="xref py py-func docutils literal notranslate"><span class="pre">UFLP_fullDD.calc_cost()</span></code></a> function.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="UFLP_fullDD.test_full_DD">
+<span class="sig-prename descclassname"><span class="pre">UFLP_fullDD.</span></span><span class="sig-name descname"><span class="pre">test_full_DD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLP_fullDD.html#test_full_DD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLP_fullDD.test_full_DD" title="Permalink to this definition"></a></dt>
+<dd><p>Tests the full-DD-based approach against a MiP.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

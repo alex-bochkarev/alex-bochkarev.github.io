@@ -1,85 +1,46 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>varseq &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="heuristics" href="heuristics.html" />
     <link rel="prev" title="BDD" href="BDD.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> Align-BDD
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../overview.html#reproducibility">Reproducibility</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../overview.html#code-organization">Code organization</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../overview.html#producing-figures">Producing figures</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a><ul class="current">
@@ -92,6 +53,10 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="heuristics.html">heuristics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="BB_search.html">BB_search</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UFLP_fullDD.html">UFLP_fullDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UFLPOrder.html">UFLPOrder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jUFLP_cavemen.html">jUFLP_cavemen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jUFLP_utils.html">jUFLP_utils</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a></li>
@@ -100,83 +65,44 @@
 </li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Align-BDD</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content style-external-links">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html">Docs</a> &raquo;</li>
-        
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
-        
       <li>varseq</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="../_sources/_autosummary/varseq.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <span class="target" id="module-varseq"></span><div class="section" id="varseq">
-<h1>varseq<a class="headerlink" href="#varseq" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-summary">
-<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this headline">¶</a></h2>
+             
+  <span class="target" id="module-varseq"></span><section id="varseq">
+<h1>varseq<a class="headerlink" href="#varseq" title="Permalink to this heading"></a></h1>
+<section id="module-summary">
+<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this heading"></a></h2>
 <p>Implements weighted variable sequences data structure.</p>
 <p>Mostly mirrors the corresponding key methods of <a class="reference internal" href="BDD.html#BDD.BDD" title="BDD.BDD"><code class="xref py py-class docutils literal notranslate"><span class="pre">BDD.BDD</span></code></a>
 class.</p>
 <p>Tests coverage: <a class="reference internal" href="varseq_test.html#module-varseq_test" title="varseq_test"><code class="xref py py-mod docutils literal notranslate"><span class="pre">varseq_test</span></code></a></p>
 <p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
 <p class="centered">
-<strong>❖❖❖</strong></p><div class="section" id="implements-classes">
-<h3>Implements classes:<a class="headerlink" href="#implements-classes" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
+<strong>❖❖❖</strong></p><section id="implements-classes">
+<h3>Implements classes:<a class="headerlink" href="#implements-classes" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -187,34 +113,34 @@ class.</p>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="implements-functions-outside-the-classes-above">
-<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
+</section>
+<section id="implements-functions-outside-the-classes-above">
+<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#varseq.non_dominated" title="varseq.non_dominated"><code class="xref py py-obj docutils literal notranslate"><span class="pre">non_dominated</span></code></a>(e, A, B)</p></td>
-<td><p>Checks if the element “e” is non-dominated.</p></td>
+<td><p>Checks if the element &quot;e&quot; is non-dominated.</p></td>
 </tr>
 </tbody>
 </table>
 <p class="centered">
 <strong>❖❖❖</strong></p><p class="centered">
 <strong>Implementation details</strong></p><p class="centered">
-<strong>❖❖❖</strong></p></div>
-</div>
-<div class="section" id="id1">
-<h2>VarSeq<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<strong>❖❖❖</strong></p></section>
+</section>
+<section id="id1">
+<h2>VarSeq<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
 <dl class="py class">
-<dt id="varseq.VarSeq">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">varseq.</span></code><code class="sig-name descname"><span class="pre">VarSeq</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_sizes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="varseq.VarSeq">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">varseq.</span></span><span class="sig-name descname"><span class="pre">VarSeq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_sizes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq" title="Permalink to this definition"></a></dt>
 <dd><p>Implements weighted variable sequence data structure.</p>
 <div class="autoclasstoc docutils container">
 <p class="rubric">Public Methods:</p>
-<table class="longtable docutils align-default">
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -267,8 +193,8 @@ class.</p>
 </div>
 <hr class="docutils" />
 <dl class="py method">
-<dt id="varseq.VarSeq.OA_bruteforce">
-<code class="sig-name descname"><span class="pre">OA_bruteforce</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">with_what</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.OA_bruteforce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.OA_bruteforce" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="varseq.VarSeq.OA_bruteforce">
+<span class="sig-name descname"><span class="pre">OA_bruteforce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">with_what</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.OA_bruteforce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.OA_bruteforce" title="Permalink to this definition"></a></dt>
 <dd><p>Enumerates all possible alignments with another sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -289,20 +215,20 @@ number of optima. Then, assuming it is at least 3,
 </dd></dl>
 
 <dl class="py method">
-<dt id="varseq.VarSeq.S">
-<code class="sig-name descname"><span class="pre">S</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.S"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.S" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="varseq.VarSeq.S">
+<span class="sig-name descname"><span class="pre">S</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.S"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.S" title="Permalink to this definition"></a></dt>
 <dd><p>Returns cost of sliding element <code class="docutils literal notranslate"><span class="pre">a</span></code> (label) to position <code class="docutils literal notranslate"><span class="pre">j</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="varseq.VarSeq.align_to">
-<code class="sig-name descname"><span class="pre">align_to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_what</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.align_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.align_to" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="varseq.VarSeq.align_to">
+<span class="sig-name descname"><span class="pre">align_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_what</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.align_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.align_to" title="Permalink to this definition"></a></dt>
 <dd><p>Revises the varseq to given variable order in <span class="math notranslate nohighlight">\(O(N)\)</span> time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>to_what</strong> – a list/tuple/np.darray of target var names,</p></li>
-<li><p><strong>a variable sequence</strong> (<em>or</em>) – </p></li>
+<li><p><strong>sequence</strong> (<em>or a variable</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -319,21 +245,21 @@ number of optima. Then, assuming it is at least 3,
 </dd></dl>
 
 <dl class="py method">
-<dt id="varseq.VarSeq.count_inversions_to">
-<code class="sig-name descname"><span class="pre">count_inversions_to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_what</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.count_inversions_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.count_inversions_to" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="varseq.VarSeq.count_inversions_to">
+<span class="sig-name descname"><span class="pre">count_inversions_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_what</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.count_inversions_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.count_inversions_to" title="Permalink to this definition"></a></dt>
 <dd><p>Counts inversions with another list (or <a class="reference internal" href="#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">VarSeq</span></code></a>).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="varseq.VarSeq.generate_weights">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">generate_weights</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.generate_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.generate_weights" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="varseq.VarSeq.generate_weights">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.generate_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.generate_weights" title="Permalink to this definition"></a></dt>
 <dd><p>Generates a random valid sequence of <code class="docutils literal notranslate"><span class="pre">N</span></code> weights.</p>
 <p>That is, respects the requirement: <span class="math notranslate nohighlight">\(n_{i+1} \leq 2n_i\)</span>.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="varseq.VarSeq.greedy_sort">
-<code class="sig-name descname"><span class="pre">greedy_sort</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_what</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.greedy_sort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.greedy_sort" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="varseq.VarSeq.greedy_sort">
+<span class="sig-name descname"><span class="pre">greedy_sort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_what</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.greedy_sort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.greedy_sort" title="Permalink to this definition"></a></dt>
 <dd><p>Revises the <a class="reference internal" href="#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">VarSeq</span></code></a> to a given order of labels <code class="docutils literal notranslate"><span class="pre">to_what</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -348,14 +274,14 @@ number of optima. Then, assuming it is at least 3,
 </dd></dl>
 
 <dl class="py method">
-<dt id="varseq.VarSeq.is_aligned">
-<code class="sig-name descname"><span class="pre">is_aligned</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_what</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.is_aligned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.is_aligned" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="varseq.VarSeq.is_aligned">
+<span class="sig-name descname"><span class="pre">is_aligned</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_what</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.is_aligned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.is_aligned" title="Permalink to this definition"></a></dt>
 <dd><p>Helper function: checks if varseq is aligned with <code class="docutils literal notranslate"><span class="pre">to_what</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="varseq.VarSeq.random">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">random</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.random" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="varseq.VarSeq.random">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">random</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.random" title="Permalink to this definition"></a></dt>
 <dd><p>Generates a random variable sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -371,14 +297,14 @@ uses a random permutation of integer labels 1,…,N.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="varseq.VarSeq.size">
-<code class="sig-name descname"><span class="pre">size</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.size" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="varseq.VarSeq.size">
+<span class="sig-name descname"><span class="pre">size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.size" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the total sequence size (sum of element weights).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="varseq.VarSeq.slide">
-<code class="sig-name descname"><span class="pre">slide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.slide"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.slide" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="varseq.VarSeq.slide">
+<span class="sig-name descname"><span class="pre">slide</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.slide"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.slide" title="Permalink to this definition"></a></dt>
 <dd><p>Performs a sift of element <code class="docutils literal notranslate"><span class="pre">a</span></code> (label) to position <code class="docutils literal notranslate"><span class="pre">j</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -392,20 +318,20 @@ or a self-pointer (if <code class="docutils literal notranslate"><span class="pr
 </dd></dl>
 
 <dl class="py method">
-<dt id="varseq.VarSeq.var_size">
-<code class="sig-name descname"><span class="pre">var_size</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.var_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.var_size" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="varseq.VarSeq.var_size">
+<span class="sig-name descname"><span class="pre">var_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#VarSeq.var_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.VarSeq.var_size" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the element weight (given its label <code class="docutils literal notranslate"><span class="pre">var</span></code>).</p>
 </dd></dl>
 
 </dd></dl>
 
 <p class="centered">
-<strong>❖❖❖</strong></p></div>
-<div class="section" id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<strong>❖❖❖</strong></p></section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
 <dl class="py function">
-<dt id="varseq.non_dominated">
-<code class="sig-prename descclassname"><span class="pre">varseq.</span></code><code class="sig-name descname"><span class="pre">non_dominated</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#non_dominated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.non_dominated" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="varseq.non_dominated">
+<span class="sig-prename descclassname"><span class="pre">varseq.</span></span><span class="sig-name descname"><span class="pre">non_dominated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/varseq.html#non_dominated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#varseq.non_dominated" title="Permalink to this definition"></a></dt>
 <dd><p>Checks if the element “e” is non-dominated.</p>
 <p>Considering <code class="docutils literal notranslate"><span class="pre">e</span></code> as a candidate for the last position
 in the target alignment of <a class="reference internal" href="#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">VarSeq</span></code></a> -s <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code>,
@@ -417,47 +343,35 @@ check if it is non-dominated.</p>
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
-
-    </p>
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

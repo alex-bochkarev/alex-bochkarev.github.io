@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UFLP_fullDD &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          </a>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#code-organization">Code organization</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>UFLP_fullDD</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for UFLP_fullDD</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Solves UFLP using a DD-based approach.</span>
+
+<span class="sd">The core function, :py:func:`create_cover_DD`, implements</span>
+<span class="sd">the BDD-building procedure to encode a j-UFLP sub-instance</span>
+<span class="sd">(i.e., a UFLP problem with overlap costs).</span>
+
+<span class="sd">Related: a good order of variables is found with :py:mod:`UFLPOrder` module.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">BDD</span> <span class="kn">import</span> <span class="n">BDD</span><span class="p">,</span> <span class="n">NROOT</span><span class="p">,</span> <span class="n">NTRUE</span>
+<span class="kn">from</span> <span class="nn">darkcloud</span> <span class="kn">import</span> <span class="n">solve_with_MIP</span><span class="p">,</span> <span class="n">gen_caveman_inst</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+<span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">UFLPOrder</span> <span class="kn">import</span> <span class="n">UFLP_greedy_order</span>
+
+
+<div class="viewcode-block" id="make_label"><a class="viewcode-back" href="../_autosummary/UFLP_fullDD.html#UFLP_fullDD.make_label">[docs]</a><span class="k">def</span> <span class="nf">make_label</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper: formats a node label according to the ``state``.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">state</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+                           <span class="k">if</span> <span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">j</span><span class="p">])])</span></div>
+
+
+<div class="viewcode-block" id="calc_cost"><a class="viewcode-back" href="../_autosummary/UFLP_fullDD.html#UFLP_fullDD.calc_cost">[docs]</a><span class="k">def</span> <span class="nf">calc_cost</span><span class="p">(</span><span class="n">pts_list</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">prev_state</span><span class="p">,</span> <span class="n">last_decision</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper: calculates the added cost during the BDD creation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        S, f, c: UFLP instance parameters,</span>
+<span class="sd">        pts_list (list): points to generate cost for,</span>
+<span class="sd">        state: the new state</span>
+<span class="sd">        last_decision(tuple): a var (int) - value(int) pair.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Added cost according to the ``state``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">pts_list</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="mi">1</span> <span class="o">*</span> <span class="p">((</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                      <span class="ow">or</span> <span class="p">(</span><span class="n">prev_state</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                      <span class="ow">or</span> <span class="p">((</span><span class="n">i</span> <span class="o">==</span> <span class="n">last_decision</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">last_decision</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)))</span>
+                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+
+        <span class="n">cost</span> <span class="o">+=</span> <span class="n">f</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">a</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">prev_state</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                                   <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="n">j</span> <span class="o">==</span> <span class="n">last_decision</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                                             <span class="ow">and</span> <span class="p">(</span><span class="n">last_decision</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)):</span>
+            <span class="n">cost</span> <span class="o">+=</span> <span class="n">c</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">cost</span></div>
+
+
+<div class="viewcode-block" id="create_cover_DD"><a class="viewcode-back" href="../_autosummary/UFLP_fullDD.html#UFLP_fullDD.create_cover_DD">[docs]</a><span class="k">def</span> <span class="nf">create_cover_DD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">node_order</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates a BDD for an UFLP with cavemen structure.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        S, f, c: instance params (see :py:func:`darkcloud.gen_caveman_inst`),</span>
+<span class="sd">        node_order (list[int]): order of nodes to add.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        B (class BDD): resulting diagram</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Implements &#39;forgetting&#39; nodes along the way.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">N</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_order</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;node_order must contain exactly </span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s2"> nodes.&quot;</span>
+
+    <span class="n">B</span> <span class="o">=</span> <span class="n">BDD</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">node_order</span><span class="p">],</span>
+            <span class="n">weighted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># how many node costs do I need this point for?</span>
+    <span class="n">node_value</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+
+    <span class="c1"># how many more points do I need to add to calculate costs?</span>
+    <span class="c1"># (&quot;cost uncertainty&quot;)</span>
+    <span class="n">cost_unc</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+
+    <span class="n">root_state</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)))</span>
+    <span class="c1"># STATE CODES:</span>
+    <span class="c1"># 1 = true (set), -1 = false (unset), 0 = doesn&#39;t matter</span>
+
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">({</span><span class="n">NROOT</span><span class="p">:</span> <span class="n">make_label</span><span class="p">(</span><span class="n">root_state</span><span class="p">)})</span>
+
+    <span class="n">next_layer</span> <span class="o">=</span> <span class="p">{</span><span class="n">root_state</span><span class="p">:</span> <span class="n">B</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="kc">None</span><span class="p">)}</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># created layers counter</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">node_order</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">nodes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">add_costs</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of points to calc costs for during the step</span>
+
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">cost_unc</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">cost_unc</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">add_costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">node_value</span><span class="p">[</span><span class="n">s</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+
+        <span class="c1"># adding i-th point (of the original graph)</span>
+        <span class="n">current_layer</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">next_layer</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># last layer</span>
+            <span class="n">next_layer</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">([</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">root_state</span><span class="p">]):</span> <span class="n">B</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">NTRUE</span><span class="p">]}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">next_layer</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">current_layer</span><span class="p">:</span>
+            <span class="c1"># a no-arc</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">current_layer</span><span class="p">[</span><span class="n">state</span><span class="p">]</span>
+            <span class="n">next_state</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span>
+                <span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">*</span> <span class="p">((</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">i</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">node_value</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+            <span class="p">])</span>
+
+            <span class="n">arc_cost</span> <span class="o">=</span> <span class="n">calc_cost</span><span class="p">(</span><span class="n">add_costs</span><span class="p">,</span> <span class="n">next_state</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                                 <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">next_state</span> <span class="ow">in</span> <span class="n">next_layer</span><span class="p">:</span>
+                <span class="n">B</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">next_layer</span><span class="p">[</span><span class="n">next_state</span><span class="p">],</span> <span class="s2">&quot;lo&quot;</span><span class="p">,</span>
+                        <span class="n">edge_weight</span><span class="o">=</span><span class="n">arc_cost</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">newnode</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">arc_cost</span><span class="p">)</span>
+                <span class="n">next_layer</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">next_state</span><span class="p">:</span> <span class="n">newnode</span><span class="p">})</span>
+                <span class="n">node_labels</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">newnode</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">make_label</span><span class="p">(</span><span class="n">next_state</span><span class="p">)})</span>
+
+            <span class="c1"># a yes-arc</span>
+            <span class="n">next_state</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([(</span><span class="n">state</span><span class="p">[</span><span class="n">q</span><span class="p">]</span> <span class="o">+</span> <span class="p">((</span><span class="n">q</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">i</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">node_value</span><span class="p">[</span><span class="n">q</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+                                <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="p">))])</span>
+
+            <span class="n">arc_cost</span> <span class="o">=</span> <span class="n">calc_cost</span><span class="p">(</span><span class="n">add_costs</span><span class="p">,</span> <span class="n">next_state</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                                 <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">next_state</span> <span class="ow">in</span> <span class="n">next_layer</span><span class="p">:</span>
+                <span class="n">B</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">next_layer</span><span class="p">[</span><span class="n">next_state</span><span class="p">],</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span>
+                        <span class="n">edge_weight</span><span class="o">=</span><span class="n">arc_cost</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">newnode</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="n">arc_cost</span><span class="p">)</span>
+                <span class="n">next_layer</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">next_state</span><span class="p">:</span> <span class="n">newnode</span><span class="p">})</span>
+                <span class="n">node_labels</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">newnode</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">make_label</span><span class="p">(</span><span class="n">next_state</span><span class="p">)})</span>
+
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">B</span><span class="p">,</span> <span class="n">node_labels</span></div>
+
+
+<span class="c1"># Testing code ######################################################</span>
+<div class="viewcode-block" id="test_full_DD"><a class="viewcode-back" href="../_autosummary/UFLP_fullDD.html#UFLP_fullDD.test_full_DD">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;inst&quot;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="n">gen_caveman_inst</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+                     <span class="n">M</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+                     <span class="n">L</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mf">0.1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(),</span> <span class="mf">0.9</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)])</span>
+<span class="k">def</span> <span class="nf">test_full_DD</span><span class="p">(</span><span class="n">inst</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tests the full-DD-based approach against a MiP.&quot;&quot;&quot;</span>
+    <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">inst</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">objMIP</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">solve_with_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">UFLP_greedy_order</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;order = </span><span class="si">{</span><span class="n">order</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">B</span><span class="p">,</span> <span class="n">nl</span> <span class="o">=</span> <span class="n">create_cover_DD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+    <span class="n">objDD</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">objMIP</span> <span class="o">-</span> <span class="n">objDD</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span></div>
+
+
+<div class="viewcode-block" id="test_cost_calc"><a class="viewcode-back" href="../_autosummary/UFLP_fullDD.html#UFLP_fullDD.test_cost_calc">[docs]</a><span class="k">def</span> <span class="nf">test_cost_calc</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Tests :py:func:`UFLP_fullDD.calc_cost` function.&quot;&quot;&quot;</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">]]</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)):</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="o">+</span><span class="n">j</span><span class="o">+</span><span class="mf">0.1</span><span class="o">*</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">k</span><span class="p">]))])</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+
+    <span class="c1"># testing for a specific instance</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">prev_state</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">ld</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">forget</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">calc_cost</span><span class="p">(</span><span class="n">forget</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">prev_state</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mf">10.0</span>
+
+    <span class="n">forget</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">calc_cost</span><span class="p">(</span><span class="n">forget</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">prev_state</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mf">30.0</span>
+
+    <span class="n">forget</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">calc_cost</span><span class="p">(</span><span class="n">forget</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">prev_state</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mf">20.0</span>
+
+    <span class="n">forget</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">ld</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">calc_cost</span><span class="p">(</span><span class="n">forget</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">prev_state</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1.0</span>
+
+    <span class="n">forget</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">ld</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">prev_state</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">calc_cost</span><span class="p">(</span><span class="n">forget</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">prev_state</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1.0</span>
+
+    <span class="n">state</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">calc_cost</span><span class="p">(</span><span class="n">forget</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">prev_state</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mf">2.1</span>
+
+    <span class="n">ld</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">calc_cost</span><span class="p">(</span><span class="n">forget</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">prev_state</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mf">2.1</span></div>
+
+
+<div class="viewcode-block" id="run_fullDD_simple"><a class="viewcode-back" href="../_autosummary/UFLP_fullDD.html#UFLP_fullDD.run_fullDD_simple">[docs]</a><span class="k">def</span> <span class="nf">run_fullDD_simple</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Creates a diagram for a simple UFLP instance.&quot;&quot;&quot;</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">]]</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)):</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="o">+</span><span class="n">j</span><span class="o">+</span><span class="mf">0.1</span><span class="o">*</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">k</span><span class="p">]))])</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">create_cover_DD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">UFLP_greedy_order</span><span class="p">(</span><span class="n">S</span><span class="p">))</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,96 +1,56 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>experiments &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="experiments.compare_simpl_LBs" href="experiments.compare_simpl_LBs.html" />
-    <link rel="prev" title="tUFLP" href="tUFLP.html" /> 
+    <link rel="next" title="experiments.align_narrow_DDs" href="experiments.align_narrow_DDs.html" />
+    <link rel="prev" title="solve_inst" href="solve_inst.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> Align-BDD
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../overview.html#reproducibility">Reproducibility</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../overview.html#code-organization">Code organization</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../overview.html#producing-figures">Producing figures</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="gen_BDD_pair.html">gen_BDD_pair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solve_inst.html">solve_inst</a></li>
-<li class="toctree-l3"><a class="reference internal" href="UFL.html">UFL</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tUFLP.html">tUFLP</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">experiments</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#module-summary">Module summary</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="UFLP_2_cav.html">UFLP_2_cav</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../overview.html#testing-framework">Testing framework</a></li>
@@ -98,89 +58,68 @@
 </li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Align-BDD</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content style-external-links">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html">Docs</a> &raquo;</li>
-        
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
-        
       <li>experiments</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="../_sources/_autosummary/experiments.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <span class="target" id="module-experiments"></span><div class="section" id="experiments">
-<h1>experiments<a class="headerlink" href="#experiments" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-summary">
-<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this headline">¶</a></h2>
-<p>Implements numerical experiments.</p>
-<p>Almost every script here implements a stand-alone experiment, which is run from <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> with parameters passed via the command line from the <code class="docutils literal notranslate"><span class="pre">make</span></code> recipe. Passing <code class="docutils literal notranslate"><span class="pre">--help</span></code> to a script usually prints the available options.</p>
+             
+  <span class="target" id="module-experiments"></span><section id="experiments">
+<h1>experiments<a class="headerlink" href="#experiments" title="Permalink to this heading"></a></h1>
+<section id="module-summary">
+<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this heading"></a></h2>
+<p>Implements most of the numerical experiments in the paper.</p>
+<p>Almost every script here implements a stand-alone experiment, which is run from
+<code class="docutils literal notranslate"><span class="pre">Makefile</span></code> with parameters passed via the command line from the <code class="docutils literal notranslate"><span class="pre">make</span></code>
+recipe. Passing <code class="docutils literal notranslate"><span class="pre">--help</span></code> to a script usually prints the available options.</p>
+<p>The only notable exception is <a class="reference internal" href="UFLP_2_cav.html#module-UFLP_2_cav" title="UFLP_2_cav"><code class="xref py py-mod docutils literal notranslate"><span class="pre">UFLP_2_cav</span></code></a>, describing the j-UFLP
+experiment, which is implemented as a stand-alone module.</p>
+<p>(Note that the module contains some experiments that were left out from the
+second revision of the paper.)</p>
 <p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
 <p class="centered">
 <strong>❖❖❖</strong></p><p class="centered">
 <strong>❖❖❖</strong></p><p class="centered">
 <strong>Implementation details</strong></p><p class="rubric">Modules</p>
-<table class="longtable docutils align-default">
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="experiments.compare_simpl_LBs.html#module-experiments.compare_simpl_LBs" title="experiments.compare_simpl_LBs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.compare_simpl_LBs</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="experiments.align_narrow_DDs.html#module-experiments.align_narrow_DDs" title="experiments.align_narrow_DDs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.align_narrow_DDs</span></code></a></p></td>
+<td><p>Trying to figure if the heuristic performs worse for narrow DDs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="experiments.compare_simpl_LBs.html#module-experiments.compare_simpl_LBs" title="experiments.compare_simpl_LBs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.compare_simpl_LBs</span></code></a></p></td>
 <td><p>Compares different lower bounds for the simplified problem.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="experiments.dclouds.html#module-experiments.dclouds" title="experiments.dclouds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.dclouds</span></code></a></p></td>
+<td><p>Implements a MIP+DD approach experiment (left out from the paper).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="experiments.dclouds_rndcover.html#module-experiments.dclouds_rndcover" title="experiments.dclouds_rndcover"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.dclouds_rndcover</span></code></a></p></td>
+<td><p>Investigates a special class of instances: randomized cover DD.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="experiments.dclouds_sclass.html#module-experiments.dclouds_sclass" title="experiments.dclouds_sclass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.dclouds_sclass</span></code></a></p></td>
+<td><p>Investigates a special class of instances: different-width DDs.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="experiments.exp_BDD_example.html#module-experiments.exp_BDD_example" title="experiments.exp_BDD_example"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.exp_BDD_example</span></code></a></p></td>
 <td><p>Provides an example when simplified-problem based heuristic is tight for the original problem.</p></td>
@@ -188,8 +127,26 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="experiments.gen_lsizes_stats.html#module-experiments.gen_lsizes_stats" title="experiments.gen_lsizes_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.gen_lsizes_stats</span></code></a></p></td>
 <td><p>Generates a dataset summary for BDDs: layer widths.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="experiments.heu_sol_struct.html#module-experiments.heu_sol_struct" title="experiments.heu_sol_struct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.heu_sol_struct</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="experiments.greedy_UFLP_sizes.html#module-experiments.greedy_UFLP_sizes" title="experiments.greedy_UFLP_sizes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.greedy_UFLP_sizes</span></code></a></p></td>
+<td><p>An experiment for joint UFLP + special instance type (cavemen).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="experiments.heu_sol_struct.html#module-experiments.heu_sol_struct" title="experiments.heu_sol_struct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.heu_sol_struct</span></code></a></p></td>
 <td><p>Examines heuristic solutions to a random align-BDD instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="experiments.jUFLP_specins.html#module-experiments.jUFLP_specins" title="experiments.jUFLP_specins"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.jUFLP_specins</span></code></a></p></td>
+<td><p>An experiment for joint UFLP + special instance type</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="experiments.jUFLP_specins_smaller.html#module-experiments.jUFLP_specins_smaller" title="experiments.jUFLP_specins_smaller"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.jUFLP_specins_smaller</span></code></a></p></td>
+<td><p>An experiment for joint UFLP + special instance type</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="experiments.jUFLP_vsMIPs.html#module-experiments.jUFLP_vsMIPs" title="experiments.jUFLP_vsMIPs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.jUFLP_vsMIPs</span></code></a></p></td>
+<td><p>An experiment for joint UFLP + special instance type (cavemen).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="experiments.jUFLP_wCPPMIP.html#module-experiments.jUFLP_wCPPMIP" title="experiments.jUFLP_wCPPMIP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.jUFLP_wCPPMIP</span></code></a></p></td>
+<td><p>An experiment for joint UFLP + special instance type (cavemen).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="experiments.jUFLPcm.html#module-experiments.jUFLPcm" title="experiments.jUFLPcm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.jUFLPcm</span></code></a></p></td>
+<td><p>An experiment for joint UFLP + special instance type (cavemen).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="experiments.jUFL_hist_sizes.html#module-experiments.jUFL_hist_sizes" title="experiments.jUFL_hist_sizes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.jUFL_hist_sizes</span></code></a></p></td>
 <td><p>Benchmarks DD sizes for different solution methods of joint UFLP.</p></td>
@@ -206,6 +163,12 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="experiments.sample_BB_tree.html#module-experiments.sample_BB_tree" title="experiments.sample_BB_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.sample_BB_tree</span></code></a></p></td>
 <td><p>Aux script: draws a sample B&amp;B search tree for the auxiliary problem (with <a class="reference internal" href="varseq.html#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">varseq.VarSeq</span></code></a>)</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="experiments.softcover.html#module-experiments.softcover" title="experiments.softcover"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.softcover</span></code></a></p></td>
+<td><p>Generates and solves UFLP with 'soft cover' constraints.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="experiments.sumofproducts.html#module-experiments.sumofproducts" title="experiments.sumofproducts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.sumofproducts</span></code></a></p></td>
+<td><p>Performs the sum-of-products linearize/solve exercise.</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="experiments.tUFLP_runtimes.html#module-experiments.tUFLP_runtimes" title="experiments.tUFLP_runtimes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments.tUFLP_runtimes</span></code></a></p></td>
 <td><p>Benchmarks runtimes for different solution methods of typed-UFLP.</p></td>
 </tr>
@@ -214,47 +177,35 @@
 </tr>
 </tbody>
 </table>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
-
-    </p>
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

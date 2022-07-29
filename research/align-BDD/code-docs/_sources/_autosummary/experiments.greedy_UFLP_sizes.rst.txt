@@ -1,0 +1,57 @@
+.. module:: experiments.greedy_UFLP_sizes
+.. currentmodule:: experiments.greedy_UFLP_sizes
+
+experiments.greedy\_UFLP\_sizes
+===============================
+
+Module summary
+---------------
+.. automodule:: experiments.greedy_UFLP_sizes
+   :no-members:
+   :noindex:
+
+(In the implementation details below, click on class/function names for additional documentation and links to the source code.)
+
+.. centered:: ❖❖❖
+
+
+
+Implements functions (outside the classes above):
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autosummary::
+
+
+   main
+
+
+
+
+
+
+.. centered:: ❖❖❖
+.. centered:: Implementation details
+
+
+
+
+
+
+
+
+.. centered:: ❖❖❖
+
+Functions
+---------
+
+
+.. autofunction:: main
+
+
+
+
+
+
+
+
+
+

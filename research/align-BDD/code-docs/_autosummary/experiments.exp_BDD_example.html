@@ -1,96 +1,56 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>experiments.exp_BDD_example &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="experiments.gen_lsizes_stats" href="experiments.gen_lsizes_stats.html" />
-    <link rel="prev" title="experiments.compare_simpl_LBs" href="experiments.compare_simpl_LBs.html" /> 
+    <link rel="prev" title="experiments.dclouds_sclass" href="experiments.dclouds_sclass.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> Align-BDD
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../overview.html#reproducibility">Reproducibility</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../overview.html#code-organization">Code organization</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../overview.html#producing-figures">Producing figures</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="gen_BDD_pair.html">gen_BDD_pair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solve_inst.html">solve_inst</a></li>
-<li class="toctree-l3"><a class="reference internal" href="UFL.html">UFL</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tUFLP.html">tUFLP</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="experiments.html">experiments</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="experiments.html#module-summary">Module summary</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="UFLP_2_cav.html">UFLP_2_cav</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../overview.html#testing-framework">Testing framework</a></li>
@@ -98,82 +58,42 @@
 </li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Align-BDD</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content style-external-links">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html">Docs</a> &raquo;</li>
-        
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
-        
           <li><a href="experiments.html">experiments</a> &raquo;</li>
-        
       <li>experiments.exp_BDD_example</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="../_sources/_autosummary/experiments.exp_BDD_example.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <span class="target" id="module-experiments.exp_BDD_example"></span><div class="section" id="experiments-exp-bdd-example">
-<h1>experiments.exp_BDD_example<a class="headerlink" href="#experiments-exp-bdd-example" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-summary">
-<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this headline">¶</a></h2>
+             
+  <span class="target" id="module-experiments.exp_BDD_example"></span><section id="experiments-exp-bdd-example">
+<h1>experiments.exp_BDD_example<a class="headerlink" href="#experiments-exp-bdd-example" title="Permalink to this heading"></a></h1>
+<section id="module-summary">
+<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this heading"></a></h2>
 <p>Provides an example when simplified-problem based heuristic is tight for the original problem.</p>
 <p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
 <p class="centered">
-<strong>❖❖❖</strong></p><div class="section" id="implements-functions-outside-the-classes-above">
-<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
+<strong>❖❖❖</strong></p><section id="implements-functions-outside-the-classes-above">
+<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -187,57 +107,45 @@
 <p class="centered">
 <strong>❖❖❖</strong></p><p class="centered">
 <strong>Implementation details</strong></p><p class="centered">
-<strong>❖❖❖</strong></p></div>
-</div>
-<div class="section" id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<strong>❖❖❖</strong></p></section>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
 <dl class="py function">
-<dt id="experiments.exp_BDD_example.main">
-<code class="sig-prename descclassname"><span class="pre">experiments.exp_BDD_example.</span></code><code class="sig-name descname"><span class="pre">main</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/exp_BDD_example.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.exp_BDD_example.main" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="experiments.exp_BDD_example.main">
+<span class="sig-prename descclassname"><span class="pre">experiments.exp_BDD_example.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/exp_BDD_example.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.exp_BDD_example.main" title="Permalink to this definition"></a></dt>
 <dd><p>Makes an illustration with enumeration of all possible alignments.</p>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
-
-    </p>
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

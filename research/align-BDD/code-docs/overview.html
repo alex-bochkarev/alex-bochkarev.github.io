@@ -1,86 +1,47 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Implementation: overview &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/autoclasstoc.css" type="text/css" />
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="BDD" href="_autosummary/BDD.html" />
     <link rel="prev" title="Implementation details for Align-BDD project" href="index.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> Align-BDD
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Implementation: overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#computational-infrastructure">Computational infrastructure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#reproducibility">Reproducibility</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#problem-instances-and-raw-data">Problem instances and raw data</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#raw-data-format">Raw data format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#raw-data-formats">Raw data formats</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#binary-decision-diagrams">Binary Decision Diagrams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#j-uflp-instance-data">j-UFLP instance data</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#code-organization">Code organization</a><ul>
@@ -90,14 +51,17 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/varseq.html">varseq</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/heuristics.html">heuristics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/BB_search.html">BB_search</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/UFLP_fullDD.html">UFLP_fullDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/UFLPOrder.html">UFLPOrder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/jUFLP_cavemen.html">jUFLP_cavemen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/jUFLP_utils.html">jUFLP_utils</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#numerical-experiments">Numerical experiments</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/gen_BDD_pair.html">gen_BDD_pair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/solve_inst.html">solve_inst</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/UFL.html">UFL</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/tUFLP.html">tUFLP</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/experiments.html">experiments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/UFLP_2_cav.html">UFLP_2_cav</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#testing-framework">Testing framework</a><ul>
@@ -106,123 +70,132 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/varseq_test.html">varseq_test</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/BB_search_test.html">BB_search_test</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/UFLP_test.html">UFLP_test</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/tUFLP_test.html">tUFLP_test</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">Align-BDD</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content style-external-links">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
       <li>Implementation: overview</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="_sources/overview.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="implementation-overview">
-<h1>Implementation: overview<a class="headerlink" href="#implementation-overview" title="Permalink to this headline">¶</a></h1>
-<p>These pages document the implementation of the numerical experiments for “Align-BDD” working paper by Bochkarev and Smith. These notes along with the accompanying source code and data are assumed to provide enough information to:</p>
+             
+  <section id="implementation-overview">
+<h1>Implementation: overview<a class="headerlink" href="#implementation-overview" title="Permalink to this heading"></a></h1>
+<p>These pages document the implementation of the numerical experiments for
+“Align-BDD” working paper by Bochkarev and Smith. The notes along with the
+accompanying <a class="reference external" href="https://github.com/alex-bochkarev/align-BDD">source code and data</a>
+are assumed to provide enough information to:</p>
 <ol class="arabic simple">
 <li><p>inspect the raw data,</p></li>
-<li><p>reproduce and adjust/inspect as nececssary the figures from the paper (given the experiment log files), and</p></li>
-<li><p>completely reproduce the paper results from scratch, including instance generation, with minimal efforts.</p></li>
+<li><p>reproduce / adjust / inspect the figures from the paper (given the experiment log files) as necessary, and</p></li>
+<li><p>completely reproduce the paper results from scratch, including instance generation, with reasonable efforts.</p></li>
 </ol>
-<p>All technical questions can be addressed to <a class="reference external" href="https://www.bochkarev.io/contact">Alexey Bochkarev</a>.</p>
+<p>It is our special interest to help the reader build upon our results, so please
+do not hesitate to address any technical questions to <a class="reference external" href="https://www.bochkarev.io/contact">Alexey
+Bochkarev</a>.</p>
+</section>
+<section id="computational-infrastructure">
+<h1>Computational infrastructure<a class="headerlink" href="#computational-infrastructure" title="Permalink to this heading"></a></h1>
+<p>To run the experiments we used machines running GNU/Linux system (remote
+computational resources provided by <a class="reference external" href="https://www.palmetto.clemson.edu/palmetto/about/">Clemson Palmetto cluster</a> and laptops), running the
+following software:</p>
+<ul>
+<li><p>experiments implementation: python3. <a class="reference download internal" download="" href="_downloads/b4ef698db8ca845e5845c4618278f29a/requirements.txt"><code class="xref download docutils literal notranslate"><span class="pre">packages</span> <span class="pre">list</span></code></a>, the usual way should work:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
 </div>
-<div class="section" id="computational-infrastructure">
-<h1>Computational infrastructure<a class="headerlink" href="#computational-infrastructure" title="Permalink to this headline">¶</a></h1>
-<p>To run the experiments we used machines running GNU/Linux system (laptops and remote computational resources provided by <a class="reference external" href="https://www.palmetto.clemson.edu/palmetto/about/">Clemson Palmetto cluster</a>), running the following software:</p>
+</li>
+<li><p>figures: R. To install (a superset of) the necessary libraries, from within R session:</p></li>
+</ul>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="nf">install.packages</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;dplyr&quot;</span><span class="p">,</span> <span class="s">&quot;ggplot2&quot;</span><span class="p">,</span> <span class="s">&quot;ggridges&quot;</span><span class="p">,</span>
+   <span class="s">&quot;gridExtra&quot;</span><span class="p">,</span> <span class="s">&quot;latex2exp&quot;</span><span class="p">,</span> <span class="s">&quot;optparse&quot;</span><span class="p">,</span> <span class="s">&quot;reshape&quot;</span><span class="p">,</span>
+   <span class="s">&quot;stringr&quot;</span><span class="p">,</span> <span class="s">&quot;tidyr&quot;</span><span class="p">,</span> <span class="s">&quot;viridis&quot;</span><span class="p">,</span> <span class="s">&quot;xtable&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
 <ul class="simple">
-<li><p>experiments implementation: python3 (<code class="xref download docutils literal notranslate"><span class="pre">python-packages.txt</span></code>),</p></li>
-<li><p>figures: R (<code class="xref download docutils literal notranslate"><span class="pre">R-libraries.txt</span></code>),</p></li>
 <li><p>parallel computation: <a class="reference external" href="https://www.gnu.org/software/parallel/">GNU parallel</a>,</p></li>
 <li><p>experiments pipeline: GNU make and PBS (for job scheduling on the cluster).</p></li>
 <li><p>(we also used a separate <a class="reference external" href="https://github.com/alex-bochkarev/tgs-curl">tool</a> to receive the results promptly via <a class="reference external" href="https://telegram.org">Telegram</a>, but this can be safely removed)</p></li>
 <li><p>numerical experiments require <a class="reference external" href="https://www.gurobi.com">Gurobi</a> solver.</p></li>
+<li><p>most graphs were visualized used a stand-alone program called <a class="reference external" href="https://graphviz.org/">Graphviz</a>
+Note that before <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pygraphviz</span></code> you might need to install the program
+and the header files as well. On my Debian distribution I needed to do
+<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">graphviz</span> <span class="pre">graphviz-dev</span></code>.</p></li>
 </ul>
+<p>Note that for the (python) environment management we used the recommended
+<a class="reference external" href="https://docs.python.org/3/library/venv.html">venv-way</a>. For example, the
+virtual environment can be created and activated with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m venv .venv
+<span class="nb">source</span> .venv/bin/activate
+
+<span class="c1"># so that we can install the necessary packages there with:</span>
+pip install -r requirements.txt
+</pre></div>
 </div>
-<div class="section" id="reproducibility">
-<h1>Reproducibility<a class="headerlink" href="#reproducibility" title="Permalink to this headline">¶</a></h1>
-<p>Assuming the necessary software is present, one can rebuild any figure from the existing log file (specific experiment results) by running a <code class="docutils literal notranslate"><span class="pre">make</span></code> command from the root project directory (<code class="docutils literal notranslate"><span class="pre">align-BDD</span></code>). For example,</p>
+<p>(<code class="docutils literal notranslate"><span class="pre">conda</span></code> would work just as well.)</p>
+</section>
+<section id="general-reproducibility">
+<h1>General reproducibility<a class="headerlink" href="#general-reproducibility" title="Permalink to this heading"></a></h1>
+<p>Assuming the necessary software is present, one can rebuild any figure from the
+existing log file (specific experiment results) by running a <code class="docutils literal notranslate"><span class="pre">make</span></code> command
+from the root project directory (<code class="docutils literal notranslate"><span class="pre">align-BDD</span></code>). For example, theoretically this
+will work:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make figures/simpl_heuristics.eps  <span class="c1"># to rebuild Figure 6, or</span>
 make figures  <span class="c1"># to rebuild all figures for the paper</span>
 </pre></div>
 </div>
-<p>GNU make will consider files’ timestamps and re-run the experiments as necessary (e.g., if the instance generation procedure has changed). To force a complete run (generate all the data, make all experiments, and build all figures), just clean up the previous results first:</p>
+<p>GNU make will consider files’ timestamps and re-run the
+experiments as necessary (e.g., if the instance generation procedure has
+changed). To force a complete run (generate all the data, make all experiments,
+and build all figures), just clean up the previous results first:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make fresh  <span class="c1"># to delete all instances and run logs</span>
 make figures  <span class="c1"># to rebuild everything</span>
 </pre></div>
 </div>
-<p>Note that depending on the parameters (which are set in <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>) and the hardware, it might take quite some time to recalculate everything. PBS scripts <a class="footnote-reference brackets" href="#id2" id="id1">1</a> that were used to run our experiments on the computation cluster are kept in <code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">pbs</span></code> .</p>
-<p>All the recipies are implemented in <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> (that’s the default makefile name), which is basically a list of commands and source files needed to build each target.</p>
-<dl class="footnote brackets">
-<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>obviously, they are dependent on specific software and hardware on the computation system you use.</p>
-</dd>
-</dl>
-</div>
-<div class="section" id="problem-instances-and-raw-data">
-<h1>Problem instances and raw data<a class="headerlink" href="#problem-instances-and-raw-data" title="Permalink to this headline">¶</a></h1>
-<p>All the source data is available in the public repository. In particular,</p>
+<p>Note, however, that depending on the parameters (which are set in <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>)
+and the hardware, it might take quite some time to recalculate everything. PBS
+scripts that were used to run our experiments on the computation cluster are
+kept in folder <code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">pbs</span></code>. Certainly, they are dependent on the hardware and the
+available software, but these materials hopefully will provide a good starting
+point to reproduce the results presented in the paper.</p>
+<p>All the recipies (how to make each figure or other artifact) are described in
+the file called <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>, which is basically a list of commands and source
+files needed to build each target.</p>
+</section>
+<section id="project-repository-structure">
+<h1>Project repository structure.<a class="headerlink" href="#project-repository-structure" title="Permalink to this heading"></a></h1>
+<p>All the source data is available in the <a class="reference external" href="https://github.com/alex-bochkarev/align-BDD">project repository</a>.</p>
+<p>Key folders are:</p>
 <ul class="simple">
-<li><p>📁 <cite>instances</cite> containts all the instance (“raw”) data in a compressed format (<cite>tar.gz</cite>; see e.g. <a class="reference external" href="https://www.howtogeek.com/362203/what-is-a-tar.gz-file-and-how-do-i-open-it/">here</a> if unsure how to open it),</p></li>
-<li><p>📁 <cite>run_logs</cite> contains all the numerical results (“run logs” as CSV files)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">instances</span></code>: all the instance (“raw”) data in a compressed format (<cite>tar.gz</cite>; see e.g. <a class="reference external" href="https://www.howtogeek.com/362203/what-is-a-tar.gz-file-and-how-do-i-open-it/">here</a> if unsure how to open it),</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">run_logs</span></code>: all the numerical results – “run logs,” mostly as comma separated files (<code class="docutils literal notranslate"><span class="pre">.csv</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">experiments</span></code> and the root folder contain all key implementation files (in Python).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">post_processing</span></code>: the R code that produces figures from the run logs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">figures</span></code>: the key figures themselves.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">docs</span></code>: the code documentation source (i.e., these pages).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">tests</span></code>: most of the code testing (for python code).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">pbs</span></code>: auxiliary <a class="reference external" href="https://en.wikipedia.org/wiki/Portable_Batch_System">PBS</a> scripts used to run the code on the computational cluster.</p></li>
 </ul>
 <p>The computations are summarized in the following table (scrollable right):</p>
 <table class="docutils align-default">
@@ -238,7 +211,7 @@ make figures  <span class="c1"># to rebuild everything</span>
 <thead>
 <tr class="row-odd"><th class="head"><p>Figure / Table</p></th>
 <th class="head"><p>Filename</p></th>
-<th class="head"><p>Scripts (experiment code)</p></th>
+<th class="head"><p>Experiments code (scripts)</p></th>
 <th class="head"><p>Raw instances</p></th>
 <th class="head"><p>Format</p></th>
 <th class="head"><p>Experiment run log</p></th>
@@ -262,13 +235,13 @@ make figures  <span class="c1"># to rebuild everything</span>
 <td><p><code class="docutils literal notranslate"><span class="pre">orig_obj_histograms.eps</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">fig_obj_hist.R</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>Figure 19</p></td>
+<tr class="row-odd"><td><p>Figure 17</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">LB.eps</span></code></p></td>
 <td><p><a class="reference internal" href="_autosummary/gen_BDD_pair.html#module-gen_BDD_pair" title="gen_BDD_pair"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gen_BDD_pair</span></code></a> + <a class="reference internal" href="_autosummary/experiments.compare_simpl_LBs.html#module-experiments.compare_simpl_LBs" title="experiments.compare_simpl_LBs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">experiments.compare_simpl_LBs</span></code></a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">simpl_LB.csv</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">fig_LBs.R</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>Figure 20</p></td>
+<tr class="row-even"><td><p>Figure 18</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">orig_lwidth_stats.eps</span></code></p></td>
 <td><p><a class="reference internal" href="_autosummary/gen_BDD_pair.html#module-gen_BDD_pair" title="gen_BDD_pair"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gen_BDD_pair</span></code></a> + <a class="reference internal" href="_autosummary/experiments.gen_lsizes_stats.html#module-experiments.gen_lsizes_stats" title="experiments.gen_lsizes_stats"><code class="xref py py-mod docutils literal notranslate"><span class="pre">experiments.gen_lsizes_stats</span></code></a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">orig_stats.tar.gz</span></code></p></td>
@@ -282,10 +255,10 @@ make figures  <span class="c1"># to rebuild everything</span>
 <td><p><code class="docutils literal notranslate"><span class="pre">orig_scal.csv</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">fig_scal.R</span></code></p></td>
 </tr>
-<tr class="row-even"><td rowspan="4"><p>Figure 21</p>
+<tr class="row-even"><td rowspan="4"><p>Figure 19</p>
+<p>Figure 20</p>
+<p>Figure 21</p>
 <p>Figure 22</p>
-<p>Figure 23</p>
-<p>Figure 24</p>
 </td>
 <td rowspan="4"><p><code class="docutils literal notranslate"><span class="pre">no_opts.eps</span></code></p>
 <p><code class="docutils literal notranslate"><span class="pre">opts_diam.eps</span></code></p>
@@ -300,45 +273,137 @@ make figures  <span class="c1"># to rebuild everything</span>
 <tr class="row-odd"></tr>
 <tr class="row-even"></tr>
 <tr class="row-odd"></tr>
-<tr class="row-even"><td><p>Figure 12</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">tUFLP_runtimes_overview.eps</span></code></p></td>
-<td rowspan="2"><p><a class="reference internal" href="_autosummary/experiments.tUFLP_runtimes.html#module-experiments.tUFLP_runtimes" title="experiments.tUFLP_runtimes"><code class="xref py py-mod docutils literal notranslate"><span class="pre">experiments.tUFLP_runtimes</span></code></a></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">tUFLP_scal_inst.json</span></code></p></td>
-<td rowspan="4"><p>json</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">tUFLP_runtimes_scal.csv</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">fig_tUFLP_runtimes_scal.R</span></code></p></td>
+<tr class="row-even"><td rowspan="3"><p>Figure 9b</p>
+<p>Figure 10a</p>
+<p>Figure 10b</p>
+</td>
+<td rowspan="3"><p><code class="docutils literal notranslate"><span class="pre">tMIP_tMIPCPP_tDD.eps</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">intDD_VS_vs_toA.eps</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">tMIP_tMIPCPP_tDD.eps</span></code></p>
+</td>
+<td rowspan="3"><p><a class="reference internal" href="_autosummary/UFLP_2_cav.html#module-UFLP_2_cav" title="UFLP_2_cav"><code class="xref py py-mod docutils literal notranslate"><span class="pre">UFLP_2_cav</span></code></a>  <code class="xref py py-func docutils literal notranslate"><span class="pre">darkcloud.gen_cavemen_inst()</span></code></p>
+<p><a class="reference internal" href="_autosummary/jUFLP_cavemen.html#module-jUFLP_cavemen" title="jUFLP_cavemen"><code class="xref py py-mod docutils literal notranslate"><span class="pre">jUFLP_cavemen</span></code></a>  <a class="reference internal" href="_autosummary/jUFLP_utils.html#module-jUFLP_utils" title="jUFLP_utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">jUFLP_utils</span></code></a></p>
+<p><a class="reference internal" href="_autosummary/experiments.softcover.html#experiments.softcover.generate_overlaps" title="experiments.softcover.generate_overlaps"><code class="xref py py-func docutils literal notranslate"><span class="pre">experiments.softcover.generate_overlaps()</span></code></a></p>
+</td>
+<td rowspan="3"><p><code class="docutils literal notranslate"><span class="pre">jUFLP.tar.gz</span></code></p></td>
+<td rowspan="3"><p>json</p></td>
+<td rowspan="3"><p><code class="docutils literal notranslate"><span class="pre">2022-07-19_jUFLP.csv</span></code></p></td>
+<td rowspan="3"><p><code class="docutils literal notranslate"><span class="pre">fig_DDvsMIP.R</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>Figure 25</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">tUFL_runtimes_breakdown.eps</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">tUFLP_steps_breakdown.json</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">tUFLP_runtimes.csv</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">fig_tUFLP_runtimes_breakdown.R</span></code></p></td>
+<tr class="row-odd"></tr>
+<tr class="row-even"></tr>
+</tbody>
+</table>
+<p>Figure 16: sample B&amp;B tree was generated by <a class="reference internal" href="_autosummary/experiments.sample_BB_tree.html#module-experiments.sample_BB_tree" title="experiments.sample_BB_tree"><code class="xref py py-mod docutils literal notranslate"><span class="pre">experiments.sample_BB_tree</span></code></a>.</p>
+<p>(Figures 1-5, 9a, 11-15, and 23-26 do not involve any computations.)</p>
+<p>All the key parameters (instance sizes, generation parameters, etc.) are set in <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>.</p>
+</section>
+<section id="implementation-details">
+<h1>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this heading"></a></h1>
+<p>Here are implementations of the key algorithms from the paper:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 39%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Reference</p></th>
+<th class="head"><p>Brief Description</p></th>
+<th class="head"><p>Implementation</p></th>
 </tr>
-<tr class="row-even"><td><p>Figure 26a</p></td>
-<td rowspan="3"><p><code class="docutils literal notranslate"><span class="pre">various_simpl_vs_min.eps</span></code></p></td>
-<td rowspan="2"><p><a class="reference internal" href="_autosummary/experiments.tUFL_hist_sizes_control.html#module-experiments.tUFL_hist_sizes_control" title="experiments.tUFL_hist_sizes_control"><code class="xref py py-mod docutils literal notranslate"><span class="pre">experiments.tUFL_hist_sizes_control</span></code></a></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">tUFLP_nat_instances.json</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">tUFLP_nat.csv</span></code></p></td>
-<td rowspan="3"><p><code class="docutils literal notranslate"><span class="pre">fig_simpl_vs_min.R</span></code></p></td>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Sec. 2.1</p></td>
+<td><p>BDD data structure implementation</p></td>
+<td><p><a class="reference internal" href="_autosummary/BDD.html#BDD.BDD" title="BDD.BDD"><code class="xref py py-class docutils literal notranslate"><span class="pre">BDD.BDD</span></code></a></p></td>
 </tr>
-<tr class="row-odd"><td><p>Figure 26b</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">tUFLP_rnd_instances.json</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">tUFLP_rnd.csv</span></code></p></td>
+<tr class="row-odd"><td><p>Sec. 3.2</p></td>
+<td><p>Weighted variable sequence (<code class="docutils literal notranslate"><span class="pre">VarSeq</span></code>) implementation.</p></td>
+<td><p><a class="reference internal" href="_autosummary/varseq.html#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">varseq.VarSeq</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td><p>Figure 26c</p></td>
-<td><p><a class="reference internal" href="_autosummary/experiments.rnd_dia_hist_sizes_control.html#module-experiments.rnd_dia_hist_sizes_control" title="experiments.rnd_dia_hist_sizes_control"><code class="xref py py-mod docutils literal notranslate"><span class="pre">experiments.rnd_dia_hist_sizes_control</span></code></a></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">bm_heu_random_diagrams.tar.gz</span></code></p></td>
-<td><p>BDD</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">tUFLP_rnd.csv</span></code></p></td>
+<tr class="row-even"><td><p>Algo 3</p></td>
+<td><p>A <code class="docutils literal notranslate"><span class="pre">swap</span></code> operation for a BDD.</p></td>
+<td><p><a class="reference internal" href="_autosummary/BDD.html#BDD.BDD.swap_up" title="BDD.BDD.swap_up"><code class="xref py py-func docutils literal notranslate"><span class="pre">BDD.BDD.swap_up()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Algo 4</p></td>
+<td><div class="line-block">
+<div class="line">Align-to (weighted variable sequence, linear time)</div>
+<div class="line">(Algo 1 is slower and is not used in the experiments)</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference internal" href="_autosummary/varseq.html#varseq.VarSeq.align_to" title="varseq.VarSeq.align_to"><code class="xref py py-func docutils literal notranslate"><span class="pre">varseq.VarSeq.align_to()</span></code></a></div>
+<div class="line">(see also <a class="reference internal" href="_autosummary/varseq.html#varseq.VarSeq.greedy_sort" title="varseq.VarSeq.greedy_sort"><code class="xref py py-func docutils literal notranslate"><span class="pre">varseq.VarSeq.greedy_sort()</span></code></a>)</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Algo 5</p></td>
+<td><div class="line-block">
+<div class="line">Branch-and-bound algorithm for the simplified problem.</div>
+<div class="line">- lower bound:</div>
+<div class="line">- upper bound:</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">See <a class="reference internal" href="_autosummary/BB_search.html#BB_search.BBSearch" title="BB_search.BBSearch"><code class="xref py py-class docutils literal notranslate"><span class="pre">BB_search.BBSearch</span></code></a> and <a class="reference internal" href="_autosummary/BB_search.html#BB_search.BBSearch.search" title="BB_search.BBSearch.search"><code class="xref py py-func docutils literal notranslate"><span class="pre">BB_search.BBSearch.search()</span></code></a></div>
+<div class="line"><a class="reference internal" href="_autosummary/BB_search.html#BB_search.SearchNode.calculate_LB" title="BB_search.SearchNode.calculate_LB"><code class="xref py py-func docutils literal notranslate"><span class="pre">BB_search.SearchNode.calculate_LB()</span></code></a></div>
+<div class="line"><a class="reference internal" href="_autosummary/BB_search.html#BB_search.SearchNode.calculate_UB" title="BB_search.SearchNode.calculate_UB"><code class="xref py py-func docutils literal notranslate"><span class="pre">BB_search.SearchNode.calculate_UB()</span></code></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Sec. 4.1.2</p></td>
+<td><p>Various heuristics for aligning BDDs and VarSeqs.</p></td>
+<td><p><a class="reference internal" href="_autosummary/heuristics.html#module-heuristics" title="heuristics"><code class="xref py py-mod docutils literal notranslate"><span class="pre">heuristics</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Algo 6</p></td>
+<td><div class="line-block">
+<div class="line">Creating a BDD encoding an UFLP sub-instance.</div>
+<div class="line">(for a given order of variables)</div>
+</div>
+</td>
+<td><p><a class="reference internal" href="_autosummary/UFLP_fullDD.html#UFLP_fullDD.create_cover_DD" title="UFLP_fullDD.create_cover_DD"><code class="xref py py-func docutils literal notranslate"><span class="pre">UFLP_fullDD.create_cover_DD()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">Example 5</div>
+<div class="line">(App. H)</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Finding a good order of variables</div>
+<div class="line">for an UFLP sub-instance.</div>
+</div>
+</td>
+<td><p><a class="reference internal" href="_autosummary/UFLPOrder.html#UFLPOrder.UFLP_greedy_order" title="UFLPOrder.UFLP_greedy_order"><code class="xref py py-func docutils literal notranslate"><span class="pre">UFLPOrder.UFLP_greedy_order()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Sec. 4.2</p></td>
+<td><div class="line-block">
+<div class="line">Solving j-UFLP:</div>
+<div class="line">- with naive MIP (formulation (2)):</div>
+<div class="line">- CPP as an MIP:</div>
+<div class="line">- CPP / shortest-path over intersection BDD:</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">See <a class="reference internal" href="_autosummary/UFLP_2_cav.html#module-UFLP_2_cav" title="UFLP_2_cav"><code class="xref py py-mod docutils literal notranslate"><span class="pre">UFLP_2_cav</span></code></a> for the overview, and then, in particular:</div>
+<div class="line"><a class="reference internal" href="_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.solve_cm_jUFLP_MIP" title="jUFLP_cavemen.solve_cm_jUFLP_MIP"><code class="xref py py-func docutils literal notranslate"><span class="pre">jUFLP_cavemen.solve_cm_jUFLP_MIP()</span></code></a></div>
+<div class="line"><a class="reference internal" href="_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.solve_cm_jUFLP_CPPMIP_fullDDs" title="jUFLP_cavemen.solve_cm_jUFLP_CPPMIP_fullDDs"><code class="xref py py-func docutils literal notranslate"><span class="pre">jUFLP_cavemen.solve_cm_jUFLP_CPPMIP_fullDDs()</span></code></a></div>
+<div class="line"><a class="reference internal" href="_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.solve_cm_jUFLP_fullDDs" title="jUFLP_cavemen.solve_cm_jUFLP_fullDDs"><code class="xref py py-func docutils literal notranslate"><span class="pre">jUFLP_cavemen.solve_cm_jUFLP_fullDDs()</span></code></a></div>
+</div>
+</td>
 </tr>
 </tbody>
 </table>
-<p>Figure 18: sample B&amp;B tree was generated by <a class="reference internal" href="_autosummary/experiments.sample_BB_tree.html#module-experiments.sample_BB_tree" title="experiments.sample_BB_tree"><code class="xref py py-mod docutils literal notranslate"><span class="pre">experiments.sample_BB_tree</span></code></a>.</p>
-<p>(Figures 1-5, 9-11, and 13-17 do not involve any computations.)</p>
-<p>All the key parameters (instance sizes, generation parameters, etc.) are set in <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>.</p>
-<div class="section" id="raw-data-format">
-<h2>Raw data format<a class="headerlink" href="#raw-data-format" title="Permalink to this headline">¶</a></h2>
-<p><strong>BDD</strong> is a structured plain-text description of a BDD explained in more detail in <a class="reference internal" href="_autosummary/BDD.html#BDD.BDD.save" title="BDD.BDD.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">BDD.BDD.save()</span></code></a>. Any diagram (say, from file <code class="docutils literal notranslate"><span class="pre">filename.bdd</span></code>) can be loaded for inspection with the code like:</p>
+</section>
+<section id="raw-data-formats">
+<h1>Raw data formats<a class="headerlink" href="#raw-data-formats" title="Permalink to this heading"></a></h1>
+<section id="binary-decision-diagrams">
+<h2>Binary Decision Diagrams<a class="headerlink" href="#binary-decision-diagrams" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>A <code class="docutils literal notranslate"><span class="pre">.bdd</span></code> file represents a structured plain-text description of a BDD</dt><dd><p>explained in more detail in <a class="reference internal" href="_autosummary/BDD.html#BDD.BDD.save" title="BDD.BDD.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">BDD.BDD.save()</span></code></a>. Any diagram (say, from
+file <code class="docutils literal notranslate"><span class="pre">filename.bdd</span></code>) can be loaded for inspection with the code like:</p>
+</dd>
+</dl>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">BDD</span>
 
 <span class="n">A</span> <span class="o">=</span> <span class="n">BDD</span><span class="o">.</span><span class="n">BDD</span><span class="p">()</span>
@@ -346,41 +411,47 @@ make figures  <span class="c1"># to rebuild everything</span>
 <span class="n">A</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># will pop up the diagram if the relevant software is installed</span>
 </pre></div>
 </div>
-<p><strong>json</strong> describes a tUFLP instance per line of a plain text file. E.g., consider the instance (text line):</p>
-<blockquote>
-<div><p>{“S”: [[1, 3, 5, 7, 8, 12, 15, 17, 18, 19], [2, 3, 4, 5, 7, 15, 20], [3, 1, 2, 8, 12, 13, 15, 18, 19], [4, 2, 5, 7, 8, 15, 16, 19], [5, 1, 2, 4, 8, 11, 14, 16, 20], [6, 8], [7, 1, 2, 4, 8, 9, 14, 20], [8, 1, 3, 4, 5, 6, 7, 11, 19], [9, 7, 13, 20], [10, 11, 12, 14], [11, 5, 8, 10, 13, 17, 19], [12, 1, 3, 10], [13, 3, 9, 11, 14, 15, 16, 20], [14, 5, 7, 10, 13, 16, 20], [15, 1, 2, 3, 4, 13, 19], [16, 4, 5, 13, 14, 19], [17, 1, 11, 19], [18, 1, 3], [19, 1, 3, 4, 8, 11, 15, 16, 17, 20], [20, 2, 5, 7, 9, 13, 14, 19]], “f”: {“1”: 9, “2”: 6, “3”: 6, “4”: 8, “5”: 8, “6”: 8, “7”: 6, “8”: 7, “9”: 6, “10”: 9, “11”: 7, “12”: 6, “13”: 5, “14”: 8, “15”: 7, “16”: 8, “17”: 6, “18”: 5, “19”: 9, “20”: 7}, “fc”: [1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0], “kb”: [5, 2]}</p>
-</div></blockquote>
-<p>It can be loaded for inspection from a string <code class="docutils literal notranslate"><span class="pre">instance</span></code> as follows.</p>
+<p>Note that each align-BDD instance is just a pair of BDDs with the same number.
+For example, instance number one from <code class="docutils literal notranslate"><span class="pre">orig_problem.tar.gz</span></code> (which ends up,
+for example, in Figure 7) is contained in two files, <code class="docutils literal notranslate"><span class="pre">A1.bdd</span></code> and <code class="docutils literal notranslate"><span class="pre">B1.bdd</span></code>.</p>
+</section>
+<section id="j-uflp-instance-data">
+<h2>j-UFLP instance data<a class="headerlink" href="#j-uflp-instance-data" title="Permalink to this heading"></a></h2>
+<p>A <code class="docutils literal notranslate"><span class="pre">.json</span></code> file describes a j-UFLP instance in <a class="reference external" href="https://docs.python.org/3/library/json.html">JSON format</a>.
+For more details on how exactly it is saved, see <a class="reference internal" href="_autosummary/jUFLP_utils.html#jUFLP_utils.save_inst" title="jUFLP_utils.save_inst"><code class="xref py py-func docutils literal notranslate"><span class="pre">jUFLP_utils.save_inst()</span></code></a>.</p>
+<p>Each instance can be loaded for inspection from a file as follows, using the
+auxiliary code we have in <a class="reference internal" href="_autosummary/jUFLP_utils.html#module-jUFLP_utils" title="jUFLP_utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">jUFLP_utils</span></code></a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">tUFLP</span>
+<span class="kn">from</span> <span class="nn">jUFLP_utils</span> <span class="kn">import</span> <span class="n">load_inst</span><span class="p">,</span> <span class="n">draw_jUFLP_inst</span>
 
-<span class="n">inst</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+<span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">link</span> <span class="o">=</span> <span class="n">load_inst</span><span class="p">(</span><span class="s2">&quot;./instances/jUFLP_cm/inst_1.json&quot;</span><span class="p">)</span>
 
-<span class="c1"># This will draw corresponding network structure:</span>
-<span class="n">tUFLP</span><span class="o">.</span><span class="n">draw_problem_dia</span><span class="p">(</span><span class="n">inst</span><span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">],</span> <span class="n">inst</span><span class="p">[</span><span class="s2">&quot;f&quot;</span><span class="p">],</span>
-                       <span class="n">inst</span><span class="p">[</span><span class="s2">&quot;fc&quot;</span><span class="p">],</span> <span class="n">inst</span><span class="p">[</span><span class="s2">&quot;kb&quot;</span><span class="p">])</span>
+<span class="n">draw_jUFLP_inst</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">link</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;tmp/jUFLP-check.dot&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>After this, dictionary <code class="docutils literal notranslate"><span class="pre">inst</span></code> will contain:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">inst[&quot;S&quot;]</span></code>: list of adjacency lists, <span class="math notranslate nohighlight">\(S_i\)</span> (<span class="math notranslate nohighlight">\(M\)</span> lists),</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">inst[&quot;f&quot;]</span></code>: list of location costs (of length <span class="math notranslate nohighlight">\(M\)</span>)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">inst[&quot;fc&quot;]</span></code>: list of types assigned to each point, (list of <span class="math notranslate nohighlight">\(M\)</span> numbers / type IDs)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">inst[&quot;kb&quot;]</span></code>: list of budgets per type (list of <span class="math notranslate nohighlight">\(K\)</span> numbers)</p></li>
-</ul>
-</div>
-</div>
-<div class="section" id="code-organization">
-<h1>Code organization<a class="headerlink" href="#code-organization" title="Permalink to this headline">¶</a></h1>
-<p>The code is organized into several blocks as follows.</p>
-<div class="section" id="producing-figures">
-<h2>Producing figures<a class="headerlink" href="#producing-figures" title="Permalink to this headline">¶</a></h2>
-<p>The code that physically produces figures from CSV run logs is written in <a class="reference external" href="https://www.r-project.org/">R</a> (and the wonderful tidyverse/<a class="reference external" href="https://ggplot2.tidyverse.org">ggplot2</a> library). The code is conceptually simple and, hopefully, self-explanatory – see <code class="docutils literal notranslate"><span class="pre">.R</span></code> - files in <code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">post_processing</span></code>.</p>
-</div>
-<div class="section" id="key-data-structures-and-algorithms">
-<h2>Key data structures and algorithms.<a class="headerlink" href="#key-data-structures-and-algorithms" title="Permalink to this headline">¶</a></h2>
-<p>The core data structures critical to the paper are presented in the following modules (click on the links for more implementation details and the source code):</p>
-<table class="longtable docutils align-default">
+<p>After this, variables <code class="docutils literal notranslate"><span class="pre">i1</span></code>, <code class="docutils literal notranslate"><span class="pre">i2</span></code>, and <code class="docutils literal notranslate"><span class="pre">link</span></code> will contain the j-UFLP
+instance description (respectively, the two sub-instances and the linking
+dictionary). Moreover, function <a class="reference internal" href="_autosummary/jUFLP_utils.html#jUFLP_utils.draw_jUFLP_inst" title="jUFLP_utils.draw_jUFLP_inst"><code class="xref py py-func docutils literal notranslate"><span class="pre">jUFLP_utils.draw_jUFLP_inst()</span></code></a> will
+create a <code class="docutils literal notranslate"><span class="pre">.dot</span></code> (Graphviz) file visualizing the instance as a graph,
+similar to Figure 9a. So that invoking <code class="docutils literal notranslate"><span class="pre">dot</span> <span class="pre">-Tx11</span> <span class="pre">tmp/jUFLP-check.dot</span></code>
+(on my GNU/Linux machine) gives something like:</p>
+<a class="reference internal image-reference" href="_images/jUFLP_sample.png"><img alt="An example of j-UFLP instance (two sub-instances)" src="_images/jUFLP_sample.png" style="width: 600px;" /></a>
+</section>
+</section>
+<section id="code-organization">
+<h1>Code organization<a class="headerlink" href="#code-organization" title="Permalink to this heading"></a></h1>
+<p>The code is organized into several blocks (modules) as follows.</p>
+<section id="producing-figures">
+<h2>Producing figures<a class="headerlink" href="#producing-figures" title="Permalink to this heading"></a></h2>
+<p>The code that physically produces figures from CSV run logs is written in <a class="reference external" href="https://www.r-project.org/">R</a> (and the wonderful tidyverse/<a class="reference external" href="https://ggplot2.tidyverse.org">ggplot2</a> library). The code is conceptually simple and,
+hopefully, self-explanatory – see <code class="docutils literal notranslate"><span class="pre">.R</span></code> - files in <code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">post_processing</span></code>.</p>
+</section>
+<section id="key-data-structures-and-algorithms">
+<h2>Key data structures and algorithms.<a class="headerlink" href="#key-data-structures-and-algorithms" title="Permalink to this heading"></a></h2>
+<p>The core data structures critical to the paper are presented in the following
+modules (click on the links for more implementation details and the source
+code):</p>
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -393,45 +464,67 @@ make figures  <span class="c1"># to rebuild everything</span>
 <td><p>Implements weighted variable sequences data structure.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/heuristics.html#module-heuristics" title="heuristics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">heuristics</span></code></a></p></td>
-<td><p>Implements several heuristics to be used with a separate script.</p></td>
+<td><p>Implements several heuristics to be used with a separate script to generate <code class="docutils literal notranslate"><span class="pre">.csv</span></code> logs.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="_autosummary/BB_search.html#module-BB_search" title="BB_search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BB_search</span></code></a></p></td>
 <td><p>A branch-and-bound search scheme implementation for the align-sequences problem: alignts two <a class="reference internal" href="_autosummary/varseq.html#varseq.VarSeq" title="varseq.VarSeq"><code class="xref py py-class docutils literal notranslate"><span class="pre">varseq.VarSeq</span></code></a> objects.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="numerical-experiments">
-<h2>Numerical experiments<a class="headerlink" href="#numerical-experiments" title="Permalink to this headline">¶</a></h2>
-<p>Description for specific problems serves the basis for further numerical experiments, which are implemented as separate python programs in <code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">experiments</span></code></p>
-<table class="longtable docutils align-default">
+<p>The code relevant to j-UFLP application (Section 4.2) is here:</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/UFLP_fullDD.html#module-UFLP_fullDD" title="UFLP_fullDD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UFLP_fullDD</span></code></a></p></td>
+<td><p>Solves UFLP using a DD-based approach.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/UFLPOrder.html#module-UFLPOrder" title="UFLPOrder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UFLPOrder</span></code></a></p></td>
+<td><p>Implements an algorithm to find  a var order for BDD representing an UFLP.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/jUFLP_cavemen.html#module-jUFLP_cavemen" title="jUFLP_cavemen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jUFLP_cavemen</span></code></a></p></td>
+<td><p>Proof-of-concept experiment: joint UFLP over special class of instances.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/jUFLP_utils.html#module-jUFLP_utils" title="jUFLP_utils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jUFLP_utils</span></code></a></p></td>
+<td><p>Utility / helper functions for j-UFLP: used save / load / draw instances.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="numerical-experiments">
+<h2>Numerical experiments<a class="headerlink" href="#numerical-experiments" title="Permalink to this heading"></a></h2>
+<p>Description for specific problems serves the basis for further numerical
+experiments, which are implemented as separate python programs in <code class="docutils literal notranslate"><span class="pre">📁</span>
+<span class="pre">experiments</span></code></p>
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/gen_BDD_pair.html#module-gen_BDD_pair" title="gen_BDD_pair"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen_BDD_pair</span></code></a></p></td>
-<td><p>Generates a pair of random BDDs (“original problem” instance).</p></td>
+<td><p>Generates a pair of random BDDs (&quot;original problem&quot; instance).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="_autosummary/solve_inst.html#module-solve_inst" title="solve_inst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_inst</span></code></a></p></td>
 <td><p>Solves given align-BDD instances to benchmark different methods.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/UFL.html#module-UFL" title="UFL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UFL</span></code></a></p></td>
-<td><p>Implements basic functions for UFL – Uncapacitated Facility Location.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/tUFLP.html#module-tUFLP" title="tUFLP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tUFLP</span></code></a></p></td>
-<td><p>Implements the basic machinery for Uncapacitated Facility Location problem with type-constraints.</p></td>
-</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/experiments.html#module-experiments" title="experiments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiments</span></code></a></p></td>
-<td><p>Implements numerical experiments.</p></td>
+<td><p>Implements most of the numerical experiments in the paper.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/UFLP_2_cav.html#module-UFLP_2_cav" title="UFLP_2_cav"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UFLP_2_cav</span></code></a></p></td>
+<td><p>Generates and solves the special class j-UFLP instances.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="testing-framework">
-<h2>Testing framework<a class="headerlink" href="#testing-framework" title="Permalink to this headline">¶</a></h2>
-<p>Key implementations are covered with tests, mostly using <a class="reference external" href="https://pytest.org">pytest</a> framework (the tests are in <code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">tests</span></code>).</p>
-<table class="longtable docutils align-default">
+</section>
+<section id="testing-framework">
+<h2>Testing framework<a class="headerlink" href="#testing-framework" title="Permalink to this heading"></a></h2>
+<p>Key implementations are covered with tests, mostly using <a class="reference external" href="https://pytest.org">pytest</a> framework. On top of the testing code in the files
+mentioned above (testing functions have <code class="docutils literal notranslate"><span class="pre">test_</span></code> prefix in the name), some
+tests are in <code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">tests</span></code>:</p>
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -450,54 +543,39 @@ make figures  <span class="c1"># to rebuild everything</span>
 <td><p>Tests BB search correctness (<a class="reference internal" href="_autosummary/BB_search.html#module-BB_search" title="BB_search"><code class="xref py py-mod docutils literal notranslate"><span class="pre">BB_search</span></code></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/UFLP_test.html#module-UFLP_test" title="UFLP_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UFLP_test</span></code></a></p></td>
-<td><p>Tests the UFLP-related machinery (<a class="reference internal" href="_autosummary/tUFLP.html#module-tUFLP" title="tUFLP"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tUFLP</span></code></a>).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/tUFLP_test.html#module-tUFLP_test" title="tUFLP_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tUFLP_test</span></code></a></p></td>
-<td><p>Tests the tUFLP procedures.</p></td>
+<td><p>Tests the UFLP-related machinery (<code class="xref py py-mod docutils literal notranslate"><span class="pre">tUFLP</span></code>).</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
-
-    </p>
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

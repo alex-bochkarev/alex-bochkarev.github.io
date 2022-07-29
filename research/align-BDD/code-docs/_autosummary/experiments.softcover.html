@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>experiments.softcover &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="experiments.sumofproducts" href="experiments.sumofproducts.html" />
+    <link rel="prev" title="experiments.sample_BB_tree" href="experiments.sample_BB_tree.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          </a>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../overview.html#code-organization">Code organization</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#producing-figures">Producing figures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gen_BDD_pair.html">gen_BDD_pair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solve_inst.html">solve_inst</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="experiments.html">experiments</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="experiments.html#module-summary">Module summary</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="UFLP_2_cav.html">UFLP_2_cav</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#testing-framework">Testing framework</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
+          <li><a href="experiments.html">experiments</a> &raquo;</li>
+      <li>experiments.softcover</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/experiments.softcover.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <span class="target" id="module-experiments.softcover"></span><section id="experiments-softcover">
+<h1>experiments.softcover<a class="headerlink" href="#experiments-softcover" title="Permalink to this heading"></a></h1>
+<section id="module-summary">
+<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this heading"></a></h2>
+<p>Generates and solves UFLP with ‘soft cover’ constraints.</p>
+<p>Implements the UFLP model when all solutions are feasible, but
+there are overlap costs (which can be thought of as “soft”
+covering constraints).</p>
+<p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
+<p class="centered">
+<strong>❖❖❖</strong></p><section id="implements-functions-outside-the-classes-above">
+<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#experiments.softcover.assert_instance" title="experiments.softcover.assert_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assert_instance</span></code></a>(S, f, c)</p></td>
+<td><p>Check that the instance is technically correct.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#experiments.softcover.build_soft_cover_DD" title="experiments.softcover.build_soft_cover_DD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_soft_cover_DD</span></code></a>(S, f, c[, next_node_type])</p></td>
+<td><p>Builds a BDD for the soft-UFL problem with overlaps.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#experiments.softcover.dia_sizes" title="experiments.softcover.dia_sizes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dia_sizes</span></code></a>([n1, n2, K, igen])</p></td>
+<td><p>Prints random diagram sizes for different instance size.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#experiments.softcover.dump_instance" title="experiments.softcover.dump_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump_instance</span></code></a>(S[, filename])</p></td>
+<td><p>Dumps a graph implied by S into a <cite>.dot</cite> file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#experiments.softcover.generate_S" title="experiments.softcover.generate_S"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_S</span></code></a>(n[, p])</p></td>
+<td><p>Generates adjacency lists <cite>S</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#experiments.softcover.generate_overlaps" title="experiments.softcover.generate_overlaps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_overlaps</span></code></a>(S)</p></td>
+<td><p>Generates overlaps values (costs) <cite>f</cite> given adjacencies <cite>S</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#experiments.softcover.make_MIP" title="experiments.softcover.make_MIP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_MIP</span></code></a>(S, c, f)</p></td>
+<td><p>Creates a MIP model (for gurobi) from an instance specs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#experiments.softcover.make_caveman_inst" title="experiments.softcover.make_caveman_inst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_caveman_inst</span></code></a>([n, M, pcave, verbose])</p></td>
+<td><p>Generates a special type instance ('cavemen').</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#experiments.softcover.make_instance" title="experiments.softcover.make_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_instance</span></code></a>(n[, p, verbose])</p></td>
+<td><p>Generates an instance of <cite>n</cite> points and connectivity <cite>p</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#experiments.softcover.make_label" title="experiments.softcover.make_label"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_label</span></code></a>(state, pts)</p></td>
+<td><p>Helper: formats a node label out of the state.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#experiments.softcover.make_organic_inst" title="experiments.softcover.make_organic_inst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_organic_inst</span></code></a>(n[, verbose])</p></td>
+<td><p>Generates a special-type instance ('organic molecule').</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#experiments.softcover.make_string_inst" title="experiments.softcover.make_string_inst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_string_inst</span></code></a>(n[, verbose])</p></td>
+<td><p>Generates a special-type instance ('string').</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#experiments.softcover.mknode" title="experiments.softcover.mknode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mknode</span></code></a>(state, freedoms)</p></td>
+<td><p>Makes a node key.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#experiments.softcover.test_MIP_example" title="experiments.softcover.test_MIP_example"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_MIP_example</span></code></a>()</p></td>
+<td><p>Tries a specific, simple instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#experiments.softcover.test_build_soft_cover_DD" title="experiments.softcover.test_build_soft_cover_DD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_build_soft_cover_DD</span></code></a>(test_inst)</p></td>
+<td><p>Asserts naive MIP ~ BDD MIP.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#experiments.softcover.test_build_soft_cover_DD_simple1" title="experiments.softcover.test_build_soft_cover_DD_simple1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_build_soft_cover_DD_simple1</span></code></a>()</p></td>
+<td><p>Tests the softcover DD construction procedure.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#experiments.softcover.test_build_soft_cover_DD_simple2" title="experiments.softcover.test_build_soft_cover_DD_simple2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_build_soft_cover_DD_simple2</span></code></a>()</p></td>
+<td><p>Tests the softcover DD construction procedure.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#experiments.softcover.test_make_MIP" title="experiments.softcover.test_make_MIP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_make_MIP</span></code></a>()</p></td>
+<td><p>Tries a trivial instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#experiments.softcover.try_softcover_inst" title="experiments.softcover.try_softcover_inst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">try_softcover_inst</span></code></a>(S, c, f)</p></td>
+<td><p>Solves a softcover inst with naive MIP and BDD MIP (both w/Gurobi).</p></td>
+</tr>
+</tbody>
+</table>
+<p class="centered">
+<strong>❖❖❖</strong></p><p class="centered">
+<strong>Implementation details</strong></p><p class="centered">
+<strong>❖❖❖</strong></p></section>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.assert_instance">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">assert_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#assert_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.assert_instance" title="Permalink to this definition"></a></dt>
+<dd><p>Check that the instance is technically correct.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.build_soft_cover_DD">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">build_soft_cover_DD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'min'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#build_soft_cover_DD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.build_soft_cover_DD" title="Permalink to this definition"></a></dt>
+<dd><p>Builds a BDD for the soft-UFL problem with overlaps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>S</strong> (<em>list</em>) – neighborhood list,</p></li>
+<li><p><strong>f</strong> (<em>list</em>) – overlap costs, <cite>f[j][a]</cite>, a=0,..,|S_j|</p></li>
+<li><p><strong>c</strong> (<em>list</em>) – location costs.
+next_node_type (str): <cite>min</cite>, <cite>max</cite>, or <cite>rnd</cite> – see <cite>DegreeKeeper</cite>
+docstring for details.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The resulting BDD.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>employs a DP approach with state being the Boolean
+covering at each customer.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.dia_sizes">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">dia_sizes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n1=5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n2=10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K=5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">igen=&lt;function</span> <span class="pre">make_instance&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#dia_sizes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.dia_sizes" title="Permalink to this definition"></a></dt>
+<dd><p>Prints random diagram sizes for different instance size.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.dump_instance">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">dump_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tmp/S.dot'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#dump_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.dump_instance" title="Permalink to this definition"></a></dt>
+<dd><p>Dumps a graph implied by S into a <cite>.dot</cite> file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.generate_S">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">generate_S</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#generate_S"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.generate_S" title="Permalink to this definition"></a></dt>
+<dd><p>Generates adjacency lists <cite>S</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>) – number of points,</p></li>
+<li><p><strong>p</strong> (<em>float</em>) – probability of an edge.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of lists.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>S</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.generate_overlaps">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">generate_overlaps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#generate_overlaps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.generate_overlaps" title="Permalink to this definition"></a></dt>
+<dd><p>Generates overlaps values (costs) <cite>f</cite> given adjacencies <cite>S</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>list</em>) – list of lists (adjacencies)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of lists, f[j][a], a=0,..,|S_j|</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>f (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.make_MIP">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">make_MIP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#make_MIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.make_MIP" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a MIP model (for gurobi) from an instance specs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>S</strong> (<em>list</em>) – list of adjacency lists,</p></li>
+<li><p><strong>c</strong> (<em>list</em>) – location costs per point,</p></li>
+<li><p><strong>f</strong> (<em>list</em>) – overlap cost function, f[j][a]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>gurobi model and vars</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(m, x, y)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.make_caveman_inst">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">make_caveman_inst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pcave</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#make_caveman_inst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.make_caveman_inst" title="Permalink to this definition"></a></dt>
+<dd><p>Generates a special type instance (‘cavemen’).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.make_instance">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">make_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#make_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.make_instance" title="Permalink to this definition"></a></dt>
+<dd><p>Generates an instance of <cite>n</cite> points and connectivity <cite>p</cite>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.make_label">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">make_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#make_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.make_label" title="Permalink to this definition"></a></dt>
+<dd><p>Helper: formats a node label out of the state.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.make_organic_inst">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">make_organic_inst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#make_organic_inst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.make_organic_inst" title="Permalink to this definition"></a></dt>
+<dd><p>Generates a special-type instance (‘organic molecule’).</p>
+<p>Note: <cite>n</cite> here is length of the “main” line.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.make_string_inst">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">make_string_inst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#make_string_inst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.make_string_inst" title="Permalink to this definition"></a></dt>
+<dd><p>Generates a special-type instance (‘string’).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.mknode">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">mknode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freedoms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#mknode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.mknode" title="Permalink to this definition"></a></dt>
+<dd><p>Makes a node key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<em>list</em>) – no. of overlaps per point,</p></li>
+<li><p><strong>freedoms</strong> (<em>DegreeKeeper</em>) – no. of point (residual) degrees.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>String label.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.test_MIP_example">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">test_MIP_example</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#test_MIP_example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.test_MIP_example" title="Permalink to this definition"></a></dt>
+<dd><p>Tries a specific, simple instance.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.test_build_soft_cover_DD">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">test_build_soft_cover_DD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#test_build_soft_cover_DD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.test_build_soft_cover_DD" title="Permalink to this definition"></a></dt>
+<dd><p>Asserts naive MIP ~ BDD MIP.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.test_build_soft_cover_DD_simple1">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">test_build_soft_cover_DD_simple1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#test_build_soft_cover_DD_simple1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.test_build_soft_cover_DD_simple1" title="Permalink to this definition"></a></dt>
+<dd><p>Tests the softcover DD construction procedure.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.test_build_soft_cover_DD_simple2">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">test_build_soft_cover_DD_simple2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#test_build_soft_cover_DD_simple2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.test_build_soft_cover_DD_simple2" title="Permalink to this definition"></a></dt>
+<dd><p>Tests the softcover DD construction procedure.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.test_make_MIP">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">test_make_MIP</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#test_make_MIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.test_make_MIP" title="Permalink to this definition"></a></dt>
+<dd><p>Tries a trivial instance.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="experiments.softcover.try_softcover_inst">
+<span class="sig-prename descclassname"><span class="pre">experiments.softcover.</span></span><span class="sig-name descname"><span class="pre">try_softcover_inst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/softcover.html#try_softcover_inst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.softcover.try_softcover_inst" title="Permalink to this definition"></a></dt>
+<dd><p>Solves a softcover inst with naive MIP and BDD MIP (both w/Gurobi).</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

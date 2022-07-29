@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>jUFLP_cavemen &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          </a>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#code-organization">Code organization</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>jUFLP_cavemen</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for jUFLP_cavemen</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Proof-of-concept experiment: joint UFLP over special class of instances.</span>
+
+<span class="sd">Implements DD-based solution procedures for j-UFLP instances, along with the</span>
+<span class="sd">instance generation. Note that the up-to-date experiment corresponding to</span>
+<span class="sd">Section 4.2 of the paper is presented in :py:mod:`UFLP_2_cav`, but it calls</span>
+<span class="sd">solution procedures implemented in this module.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">gurobipy</span> <span class="k">as</span> <span class="nn">gp</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+
+<span class="kn">from</span> <span class="nn">darkcloud</span> <span class="kn">import</span> <span class="n">ptscloud</span><span class="p">,</span> <span class="n">DDSolver</span><span class="p">,</span> <span class="n">gen_caveman_inst</span>
+<span class="kn">from</span> <span class="nn">BDD</span> <span class="kn">import</span> <span class="n">intersect</span>
+<span class="kn">from</span> <span class="nn">varseq</span> <span class="kn">import</span> <span class="n">VarSeq</span>
+<span class="kn">from</span> <span class="nn">BB_search</span> <span class="kn">import</span> <span class="n">BBSearch</span>
+<span class="kn">from</span> <span class="nn">UFL</span> <span class="kn">import</span> <span class="n">add_BDD_to_MIP</span>
+<span class="kn">from</span> <span class="nn">UFLP_fullDD</span> <span class="kn">import</span> <span class="n">create_cover_DD</span>
+<span class="kn">from</span> <span class="nn">UFLPOrder</span> <span class="kn">import</span> <span class="n">UFLP_greedy_order</span>
+
+
+<div class="viewcode-block" id="gen_cavemen_jUFLP_inst"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.gen_cavemen_jUFLP_inst">[docs]</a><span class="k">def</span> <span class="nf">gen_cavemen_jUFLP_inst</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                           <span class="n">M</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+                           <span class="n">L</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+                           <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                           <span class="n">linking</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates an instance with the related metadata (info on caves).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      n (int): number of caves,</span>
+<span class="sd">      M (int): number of points in a cave,</span>
+<span class="sd">      L (float): edge sparsity parameter (share of missing edges)</span>
+<span class="sd">      verbose (Bool): print debug info</span>
+<span class="sd">      linking (str): linking constraints type</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      inst1, inst2, join_map: sub-instances and caves description.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">      Each sub-instance is parameterized by [S,f,c,caves].</span>
+<span class="sd">      (See :py:func:`darkcloud.gen_caveman_inst` for details.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">gen_caveman_inst</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+    <span class="n">S2</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">caves2</span> <span class="o">=</span> <span class="n">gen_caveman_inst</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+
+    <span class="n">join_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">linking</span> <span class="o">==</span> <span class="s2">&quot;uniform&quot;</span><span class="p">:</span>
+        <span class="n">join_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span>
+                                  <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span>
+                                                        <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])))</span>
+    <span class="k">elif</span> <span class="n">linking</span> <span class="o">==</span> <span class="s2">&quot;consecutive&quot;</span><span class="p">:</span>
+        <span class="n">ca1</span> <span class="o">=</span> <span class="p">[</span><span class="n">ca</span><span class="o">.</span><span class="n">S</span> <span class="k">for</span> <span class="n">ca</span> <span class="ow">in</span> <span class="n">caves</span><span class="p">]</span>
+        <span class="n">ca2</span> <span class="o">=</span> <span class="p">[</span><span class="n">ca</span><span class="o">.</span><span class="n">S</span> <span class="k">for</span> <span class="n">ca</span> <span class="ow">in</span> <span class="n">caves2</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca1</span><span class="p">)):</span>
+            <span class="n">join_map</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ca1</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">ca2</span><span class="p">[</span><span class="n">k</span><span class="p">]))))</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ca1</span> <span class="o">=</span> <span class="p">[</span><span class="n">ca</span><span class="o">.</span><span class="n">S</span> <span class="k">for</span> <span class="n">ca</span> <span class="ow">in</span> <span class="n">caves</span><span class="p">]</span>
+        <span class="n">ca2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">([</span><span class="n">ca</span><span class="o">.</span><span class="n">S</span> <span class="k">for</span> <span class="n">ca</span> <span class="ow">in</span> <span class="n">caves2</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca1</span><span class="p">)):</span>
+            <span class="n">join_map</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ca1</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">ca2</span><span class="p">[</span><span class="n">k</span><span class="p">]))))</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;S=</span><span class="si">{</span><span class="n">S</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">f=</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="se">\n</span><span class="s2">;c=</span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[[</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">],</span> <span class="p">[</span><span class="n">S2</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">caves2</span><span class="p">],</span> <span class="n">join_map</span><span class="p">]</span></div>
+
+
+<span class="c1"># encoding numpy numbers</span>
+
+
+<span class="c1"># save and load instances</span>
+<div class="viewcode-block" id="jUFLPEncoder"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.jUFLPEncoder">[docs]</a><span class="k">class</span> <span class="nc">jUFLPEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A technical implementation needed to save an instance as ``.json``&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="jUFLPEncoder.default"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.jUFLPEncoder.default">[docs]</a>    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="nb">int</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="save_inst"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.save_inst">[docs]</a><span class="k">def</span> <span class="nf">save_inst</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">join_map</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Saves the jUFLP instance to ``.json`` file. (old instance format).&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;inst1&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;S&#39;</span><span class="p">:</span> <span class="n">i1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="s1">&#39;f&#39;</span><span class="p">:</span> <span class="n">i1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="n">i1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                        <span class="s1">&#39;ptsclouds&#39;</span><span class="p">:</span>
+                        <span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="mi">3</span><span class="p">]))]</span>
+                    <span class="p">},</span>
+                    <span class="s1">&#39;inst2&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;S&#39;</span><span class="p">:</span> <span class="n">i2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="s1">&#39;f&#39;</span><span class="p">:</span> <span class="n">i2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="n">i2</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                        <span class="s1">&#39;ptsclouds&#39;</span><span class="p">:</span>
+                        <span class="p">[</span><span class="n">i2</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">i2</span><span class="p">[</span><span class="mi">3</span><span class="p">]))]</span>
+                    <span class="p">},</span>
+                    <span class="s1">&#39;jmap&#39;</span><span class="p">:</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">j</span><span class="p">):</span> <span class="n">join_map</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">join_map</span><span class="p">}</span>
+                <span class="p">},</span>
+                <span class="bp">cls</span><span class="o">=</span><span class="n">jUFLPEncoder</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="load_inst"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.load_inst">[docs]</a><span class="k">def</span> <span class="nf">load_inst</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads a jUFLP instance from ``.json`` file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      [[S,f,c,ptsclouds], [S2,f2,c2,pltsclouds2], jmap]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
+        <span class="n">json_inst</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="n">json_dct</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_inst</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[[</span>
+        <span class="n">json_dct</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;inst</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="s1">&#39;S&#39;</span><span class="p">],</span> <span class="n">json_dct</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;inst</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="s1">&#39;f&#39;</span><span class="p">],</span>
+        <span class="n">json_dct</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;inst</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="s1">&#39;c&#39;</span><span class="p">],</span>
+        <span class="p">[</span>
+            <span class="n">ptscloud</span><span class="p">(</span><span class="n">ptc</span><span class="p">[</span><span class="s1">&#39;e1&#39;</span><span class="p">],</span> <span class="n">ptc</span><span class="p">[</span><span class="s1">&#39;e2&#39;</span><span class="p">],</span> <span class="n">ptc</span><span class="p">[</span><span class="s1">&#39;S&#39;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">ptc</span> <span class="ow">in</span> <span class="n">json_dct</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;inst</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="s1">&#39;ptsclouds&#39;</span><span class="p">]</span>
+        <span class="p">]</span>
+    <span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="p">]</span> <span class="o">+</span> <span class="p">[{</span><span class="nb">int</span><span class="p">(</span><span class="n">j1</span><span class="p">):</span> <span class="n">json_dct</span><span class="p">[</span><span class="s1">&#39;jmap&#39;</span><span class="p">][</span><span class="n">j1</span><span class="p">]</span>
+                  <span class="k">for</span> <span class="n">j1</span> <span class="ow">in</span> <span class="n">json_dct</span><span class="p">[</span><span class="s1">&#39;jmap&#39;</span><span class="p">]}]</span></div>
+
+
+<div class="viewcode-block" id="show_inst"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.show_inst">[docs]</a><span class="k">def</span> <span class="nf">show_inst</span><span class="p">(</span><span class="n">inst1</span><span class="p">,</span> <span class="n">inst2</span><span class="p">,</span> <span class="n">join_map</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;./tmp/jUFLP.dot&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Shows the supplied j-UFLP instance / saves it to a .dot file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        inst1, inst2 (list): instances description, [S,f,c,caves]</span>
+<span class="sd">        filename (str): filename to save to (default &quot;./tmp/jUFLP.dot&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">added</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;graph G {</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;    rankdir=&quot;LR&quot;;</span><span class="se">\n</span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">inst2</span>
+        <span class="n">join_pts</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">e1</span> <span class="o">+</span> <span class="n">c</span><span class="o">.</span><span class="n">e2</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">caves</span><span class="p">],</span> <span class="p">[])</span>
+        <span class="n">join_pts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">join_pts</span> <span class="k">if</span> <span class="n">j</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="p">((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">j</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(((</span><span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="ow">in</span> <span class="n">added</span><span class="p">)</span> <span class="ow">or</span>
+                                           <span class="p">((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="ow">in</span> <span class="n">added</span><span class="p">)):</span>
+
+                    <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">in</span> <span class="n">join_pts</span><span class="p">:</span>
+                        <span class="n">pref_i</span> <span class="o">=</span> <span class="s2">&quot;j&quot;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">pref_i</span> <span class="o">=</span> <span class="s2">&quot;f&quot;</span>
+
+                    <span class="k">if</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">join_pts</span><span class="p">:</span>
+                        <span class="n">pref_j</span> <span class="o">=</span> <span class="s2">&quot;j&quot;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">pref_j</span> <span class="o">=</span> <span class="s2">&quot;f&quot;</span>
+
+                    <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">pref_i</span><span class="si">}{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">--</span><span class="si">{</span><span class="n">pref_j</span><span class="si">}{</span><span class="n">j</span><span class="si">}</span><span class="s2">[penwidth=3];</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">added</span><span class="o">.</span><span class="n">add</span><span class="p">(((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">j</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">join_pts</span><span class="p">:</span>
+                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    f</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">[penwidth=3];</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">inst1</span>
+        <span class="n">join_pts</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">e1</span> <span class="o">+</span> <span class="n">c</span><span class="o">.</span><span class="n">e2</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">caves</span><span class="p">],</span> <span class="p">[])</span>
+        <span class="n">join_pts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">join_pts</span> <span class="k">if</span> <span class="n">j</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]))</span>
+        <span class="n">added</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="p">((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">j</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(((</span><span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="ow">in</span> <span class="n">added</span><span class="p">)</span> <span class="ow">or</span>
+                                           <span class="p">((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="ow">in</span> <span class="n">added</span><span class="p">)):</span>
+
+                    <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">in</span> <span class="n">join_pts</span><span class="p">:</span>
+                        <span class="n">a</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;j</span><span class="si">{</span><span class="n">join_map</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">a</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;s</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
+
+                    <span class="k">if</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">join_pts</span><span class="p">:</span>
+                        <span class="n">b</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;j</span><span class="si">{</span><span class="n">join_map</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">b</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;s</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span>
+
+                    <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2">--</span><span class="si">{</span><span class="n">b</span><span class="si">}</span><span class="s2">[color=red];</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">added</span><span class="o">.</span><span class="n">add</span><span class="p">(((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">j</span><span class="p">))</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">join_pts</span><span class="p">:</span>
+                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    s</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">[color=red, textcolor=red];</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">join_pts</span><span class="p">:</span>
+            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;    j</span><span class="si">{</span><span class="n">join_map</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">[style=filled, fillcolor=yellow, penwidth=5];</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="solve_cm_jUFLP_MIP"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.solve_cm_jUFLP_MIP">[docs]</a><span class="k">def</span> <span class="nf">solve_cm_jUFLP_MIP</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Solves the special jUFLP instance with MIP.&quot;&quot;&quot;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">modelSense</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">MINIMIZE</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">setParam</span><span class="p">(</span><span class="s2">&quot;OutputFlag&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># add the first instance</span>
+    <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">i1</span>
+    <span class="c1"># create variables</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;x1_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">y</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span>
+                                    <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;y1_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                    <span class="n">obj</span><span class="o">=</span><span class="n">f</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="n">f</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">a</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># create constraints</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span>
+            <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span>
+                <span class="n">y</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span>
+                                            <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
+
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])):</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">y</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="o">&gt;=</span> <span class="n">y</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+
+    <span class="c1"># add the second instance</span>
+    <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">i2</span>
+    <span class="c1"># create variables</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;x2_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">y</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span>
+                                    <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;y2_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                    <span class="n">obj</span><span class="o">=</span><span class="n">f</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="n">f</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">a</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># create constraints</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span>
+            <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span>
+                <span class="n">y</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span>
+                                            <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
+
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])):</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">y</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="o">&gt;=</span> <span class="n">y</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+
+    <span class="c1"># link the two instances</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jmap</span><span class="p">:</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">x</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">==</span> <span class="n">x</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="n">jmap</span><span class="p">[</span><span class="n">j</span><span class="p">])])</span>
+
+    <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">m</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">OPTIMAL</span>
+    <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">objVal</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">([</span><span class="n">fs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                           <span class="k">for</span> <span class="n">fs</span> <span class="ow">in</span> <span class="n">i1</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">([</span><span class="n">fs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">fs</span> <span class="ow">in</span> <span class="n">i2</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span></div>
+
+
+<div class="viewcode-block" id="solve_cm_jUFLP_DDs"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.solve_cm_jUFLP_DDs">[docs]</a><span class="k">def</span> <span class="nf">solve_cm_jUFLP_DDs</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span><span class="p">,</span> <span class="n">intmode</span><span class="o">=</span><span class="s2">&quot;toA&quot;</span><span class="p">,</span> <span class="n">ret_int</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Solves the jUFLP cavemen instance with DDs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      i1, i2 (list): instances</span>
+<span class="sd">      intmode (str): alignment mode, &#39;toA&#39;, &#39;toB&#39;, or &#39;VS&#39;</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">      Instance is parameterized as per :py:func:`gen_caveman_inst`,</span>
+<span class="sd">      The diagrams are built with :py:class:`darkcloud.DDSolver`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">i1</span>
+    <span class="n">S2</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">caves2</span> <span class="o">=</span> <span class="n">i2</span>
+
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">DDSolver</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">)</span>
+    <span class="n">B1</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">build_cover_DD</span><span class="p">()</span>
+
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">DDSolver</span><span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">caves2</span><span class="p">)</span>
+    <span class="n">B2</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">build_cover_DD</span><span class="p">()</span>
+
+    <span class="n">B1</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+    <span class="n">B2</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+    <span class="n">B1</span><span class="o">.</span><span class="n">rename_vars</span><span class="p">(</span><span class="n">jmap</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">intmode</span> <span class="o">==</span> <span class="s2">&quot;toA&quot;</span><span class="p">:</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">B1</span><span class="o">.</span><span class="n">vars</span>
+    <span class="k">elif</span> <span class="n">intmode</span> <span class="o">==</span> <span class="s2">&quot;toB&quot;</span><span class="p">:</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">B2</span><span class="o">.</span><span class="n">vars</span>
+    <span class="k">elif</span> <span class="n">intmode</span> <span class="o">==</span> <span class="s1">&#39;VS&#39;</span><span class="p">:</span>
+        <span class="n">vs1</span> <span class="o">=</span> <span class="n">VarSeq</span><span class="p">(</span><span class="n">B1</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">B1</span><span class="o">.</span><span class="n">layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="n">vs2</span> <span class="o">=</span> <span class="n">VarSeq</span><span class="p">(</span><span class="n">B2</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">B2</span><span class="o">.</span><span class="n">layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">vs1</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">vs2</span><span class="o">.</span><span class="n">layer_var</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;1:</span><span class="si">{</span><span class="n">vs1</span><span class="o">.</span><span class="n">layer_var</span><span class="si">}</span><span class="s2">, 2:</span><span class="si">{</span><span class="n">vs2</span><span class="o">.</span><span class="n">layer_var</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">b</span> <span class="o">=</span> <span class="n">BBSearch</span><span class="p">(</span><span class="n">vs1</span><span class="p">,</span> <span class="n">vs2</span><span class="p">)</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;optimal&quot;</span> <span class="ow">or</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;timeout&quot;</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrong mode: &#39;</span><span class="si">{</span><span class="n">intmode</span><span class="si">}</span><span class="s2">&#39;. Expected: &#39;toA&#39;, &#39;toB&#39;, or &#39;VS&#39;.&quot;</span><span class="p">)</span>
+
+    <span class="n">B1</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">B2</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">int_DD</span> <span class="o">=</span> <span class="n">intersect</span><span class="p">(</span><span class="n">B1</span><span class="p">,</span> <span class="n">B2</span><span class="p">)</span>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">int_DD</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ret_int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">int_DD</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="solve_cm_jUFLP_CPPMIP"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.solve_cm_jUFLP_CPPMIP">[docs]</a><span class="k">def</span> <span class="nf">solve_cm_jUFLP_CPPMIP</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Solves a jUFLP on cavemen with CPPMIP.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">      i1, i2 (list): instances</span>
+<span class="sd">      jmap (dict): joining dict.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">      Instance is parameterized as per :py:func:`gen_caveman_inst`,</span>
+<span class="sd">      The diagrams are built with :py:class:`darkcloud.DDSolver`.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        objective (float)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">i1</span>
+    <span class="n">S2</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">caves2</span> <span class="o">=</span> <span class="n">i2</span>
+
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">DDSolver</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">)</span>
+    <span class="n">B1</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">build_cover_DD</span><span class="p">()</span>
+
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">DDSolver</span><span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">caves2</span><span class="p">)</span>
+    <span class="n">B2</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">build_cover_DD</span><span class="p">()</span>
+
+    <span class="n">B1</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+    <span class="n">B2</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+    <span class="n">B1</span><span class="o">.</span><span class="n">rename_vars</span><span class="p">(</span><span class="n">jmap</span><span class="p">)</span>
+
+    <span class="n">m</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">add_BDD_to_MIP</span><span class="p">(</span><span class="n">B1</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;B1_&quot;</span><span class="p">)</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">add_BDD_to_MIP</span><span class="p">(</span><span class="n">B2</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;B2_&quot;</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">setParam</span><span class="p">(</span><span class="s2">&quot;OutputFlag&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">objVal</span></div>
+
+
+<div class="viewcode-block" id="solve_cm_jUFLP_CPPMIP_fullDDs"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.solve_cm_jUFLP_CPPMIP_fullDDs">[docs]</a><span class="k">def</span> <span class="nf">solve_cm_jUFLP_CPPMIP_fullDDs</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Solves a jUFLP on cavemen (full-DDs) with CPPMIP.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      i1, i2 (list): instances</span>
+<span class="sd">      jmap (dict): joining dict.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">      Instance is parameterized as per :py:func:`gen_caveman_inst`,</span>
+<span class="sd">      The diagrams are built with :py:func:`UFLP_fullDD.create_cover_DD`.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        objective (float)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">i1</span>
+    <span class="n">S2</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">caves2</span> <span class="o">=</span> <span class="n">i2</span>
+
+    <span class="n">B1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">create_cover_DD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">UFLP_greedy_order</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+    <span class="n">B2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">create_cover_DD</span><span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">UFLP_greedy_order</span><span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+
+    <span class="n">B1</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+    <span class="n">B2</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+
+    <span class="n">B1</span><span class="o">.</span><span class="n">rename_vars</span><span class="p">(</span><span class="n">jmap</span><span class="p">)</span>
+
+    <span class="n">m</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">add_BDD_to_MIP</span><span class="p">(</span><span class="n">B1</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;B1_&quot;</span><span class="p">)</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">add_BDD_to_MIP</span><span class="p">(</span><span class="n">B2</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;B2_&quot;</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">setParam</span><span class="p">(</span><span class="s2">&quot;OutputFlag&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">objVal</span></div>
+
+
+<div class="viewcode-block" id="solve_cm_jUFLP_fullDDs"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.solve_cm_jUFLP_fullDDs">[docs]</a><span class="k">def</span> <span class="nf">solve_cm_jUFLP_fullDDs</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span><span class="p">,</span> <span class="n">intmode</span><span class="p">,</span> <span class="n">ret_int</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Solves the jUFLP cavemen instance with DDs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      i1, i2 (list): instances</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">      Instance is parameterized as per :py:func:`gen_caveman_inst`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">i1</span>
+    <span class="n">S2</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">caves2</span> <span class="o">=</span> <span class="n">i2</span>
+
+    <span class="n">o1</span> <span class="o">=</span> <span class="n">UFLP_greedy_order</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">o2</span> <span class="o">=</span> <span class="n">UFLP_greedy_order</span><span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">B1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">create_cover_DD</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">o1</span><span class="p">)</span>
+    <span class="n">B2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">create_cover_DD</span><span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">o2</span><span class="p">)</span>
+
+    <span class="n">B1</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+    <span class="n">B2</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+
+    <span class="n">B1</span><span class="o">.</span><span class="n">rename_vars</span><span class="p">(</span><span class="n">jmap</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">intmode</span> <span class="o">==</span> <span class="s2">&quot;toA&quot;</span><span class="p">:</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">B1</span><span class="o">.</span><span class="n">vars</span>
+    <span class="k">elif</span> <span class="n">intmode</span> <span class="o">==</span> <span class="s2">&quot;toB&quot;</span><span class="p">:</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">B2</span><span class="o">.</span><span class="n">vars</span>
+    <span class="k">elif</span> <span class="n">intmode</span> <span class="o">==</span> <span class="s1">&#39;VS&#39;</span><span class="p">:</span>
+        <span class="n">vs1</span> <span class="o">=</span> <span class="n">VarSeq</span><span class="p">(</span><span class="n">B1</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">B1</span><span class="o">.</span><span class="n">layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="n">vs2</span> <span class="o">=</span> <span class="n">VarSeq</span><span class="p">(</span><span class="n">B2</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">B2</span><span class="o">.</span><span class="n">layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">vs1</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">vs2</span><span class="o">.</span><span class="n">layer_var</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;1:</span><span class="si">{</span><span class="n">vs1</span><span class="o">.</span><span class="n">layer_var</span><span class="si">}</span><span class="s2">, 2:</span><span class="si">{</span><span class="n">vs2</span><span class="o">.</span><span class="n">layer_var</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">b</span> <span class="o">=</span> <span class="n">BBSearch</span><span class="p">(</span><span class="n">vs1</span><span class="p">,</span> <span class="n">vs2</span><span class="p">)</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;optimal&quot;</span> <span class="ow">or</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;timeout&quot;</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrong mode: &#39;</span><span class="si">{</span><span class="n">intmode</span><span class="si">}</span><span class="s2">&#39;. Expected: &#39;toA&#39;, &#39;toB&#39;, or &#39;VS&#39;.&quot;</span><span class="p">)</span>
+
+    <span class="n">B1</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">B2</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">int_DD</span> <span class="o">=</span> <span class="n">intersect</span><span class="p">(</span><span class="n">B1</span><span class="p">,</span> <span class="n">B2</span><span class="p">)</span>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">int_DD</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ret_int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">int_DD</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<span class="c1">###</span>
+<div class="viewcode-block" id="dump_instance"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.dump_instance">[docs]</a><span class="k">def</span> <span class="nf">dump_instance</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">caves</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;tmp/S.dot&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Dumps a graph implied by S into a `.dot` file. &quot;&quot;&quot;</span>
+    <span class="n">added</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;graph G {</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="p">((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">j</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(((</span><span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="ow">in</span> <span class="n">added</span><span class="p">)</span> <span class="ow">or</span>
+                                           <span class="p">((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="ow">in</span> <span class="n">added</span><span class="p">)):</span>
+                    <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    n</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> -- n</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">added</span><span class="o">.</span><span class="n">add</span><span class="p">(((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">j</span><span class="p">))</span>
+
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="solve_with_MIP"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.solve_with_MIP">[docs]</a><span class="k">def</span> <span class="nf">solve_with_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">S2</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates and solves a MIP for the supplied jUFL cavemen instance.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">      The instance is parameterized as per :py:func:`gen_caveman_inst`.</span>
+<span class="sd">      Most of the code is adapted form :py:func:`darkcloud.solve_with_MIP`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">modelSense</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">MINIMIZE</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">setParam</span><span class="p">(</span><span class="s2">&quot;OutputFlag&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># create variables</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;x_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">y</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span>
+                                 <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;y_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                 <span class="n">obj</span><span class="o">=</span><span class="n">f</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="n">f</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">a</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S2</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">y2</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span>
+                                  <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;y2_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                  <span class="n">obj</span><span class="o">=</span><span class="n">f2</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="n">f2</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">a</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># create constraints</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="c1"># first-graph constraints</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span>
+            <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span>
+                <span class="n">y</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span>
+                                         <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
+
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])):</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">y</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="o">&gt;=</span> <span class="n">y</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+
+        <span class="c1"># second-graph constraints</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span>
+            <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">S2</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span>
+                <span class="n">y2</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span>
+                                          <span class="nb">len</span><span class="p">(</span><span class="n">S2</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
+
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S2</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])):</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">y2</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="o">&gt;=</span> <span class="n">y2</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+
+    <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimizing the model...&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done.&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">m</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">OPTIMAL</span>
+    <span class="k">return</span> <span class="n">m</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">objVal</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">fs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                              <span class="k">for</span> <span class="n">fs</span> <span class="ow">in</span> <span class="n">f</span><span class="p">)</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">fs2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                                                 <span class="k">for</span> <span class="n">fs2</span> <span class="ow">in</span> <span class="n">f2</span><span class="p">)),</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">y2</span></div>
+
+
+<div class="viewcode-block" id="solve_with_DDs"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.solve_with_DDs">[docs]</a><span class="k">def</span> <span class="nf">solve_with_DDs</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">S2</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">,</span> <span class="n">intmode</span><span class="o">=</span><span class="s2">&quot;toA&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Solves the jUFLP cavemen instance with DDs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      intmode (str): intersection mode, &#39;toA&#39; or &#39;VS&#39;</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">      Instance is parameterized as per :py:func:`gen_caveman_inst`,</span>
+<span class="sd">      The diagrams are built with :py:class:`darkcloud.DDSolver`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Building the first DD...&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">DDSolver</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">)</span>
+    <span class="n">B1</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">build_cover_DD</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done.&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Building the second DD...&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">DDSolver</span><span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">c</span><span class="p">],</span> <span class="n">caves</span><span class="p">)</span>
+    <span class="n">B2</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">build_cover_DD</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">intmode</span> <span class="o">==</span> <span class="s2">&quot;toA&quot;</span><span class="p">:</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">B1</span><span class="o">.</span><span class="n">vars</span>
+    <span class="k">elif</span> <span class="n">intmode</span> <span class="o">==</span> <span class="s1">&#39;VS&#39;</span><span class="p">:</span>
+        <span class="n">vs1</span> <span class="o">=</span> <span class="n">VarSeq</span><span class="p">(</span><span class="n">B1</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">B1</span><span class="o">.</span><span class="n">layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="n">vs2</span> <span class="o">=</span> <span class="n">VarSeq</span><span class="p">(</span><span class="n">B2</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">B2</span><span class="o">.</span><span class="n">layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">vs1</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">vs2</span><span class="o">.</span><span class="n">layer_var</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;1:</span><span class="si">{</span><span class="n">vs1</span><span class="o">.</span><span class="n">layer_var</span><span class="si">}</span><span class="s2">, 2:</span><span class="si">{</span><span class="n">vs2</span><span class="o">.</span><span class="n">layer_var</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">b</span> <span class="o">=</span> <span class="n">BBSearch</span><span class="p">(</span><span class="n">vs1</span><span class="p">,</span> <span class="n">vs2</span><span class="p">)</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;optimal&quot;</span> <span class="ow">or</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;timeout&quot;</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrong intersection mode &#39;</span><span class="si">{</span><span class="n">intmode</span><span class="si">}</span><span class="s2">&#39;. Expected: &#39;toA&#39; or &#39;VS&#39;.&quot;</span><span class="p">)</span>
+
+    <span class="n">B1</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">B2</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">int_DD</span> <span class="o">=</span> <span class="n">intersect</span><span class="p">(</span><span class="n">B1</span><span class="p">,</span> <span class="n">B2</span><span class="p">)</span>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">int_DD</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">sp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<span class="c1"># Testing code ######################################################</span>
+<div class="viewcode-block" id="test_jUFL_DDs"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.test_jUFL_DDs">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;test_inst&quot;</span><span class="p">,</span>
+                         <span class="p">[</span><span class="n">gen_cavemen_jUFLP_inst</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)])</span>
+<span class="k">def</span> <span class="nf">test_jUFL_DDs</span><span class="p">(</span><span class="n">test_inst</span><span class="p">):</span>
+    <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span> <span class="o">=</span> <span class="n">test_inst</span>
+    <span class="n">obj1</span> <span class="o">=</span> <span class="n">solve_cm_jUFLP_DDs</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span><span class="p">,</span> <span class="s1">&#39;toA&#39;</span><span class="p">)</span>
+    <span class="n">obj2</span> <span class="o">=</span> <span class="n">solve_cm_jUFLP_DDs</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span><span class="p">,</span> <span class="s1">&#39;toB&#39;</span><span class="p">)</span>
+    <span class="n">obj3</span> <span class="o">=</span> <span class="n">solve_cm_jUFLP_DDs</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span><span class="p">,</span> <span class="s1">&#39;VS&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">obj1</span> <span class="o">-</span> <span class="n">obj2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.001</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">obj1</span> <span class="o">-</span> <span class="n">obj3</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.001</span></div>
+
+
+<div class="viewcode-block" id="test_cm_jUFL_DDvsMIP"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.test_cm_jUFL_DDvsMIP">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;test_inst&quot;</span><span class="p">,</span>
+                         <span class="p">[</span><span class="n">gen_cavemen_jUFLP_inst</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)])</span>
+<span class="k">def</span> <span class="nf">test_cm_jUFL_DDvsMIP</span><span class="p">(</span><span class="n">test_inst</span><span class="p">):</span>
+    <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span> <span class="o">=</span> <span class="n">test_inst</span>
+    <span class="n">obj1</span> <span class="o">=</span> <span class="n">solve_cm_jUFLP_MIP</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span><span class="p">)</span>
+    <span class="n">obj2</span> <span class="o">=</span> <span class="n">solve_cm_jUFLP_DDs</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span><span class="p">)</span>
+    <span class="n">obj3</span> <span class="o">=</span> <span class="n">solve_cm_jUFLP_CPPMIP</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">obj1</span> <span class="o">-</span> <span class="n">obj2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">obj1</span> <span class="o">-</span> <span class="n">obj3</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span></div>
+    <span class="c1"># NOTE: it seems sometimes Gurobi yields</span>
+    <span class="c1"># rounding-off (?) errors --- e.g., 77.5055 instead of 77.5000</span>
+    <span class="c1"># Seems not a big deal, but I needed to decrease the required</span>
+    <span class="c1"># tolerance to 0.01 (from 0.001)</span>
+
+
+<div class="viewcode-block" id="test_load_save"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.test_load_save">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;test_inst&quot;</span><span class="p">,</span>
+                         <span class="p">[</span><span class="n">gen_cavemen_jUFLP_inst</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)])</span>
+<span class="k">def</span> <span class="nf">test_load_save</span><span class="p">(</span><span class="n">test_inst</span><span class="p">):</span>
+    <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span> <span class="o">=</span> <span class="n">test_inst</span>
+    <span class="n">save_inst</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span><span class="p">,</span> <span class="s2">&quot;./tmp/jUFLP-loadsave-test.json&quot;</span><span class="p">)</span>
+
+    <span class="p">[</span><span class="n">inst1</span><span class="p">,</span> <span class="n">inst2</span><span class="p">,</span> <span class="n">jm</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_inst</span><span class="p">(</span><span class="s2">&quot;./tmp/jUFLP-loadsave-test.json&quot;</span><span class="p">)</span>
+    <span class="n">obj1</span> <span class="o">=</span> <span class="n">solve_cm_jUFLP_DDs</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jmap</span><span class="p">)</span>
+    <span class="n">obj2</span> <span class="o">=</span> <span class="n">solve_cm_jUFLP_DDs</span><span class="p">(</span><span class="n">inst1</span><span class="p">,</span> <span class="n">inst2</span><span class="p">,</span> <span class="n">jm</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">obj1</span> <span class="o">-</span> <span class="n">obj2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.001</span></div>
+
+
+<div class="viewcode-block" id="compare_runtimes"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.compare_runtimes">[docs]</a><span class="k">def</span> <span class="nf">compare_runtimes</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Performs a quick runtimes comparison (toA vs VS).&quot;&quot;&quot;</span>
+    <span class="n">s</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">gen_caveman_inst</span><span class="p">()</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">DDSolver</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">)</span>
+    <span class="n">B1</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">build_cover_DD</span><span class="p">()</span>
+
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">DDSolver</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">c</span><span class="p">],</span> <span class="n">caves</span><span class="p">)</span>
+    <span class="n">B2</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">build_cover_DD</span><span class="p">()</span>
+    <span class="n">B2</span><span class="o">.</span><span class="n">shuffle_vars</span><span class="p">()</span>  <span class="c1"># renames the variables, without reordering</span>
+
+    <span class="n">B1</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+    <span class="n">B2</span><span class="o">.</span><span class="n">make_reduced</span><span class="p">()</span>
+
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="n">B2p</span> <span class="o">=</span> <span class="n">B2</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">B1</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">int_toA</span> <span class="o">=</span> <span class="n">intersect</span><span class="p">(</span><span class="n">B1</span><span class="p">,</span> <span class="n">B2p</span><span class="p">)</span>
+    <span class="n">obj_toA</span> <span class="o">=</span> <span class="n">int_toA</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">t_toA</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">t_toA</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">int_toA</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">,&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="n">vs1</span> <span class="o">=</span> <span class="n">VarSeq</span><span class="p">(</span><span class="n">B1</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">B1</span><span class="o">.</span><span class="n">layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="n">vs2</span> <span class="o">=</span> <span class="n">VarSeq</span><span class="p">(</span><span class="n">B2</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">B2</span><span class="o">.</span><span class="n">layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+
+    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">vs1</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span>
+        <span class="n">vs2</span><span class="o">.</span><span class="n">layer_var</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;1:</span><span class="si">{</span><span class="n">vs1</span><span class="o">.</span><span class="n">layer_var</span><span class="si">}</span><span class="s2">, 2:</span><span class="si">{</span><span class="n">vs2</span><span class="o">.</span><span class="n">layer_var</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">b</span> <span class="o">=</span> <span class="n">BBSearch</span><span class="p">(</span><span class="n">vs1</span><span class="p">,</span> <span class="n">vs2</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;optimal&quot;</span> <span class="ow">or</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;timeout&quot;</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span>
+    <span class="n">B1p</span> <span class="o">=</span> <span class="n">B1</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">B2p</span> <span class="o">=</span> <span class="n">B2</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">int_VS</span> <span class="o">=</span> <span class="n">intersect</span><span class="p">(</span><span class="n">B1p</span><span class="p">,</span> <span class="n">B2p</span><span class="p">)</span>
+    <span class="n">obj_VS</span> <span class="o">=</span> <span class="n">int_VS</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">t_VS</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">t_VS</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">int_VS</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">obj_VS</span> <span class="o">-</span> <span class="n">obj_toA</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">obj_VS</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">obj_toA</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../_autosummary/jUFLP_cavemen.html#jUFLP_cavemen.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;t_toA, intsize_toA, t_VS, intsize_VS&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">250</span><span class="p">):</span>
+        <span class="n">compare_runtimes</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

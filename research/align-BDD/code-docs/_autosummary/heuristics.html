@@ -1,84 +1,45 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>heuristics &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="BB_search" href="BB_search.html" />
     <link rel="prev" title="varseq" href="varseq.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> Align-BDD
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../overview.html#reproducibility">Reproducibility</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../overview.html#code-organization">Code organization</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../overview.html#producing-figures">Producing figures</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a><ul class="current">
@@ -90,6 +51,10 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="BB_search.html">BB_search</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UFLP_fullDD.html">UFLP_fullDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UFLPOrder.html">UFLPOrder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jUFLP_cavemen.html">jUFLP_cavemen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jUFLP_utils.html">jUFLP_utils</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a></li>
@@ -98,83 +63,46 @@
 </li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Align-BDD</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content style-external-links">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html">Docs</a> &raquo;</li>
-        
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
-        
       <li>heuristics</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="../_sources/_autosummary/heuristics.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <span class="target" id="module-heuristics"></span><div class="section" id="heuristics">
-<h1>heuristics<a class="headerlink" href="#heuristics" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-summary">
-<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this headline">¶</a></h2>
+             
+  <span class="target" id="module-heuristics"></span><section id="heuristics">
+<h1>heuristics<a class="headerlink" href="#heuristics" title="Permalink to this heading"></a></h1>
+<section id="module-summary">
+<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this heading"></a></h2>
 <p>Implements several heuristics
-to be used with a separate script.</p>
+to be used with a separate script to generate <code class="docutils literal notranslate"><span class="pre">.csv</span></code> logs.</p>
+<p>Heuristics for the original problem generally have <code class="docutils literal notranslate"><span class="pre">orig_</span></code> prefix
+in the name, for the simplified problem – <code class="docutils literal notranslate"><span class="pre">simpl_</span></code> prefix.</p>
 <p>The module also contains some code related to possible further
 research and testing.</p>
 <p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
 <p class="centered">
-<strong>❖❖❖</strong></p><div class="section" id="implements-functions-outside-the-classes-above">
-<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
+<strong>❖❖❖</strong></p><section id="implements-functions-outside-the-classes-above">
+<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -187,7 +115,7 @@ research and testing.</p>
 <td><p>Finds a good alignment target with greedy sifts.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#heuristics.fastslide" title="heuristics.fastslide"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fastslide</span></code></a>(X, a, p)</p></td>
-<td><p>An experimental function implementing faster ‘sift’ operation.</p></td>
+<td><p>An experimental function implementing faster 'sift' operation.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#heuristics.minAB" title="heuristics.minAB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minAB</span></code></a>(A, B)</p></td>
 <td><p>Best of A and B heuristic (simplified problem).</p></td>
@@ -217,7 +145,7 @@ research and testing.</p>
 <td><p>A heuristic for the <strong>original</strong> problem involving simplified problem.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#heuristics.simpl_5random" title="heuristics.simpl_5random"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simpl_5random</span></code></a>(A, B)</p></td>
-<td><p>Implements ‘Best of 5 random orders’ heuristic.</p></td>
+<td><p>Implements 'Best of 5 random orders' heuristic.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#heuristics.simpl_g2sifts_1p" title="heuristics.simpl_g2sifts_1p"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simpl_g2sifts_1p</span></code></a>(A, B)</p></td>
 <td><p>Experimental: greedy pairs of sifts (simplified problem), one pass.</p></td>
@@ -254,125 +182,125 @@ research and testing.</p>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="attributes-defined-in-the-module">
-<h3>Attributes defined in the module:<a class="headerlink" href="#attributes-defined-in-the-module" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="attributes-defined-in-the-module">
+<h3>Attributes defined in the module:<a class="headerlink" href="#attributes-defined-in-the-module" title="Permalink to this heading"></a></h3>
 <dl class="py data">
-<dt id="heuristics.SIMPL_HEU">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">SIMPL_HEU</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[['simpl_minAB',</span> <span class="pre">&lt;function</span> <span class="pre">minAB&gt;,</span> <span class="pre">'Best</span> <span class="pre">of</span> <span class="pre">A</span> <span class="pre">and</span> <span class="pre">B'],</span> <span class="pre">['simpl_gswaps',</span> <span class="pre">&lt;function</span> <span class="pre">simpl_greedy_swaps&gt;,</span> <span class="pre">'Greedy</span> <span class="pre">swaps'],</span> <span class="pre">['simpl_5random',</span> <span class="pre">&lt;function</span> <span class="pre">simpl_5random&gt;,</span> <span class="pre">'Best/five</span> <span class="pre">random</span> <span class="pre">orders'],</span> <span class="pre">['simpl_gsifts_1p',</span> <span class="pre">&lt;function</span> <span class="pre">simpl_gsifts_1p&gt;,</span> <span class="pre">'Greedy</span> <span class="pre">sifts</span> <span class="pre">(one</span> <span class="pre">pass)'],</span> <span class="pre">['simpl_gsifts_2p',</span> <span class="pre">&lt;function</span> <span class="pre">simpl_gsifts_2p&gt;,</span> <span class="pre">'Greedy</span> <span class="pre">sifts</span> <span class="pre">(two</span> <span class="pre">passes)'],</span> <span class="pre">['simpl_gsifts_inf',</span> <span class="pre">&lt;function</span> <span class="pre">simpl_gsifts_inf&gt;,</span> <span class="pre">'Greedy</span> <span class="pre">sifts</span> <span class="pre">(all)']]</span></em><a class="headerlink" href="#heuristics.SIMPL_HEU" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.SIMPL_HEU">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">SIMPL_HEU</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[['simpl_minAB',</span> <span class="pre">&lt;function</span> <span class="pre">minAB&gt;,</span> <span class="pre">'Best</span> <span class="pre">of</span> <span class="pre">A</span> <span class="pre">and</span> <span class="pre">B'],</span> <span class="pre">['simpl_gswaps',</span> <span class="pre">&lt;function</span> <span class="pre">simpl_greedy_swaps&gt;,</span> <span class="pre">'Greedy</span> <span class="pre">swaps'],</span> <span class="pre">['simpl_5random',</span> <span class="pre">&lt;function</span> <span class="pre">simpl_5random&gt;,</span> <span class="pre">'Best/five</span> <span class="pre">random</span> <span class="pre">orders'],</span> <span class="pre">['simpl_gsifts_1p',</span> <span class="pre">&lt;function</span> <span class="pre">simpl_gsifts_1p&gt;,</span> <span class="pre">'Greedy</span> <span class="pre">sifts</span> <span class="pre">(one</span> <span class="pre">pass)'],</span> <span class="pre">['simpl_gsifts_2p',</span> <span class="pre">&lt;function</span> <span class="pre">simpl_gsifts_2p&gt;,</span> <span class="pre">'Greedy</span> <span class="pre">sifts</span> <span class="pre">(two</span> <span class="pre">passes)'],</span> <span class="pre">['simpl_gsifts_inf',</span> <span class="pre">&lt;function</span> <span class="pre">simpl_gsifts_inf&gt;,</span> <span class="pre">'Greedy</span> <span class="pre">sifts</span> <span class="pre">(all)']]</span></em><a class="headerlink" href="#heuristics.SIMPL_HEU" title="Permalink to this definition"></a></dt>
 <dd><p>List of heuristics for the <strong>simplified</strong> problem.</p>
 </dd></dl>
 
 <dl class="py data">
-<dt id="heuristics.ORIG_HEU">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">ORIG_HEU</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[['orig_simpl',</span> <span class="pre">&lt;function</span> <span class="pre">orig_simpl&gt;,</span> <span class="pre">'Simplified</span> <span class="pre">problem'],</span> <span class="pre">['orig_gsifts1p',</span> <span class="pre">&lt;function</span> <span class="pre">orig_gsifts1p&gt;,</span> <span class="pre">'Greedy</span> <span class="pre">BDD</span> <span class="pre">sifts</span> <span class="pre">(one</span> <span class="pre">pass)'],</span> <span class="pre">['orig_bestAB',</span> <span class="pre">&lt;function</span> <span class="pre">orig_bestAB&gt;,</span> <span class="pre">'Best</span> <span class="pre">of</span> <span class="pre">A</span> <span class="pre">and</span> <span class="pre">B'],</span> <span class="pre">['orig_5random',</span> <span class="pre">&lt;function</span> <span class="pre">orig_5random&gt;,</span> <span class="pre">'Best</span> <span class="pre">of</span> <span class="pre">five</span> <span class="pre">random</span> <span class="pre">orders']]</span></em><a class="headerlink" href="#heuristics.ORIG_HEU" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.ORIG_HEU">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">ORIG_HEU</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[['orig_simpl',</span> <span class="pre">&lt;function</span> <span class="pre">orig_simpl&gt;,</span> <span class="pre">'Simplified</span> <span class="pre">problem'],</span> <span class="pre">['orig_gsifts1p',</span> <span class="pre">&lt;function</span> <span class="pre">orig_gsifts1p&gt;,</span> <span class="pre">'Greedy</span> <span class="pre">BDD</span> <span class="pre">sifts</span> <span class="pre">(one</span> <span class="pre">pass)'],</span> <span class="pre">['orig_bestAB',</span> <span class="pre">&lt;function</span> <span class="pre">orig_bestAB&gt;,</span> <span class="pre">'Best</span> <span class="pre">of</span> <span class="pre">A</span> <span class="pre">and</span> <span class="pre">B'],</span> <span class="pre">['orig_5random',</span> <span class="pre">&lt;function</span> <span class="pre">orig_5random&gt;,</span> <span class="pre">'Best</span> <span class="pre">of</span> <span class="pre">five</span> <span class="pre">random</span> <span class="pre">orders']]</span></em><a class="headerlink" href="#heuristics.ORIG_HEU" title="Permalink to this definition"></a></dt>
 <dd><p>List of heuristics for the <strong>original</strong> problem.</p>
 </dd></dl>
 
 <p class="centered">
 <strong>❖❖❖</strong></p><p class="centered">
 <strong>Implementation details</strong></p><p class="centered">
-<strong>❖❖❖</strong></p></div>
-</div>
-<div class="section" id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<strong>❖❖❖</strong></p></section>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
 <dl class="py function">
-<dt id="heuristics.fast_greedy_2sifts">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">fast_greedy_2sifts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#fast_greedy_2sifts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.fast_greedy_2sifts" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.fast_greedy_2sifts">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">fast_greedy_2sifts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#fast_greedy_2sifts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.fast_greedy_2sifts" title="Permalink to this definition"></a></dt>
 <dd><p>finds a good alignment target with greedy pairs of sifts</p>
 <p>Makes sifts while it can improve the objective
 (picking the best improvement at each step)</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.fast_greedy_sifts">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">fast_greedy_sifts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#fast_greedy_sifts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.fast_greedy_sifts" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.fast_greedy_sifts">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">fast_greedy_sifts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#fast_greedy_sifts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.fast_greedy_sifts" title="Permalink to this definition"></a></dt>
 <dd><p>Finds a good alignment target with greedy sifts.</p>
 <p>Makes sifts while it can improve the objective
 (picking the best improvement at each step)</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.fastslide">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">fastslide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#fastslide"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.fastslide" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.fastslide">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">fastslide</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#fastslide"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.fastslide" title="Permalink to this definition"></a></dt>
 <dd><p>An experimental function implementing faster ‘sift’ operation.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.minAB">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">minAB</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#minAB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.minAB" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.minAB">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">minAB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#minAB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.minAB" title="Permalink to this definition"></a></dt>
 <dd><p>Best of A and B heuristic (simplified problem).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.orig_5random">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">orig_5random</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_5random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_5random" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.orig_5random">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">orig_5random</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_5random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_5random" title="Permalink to this definition"></a></dt>
 <dd><p>Five random orders (original problem).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.orig_bestAB">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">orig_bestAB</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_bestAB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_bestAB" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.orig_bestAB">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">orig_bestAB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_bestAB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_bestAB" title="Permalink to this definition"></a></dt>
 <dd><p>Best of <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code> (original problem).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.orig_gsifts1p">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">orig_gsifts1p</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_gsifts1p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_gsifts1p" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.orig_gsifts1p">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">orig_gsifts1p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_gsifts1p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_gsifts1p" title="Permalink to this definition"></a></dt>
 <dd><p>Greedy sifts heuristic for the <strong>original</strong> problem.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.orig_interleave_when_diverge">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">orig_interleave_when_diverge</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_interleave_when_diverge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_interleave_when_diverge" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.orig_interleave_when_diverge">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">orig_interleave_when_diverge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_interleave_when_diverge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_interleave_when_diverge" title="Permalink to this definition"></a></dt>
 <dd><p>Another experimental heuristic (further research).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.orig_interleaved">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">orig_interleaved</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_interleaved"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_interleaved" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.orig_interleaved">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">orig_interleaved</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_interleaved"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_interleaved" title="Permalink to this definition"></a></dt>
 <dd><p>Experimental heuristic (further research).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.orig_meta">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">orig_meta</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_meta" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.orig_meta">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">orig_meta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_meta" title="Permalink to this definition"></a></dt>
 <dd><p>Another experimental heuristic (further research).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.orig_rnd_starts">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">orig_rnd_starts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_rnd_starts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_rnd_starts" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.orig_rnd_starts">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">orig_rnd_starts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_rnd_starts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_rnd_starts" title="Permalink to this definition"></a></dt>
 <dd><p>Another experimental heuristic (further research).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.orig_simpl">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">orig_simpl</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_simpl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_simpl" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.orig_simpl">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">orig_simpl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#orig_simpl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.orig_simpl" title="Permalink to this definition"></a></dt>
 <dd><p>A heuristic for the <strong>original</strong> problem involving simplified problem.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.simpl_5random">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">simpl_5random</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_5random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_5random" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.simpl_5random">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">simpl_5random</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_5random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_5random" title="Permalink to this definition"></a></dt>
 <dd><p>Implements ‘Best of 5 random orders’ heuristic.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.simpl_g2sifts_1p">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">simpl_g2sifts_1p</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_g2sifts_1p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_g2sifts_1p" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.simpl_g2sifts_1p">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">simpl_g2sifts_1p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_g2sifts_1p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_g2sifts_1p" title="Permalink to this definition"></a></dt>
 <dd><p>Experimental: greedy pairs of sifts (simplified problem), one pass.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.simpl_g2sifts_2p">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">simpl_g2sifts_2p</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_g2sifts_2p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_g2sifts_2p" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.simpl_g2sifts_2p">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">simpl_g2sifts_2p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_g2sifts_2p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_g2sifts_2p" title="Permalink to this definition"></a></dt>
 <dd><p>Experimental: greedy pairs of sifts (simplified problem), two passes.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.simpl_greedy_2sifts">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">simpl_greedy_2sifts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_greedy_2sifts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_greedy_2sifts" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.simpl_greedy_2sifts">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">simpl_greedy_2sifts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_greedy_2sifts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_greedy_2sifts" title="Permalink to this definition"></a></dt>
 <dd><p>Finds a good alignment target with greedy pairs of sifts.</p>
 <p>Makes sifts while it can improve the objective,
 or for a given number of passes,
@@ -381,8 +309,8 @@ picking the best improvement at each step.
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.simpl_greedy_sifts">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">simpl_greedy_sifts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_greedy_sifts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_greedy_sifts" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.simpl_greedy_sifts">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">simpl_greedy_sifts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_greedy_sifts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_greedy_sifts" title="Permalink to this definition"></a></dt>
 <dd><p>Finds a good alignment target with greedy sifts</p>
 <p>Makes sifts while it can improve the objective
 or for a given number of passes,
@@ -391,90 +319,78 @@ picking the best improvement at each step.
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.simpl_greedy_swaps">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">simpl_greedy_swaps</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_greedy_swaps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_greedy_swaps" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.simpl_greedy_swaps">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">simpl_greedy_swaps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_greedy_swaps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_greedy_swaps" title="Permalink to this definition"></a></dt>
 <dd><p>finds a good alignment target with greedy swaps</p>
 <p>Makes swaps while it can improve the objective
 (picking the best improvement at each step)</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.simpl_gsifts_1p">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">simpl_gsifts_1p</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_gsifts_1p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_gsifts_1p" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.simpl_gsifts_1p">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">simpl_gsifts_1p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_gsifts_1p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_gsifts_1p" title="Permalink to this definition"></a></dt>
 <dd><p>Greedy sifts: one pass.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.simpl_gsifts_2p">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">simpl_gsifts_2p</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_gsifts_2p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_gsifts_2p" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.simpl_gsifts_2p">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">simpl_gsifts_2p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_gsifts_2p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_gsifts_2p" title="Permalink to this definition"></a></dt>
 <dd><p>Greedy sifts: two passes.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.simpl_gsifts_3p">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">simpl_gsifts_3p</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_gsifts_3p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_gsifts_3p" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.simpl_gsifts_3p">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">simpl_gsifts_3p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_gsifts_3p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_gsifts_3p" title="Permalink to this definition"></a></dt>
 <dd><p>Greedy sifts: three passes.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.simpl_gsifts_inf">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">simpl_gsifts_inf</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_gsifts_inf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_gsifts_inf" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.simpl_gsifts_inf">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">simpl_gsifts_inf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#simpl_gsifts_inf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.simpl_gsifts_inf" title="Permalink to this definition"></a></dt>
 <dd><p>Greedy sifts: all passes.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.toA">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">toA</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#toA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.toA" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.toA">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">toA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#toA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.toA" title="Permalink to this definition"></a></dt>
 <dd><p>Helper: align to <code class="docutils literal notranslate"><span class="pre">A</span></code> heuristic.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="heuristics.toB">
-<code class="sig-prename descclassname"><span class="pre">heuristics.</span></code><code class="sig-name descname"><span class="pre">toB</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#toB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.toB" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="heuristics.toB">
+<span class="sig-prename descclassname"><span class="pre">heuristics.</span></span><span class="sig-name descname"><span class="pre">toB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/heuristics.html#toB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#heuristics.toB" title="Permalink to this definition"></a></dt>
 <dd><p>Helper: align to <code class="docutils literal notranslate"><span class="pre">B</span></code> heuristic.</p>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
-
-    </p>
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

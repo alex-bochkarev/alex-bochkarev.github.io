@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>jUFLP_cavemen &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="jUFLP_utils" href="jUFLP_utils.html" />
+    <link rel="prev" title="UFLPOrder" href="UFLPOrder.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          </a>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../overview.html#code-organization">Code organization</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#producing-figures">Producing figures</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BDD.html">BDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="varseq.html">varseq</a></li>
+<li class="toctree-l3"><a class="reference internal" href="heuristics.html">heuristics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BB_search.html">BB_search</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UFLP_fullDD.html">UFLP_fullDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UFLPOrder.html">UFLPOrder</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">jUFLP_cavemen</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-summary">Module summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#juflpencoder">jUFLPEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="jUFLP_utils.html">jUFLP_utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#testing-framework">Testing framework</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
+      <li>jUFLP_cavemen</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/jUFLP_cavemen.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <span class="target" id="module-jUFLP_cavemen"></span><section id="juflp-cavemen">
+<h1>jUFLP_cavemen<a class="headerlink" href="#juflp-cavemen" title="Permalink to this heading"></a></h1>
+<section id="module-summary">
+<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this heading"></a></h2>
+<p>Proof-of-concept experiment: joint UFLP over special class of instances.</p>
+<p>Implements DD-based solution procedures for j-UFLP instances, along with the
+instance generation. Note that the up-to-date experiment corresponding to
+Section 4.2 of the paper is presented in <a class="reference internal" href="UFLP_2_cav.html#module-UFLP_2_cav" title="UFLP_2_cav"><code class="xref py py-mod docutils literal notranslate"><span class="pre">UFLP_2_cav</span></code></a>, but it calls
+solution procedures implemented in this module.</p>
+<p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
+<p class="centered">
+<strong>❖❖❖</strong></p><section id="implements-classes">
+<h3>Implements classes:<a class="headerlink" href="#implements-classes" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#jUFLP_cavemen.jUFLPEncoder" title="jUFLP_cavemen.jUFLPEncoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jUFLPEncoder</span></code></a>(*[, skipkeys, ensure_ascii, ...])</p></td>
+<td><p>A technical implementation needed to save an instance as <code class="docutils literal notranslate"><span class="pre">.json</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="implements-functions-outside-the-classes-above">
+<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#jUFLP_cavemen.compare_runtimes" title="jUFLP_cavemen.compare_runtimes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compare_runtimes</span></code></a>()</p></td>
+<td><p>Performs a quick runtimes comparison (toA vs VS).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#jUFLP_cavemen.dump_instance" title="jUFLP_cavemen.dump_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump_instance</span></code></a>(S, caves[, filename])</p></td>
+<td><p>Dumps a graph implied by S into a <cite>.dot</cite> file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#jUFLP_cavemen.gen_cavemen_jUFLP_inst" title="jUFLP_cavemen.gen_cavemen_jUFLP_inst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen_cavemen_jUFLP_inst</span></code></a>([n, M, L, verbose, ...])</p></td>
+<td><p>Generates an instance with the related metadata (info on caves).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#jUFLP_cavemen.load_inst" title="jUFLP_cavemen.load_inst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_inst</span></code></a>(filename)</p></td>
+<td><p>Loads a jUFLP instance from <code class="docutils literal notranslate"><span class="pre">.json</span></code> file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#jUFLP_cavemen.main" title="jUFLP_cavemen.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#jUFLP_cavemen.save_inst" title="jUFLP_cavemen.save_inst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_inst</span></code></a>(i1, i2, join_map, filename)</p></td>
+<td><p>Saves the jUFLP instance to <code class="docutils literal notranslate"><span class="pre">.json</span></code> file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#jUFLP_cavemen.show_inst" title="jUFLP_cavemen.show_inst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_inst</span></code></a>(inst1, inst2, join_map[, filename])</p></td>
+<td><p>Shows the supplied j-UFLP instance / saves it to a .dot file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#jUFLP_cavemen.solve_cm_jUFLP_CPPMIP" title="jUFLP_cavemen.solve_cm_jUFLP_CPPMIP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_cm_jUFLP_CPPMIP</span></code></a>(i1, i2, jmap)</p></td>
+<td><p>Solves a jUFLP on cavemen with CPPMIP.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#jUFLP_cavemen.solve_cm_jUFLP_CPPMIP_fullDDs" title="jUFLP_cavemen.solve_cm_jUFLP_CPPMIP_fullDDs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_cm_jUFLP_CPPMIP_fullDDs</span></code></a>(i1, i2, jmap)</p></td>
+<td><p>Solves a jUFLP on cavemen (full-DDs) with CPPMIP.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#jUFLP_cavemen.solve_cm_jUFLP_DDs" title="jUFLP_cavemen.solve_cm_jUFLP_DDs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_cm_jUFLP_DDs</span></code></a>(i1, i2, jmap[, intmode, ...])</p></td>
+<td><p>Solves the jUFLP cavemen instance with DDs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#jUFLP_cavemen.solve_cm_jUFLP_MIP" title="jUFLP_cavemen.solve_cm_jUFLP_MIP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_cm_jUFLP_MIP</span></code></a>(i1, i2, jmap)</p></td>
+<td><p>Solves the special jUFLP instance with MIP.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#jUFLP_cavemen.solve_cm_jUFLP_fullDDs" title="jUFLP_cavemen.solve_cm_jUFLP_fullDDs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_cm_jUFLP_fullDDs</span></code></a>(i1, i2, jmap, intmode)</p></td>
+<td><p>Solves the jUFLP cavemen instance with DDs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#jUFLP_cavemen.solve_with_DDs" title="jUFLP_cavemen.solve_with_DDs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_with_DDs</span></code></a>(S, S2, f, f2, c, caves[, intmode])</p></td>
+<td><p>Solves the jUFLP cavemen instance with DDs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#jUFLP_cavemen.solve_with_MIP" title="jUFLP_cavemen.solve_with_MIP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_with_MIP</span></code></a>(S, S2, f, f2, c, caves)</p></td>
+<td><p>Generates and solves a MIP for the supplied jUFL cavemen instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#jUFLP_cavemen.test_cm_jUFL_DDvsMIP" title="jUFLP_cavemen.test_cm_jUFL_DDvsMIP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_cm_jUFL_DDvsMIP</span></code></a>(test_inst)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#jUFLP_cavemen.test_jUFL_DDs" title="jUFLP_cavemen.test_jUFL_DDs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_jUFL_DDs</span></code></a>(test_inst)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#jUFLP_cavemen.test_load_save" title="jUFLP_cavemen.test_load_save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_load_save</span></code></a>(test_inst)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="centered">
+<strong>❖❖❖</strong></p><p class="centered">
+<strong>Implementation details</strong></p><p class="centered">
+<strong>❖❖❖</strong></p></section>
+</section>
+<section id="juflpencoder">
+<h2>jUFLPEncoder<a class="headerlink" href="#juflpencoder" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="jUFLP_cavemen.jUFLPEncoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">jUFLPEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipkeys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensure_ascii</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_circular</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#jUFLPEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.jUFLPEncoder" title="Permalink to this definition"></a></dt>
+<dd><p>A technical implementation needed to save an instance as <code class="docutils literal notranslate"><span class="pre">.json</span></code></p>
+<div class="autoclasstoc docutils container">
+<p class="rubric">Public Data Attributes:</p>
+<details><summary>Inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">JSONEncoder</span></code></summary><table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">item_separator</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">key_separator</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</details></div>
+<div class="autoclasstoc docutils container">
+<p class="rubric">Public Methods:</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#jUFLP_cavemen.jUFLPEncoder.default" title="jUFLP_cavemen.jUFLPEncoder.default"><code class="xref py py-obj docutils literal notranslate"><span class="pre">default</span></code></a>(obj)</p></td>
+<td><p>Implement this method in a subclass such that it returns a serializable object for <code class="docutils literal notranslate"><span class="pre">o</span></code>, or calls the base implementation (to raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>).</p></td>
+</tr>
+</tbody>
+</table>
+<details><summary>Inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">JSONEncoder</span></code></summary><table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code>(*[, skipkeys, ensure_ascii, ...])</p></td>
+<td><p>Constructor for JSONEncoder, with sensible defaults.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#jUFLP_cavemen.jUFLPEncoder.default" title="jUFLP_cavemen.jUFLPEncoder.default"><code class="xref py py-obj docutils literal notranslate"><span class="pre">default</span></code></a>(obj)</p></td>
+<td><p>Implement this method in a subclass such that it returns a serializable object for <code class="docutils literal notranslate"><span class="pre">o</span></code>, or calls the base implementation (to raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">encode</span></code>(o)</p></td>
+<td><p>Return a JSON string representation of a Python data structure.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">iterencode</span></code>(o[, _one_shot])</p></td>
+<td><p>Encode the given object and yield each string representation as available.</p></td>
+</tr>
+</tbody>
+</table>
+</details></div>
+<hr class="docutils" />
+<dl class="py method">
+<dt class="sig sig-object py" id="jUFLP_cavemen.jUFLPEncoder.default">
+<span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#jUFLPEncoder.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.jUFLPEncoder.default" title="Permalink to this definition"></a></dt>
+<dd><p>Implement this method in a subclass such that it returns
+a serializable object for <code class="docutils literal notranslate"><span class="pre">o</span></code>, or calls the base implementation
+(to raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>).</p>
+<p>For example, to support arbitrary iterators, you could
+implement default like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iterable</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="c1"># Let the base class default method raise the TypeError</span>
+    <span class="k">return</span> <span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<p class="centered">
+<strong>❖❖❖</strong></p></section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.compare_runtimes">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">compare_runtimes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#compare_runtimes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.compare_runtimes" title="Permalink to this definition"></a></dt>
+<dd><p>Performs a quick runtimes comparison (toA vs VS).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.dump_instance">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">dump_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tmp/S.dot'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#dump_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.dump_instance" title="Permalink to this definition"></a></dt>
+<dd><p>Dumps a graph implied by S into a <cite>.dot</cite> file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.gen_cavemen_jUFLP_inst">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">gen_cavemen_jUFLP_inst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#gen_cavemen_jUFLP_inst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.gen_cavemen_jUFLP_inst" title="Permalink to this definition"></a></dt>
+<dd><p>Generates an instance with the related metadata (info on caves).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>) – number of caves,</p></li>
+<li><p><strong>M</strong> (<em>int</em>) – number of points in a cave,</p></li>
+<li><p><strong>L</strong> (<em>float</em>) – edge sparsity parameter (share of missing edges)</p></li>
+<li><p><strong>verbose</strong> (<em>Bool</em>) – print debug info</p></li>
+<li><p><strong>linking</strong> (<em>str</em>) – linking constraints type</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>sub-instances and caves description.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>inst1, inst2, join_map</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Each sub-instance is parameterized by [S,f,c,caves].
+(See <code class="xref py py-func docutils literal notranslate"><span class="pre">darkcloud.gen_caveman_inst()</span></code> for details.)</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.load_inst">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">load_inst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#load_inst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.load_inst" title="Permalink to this definition"></a></dt>
+<dd><p>Loads a jUFLP instance from <code class="docutils literal notranslate"><span class="pre">.json</span></code> file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>[[S,f,c,ptsclouds], [S2,f2,c2,pltsclouds2], jmap]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.main">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.main" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.save_inst">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">save_inst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#save_inst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.save_inst" title="Permalink to this definition"></a></dt>
+<dd><p>Saves the jUFLP instance to <code class="docutils literal notranslate"><span class="pre">.json</span></code> file. (old instance format).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.show_inst">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">show_inst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inst1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inst2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./tmp/jUFLP.dot'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#show_inst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.show_inst" title="Permalink to this definition"></a></dt>
+<dd><p>Shows the supplied j-UFLP instance / saves it to a .dot file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inst1</strong> (<em>list</em>) – instances description, [S,f,c,caves]</p></li>
+<li><p><strong>inst2</strong> (<em>list</em>) – instances description, [S,f,c,caves]</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – filename to save to (default “./tmp/jUFLP.dot”)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.solve_cm_jUFLP_CPPMIP">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">solve_cm_jUFLP_CPPMIP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#solve_cm_jUFLP_CPPMIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.solve_cm_jUFLP_CPPMIP" title="Permalink to this definition"></a></dt>
+<dd><p>Solves a jUFLP on cavemen with CPPMIP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i1</strong> (<em>list</em>) – instances</p></li>
+<li><p><strong>i2</strong> (<em>list</em>) – instances</p></li>
+<li><p><strong>jmap</strong> (<em>dict</em>) – joining dict.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Instance is parameterized as per <code class="xref py py-func docutils literal notranslate"><span class="pre">gen_caveman_inst()</span></code>,
+The diagrams are built with <code class="xref py py-class docutils literal notranslate"><span class="pre">darkcloud.DDSolver</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>objective (float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.solve_cm_jUFLP_CPPMIP_fullDDs">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">solve_cm_jUFLP_CPPMIP_fullDDs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#solve_cm_jUFLP_CPPMIP_fullDDs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.solve_cm_jUFLP_CPPMIP_fullDDs" title="Permalink to this definition"></a></dt>
+<dd><p>Solves a jUFLP on cavemen (full-DDs) with CPPMIP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i1</strong> (<em>list</em>) – instances</p></li>
+<li><p><strong>i2</strong> (<em>list</em>) – instances</p></li>
+<li><p><strong>jmap</strong> (<em>dict</em>) – joining dict.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Instance is parameterized as per <code class="xref py py-func docutils literal notranslate"><span class="pre">gen_caveman_inst()</span></code>,
+The diagrams are built with <a class="reference internal" href="UFLP_fullDD.html#UFLP_fullDD.create_cover_DD" title="UFLP_fullDD.create_cover_DD"><code class="xref py py-func docutils literal notranslate"><span class="pre">UFLP_fullDD.create_cover_DD()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>objective (float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.solve_cm_jUFLP_DDs">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">solve_cm_jUFLP_DDs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intmode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'toA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ret_int</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#solve_cm_jUFLP_DDs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.solve_cm_jUFLP_DDs" title="Permalink to this definition"></a></dt>
+<dd><p>Solves the jUFLP cavemen instance with DDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i1</strong> (<em>list</em>) – instances</p></li>
+<li><p><strong>i2</strong> (<em>list</em>) – instances</p></li>
+<li><p><strong>intmode</strong> (<em>str</em>) – alignment mode, ‘toA’, ‘toB’, or ‘VS’</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Instance is parameterized as per <code class="xref py py-func docutils literal notranslate"><span class="pre">gen_caveman_inst()</span></code>,
+The diagrams are built with <code class="xref py py-class docutils literal notranslate"><span class="pre">darkcloud.DDSolver</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.solve_cm_jUFLP_MIP">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">solve_cm_jUFLP_MIP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#solve_cm_jUFLP_MIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.solve_cm_jUFLP_MIP" title="Permalink to this definition"></a></dt>
+<dd><p>Solves the special jUFLP instance with MIP.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.solve_cm_jUFLP_fullDDs">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">solve_cm_jUFLP_fullDDs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intmode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ret_int</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#solve_cm_jUFLP_fullDDs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.solve_cm_jUFLP_fullDDs" title="Permalink to this definition"></a></dt>
+<dd><p>Solves the jUFLP cavemen instance with DDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i1</strong> (<em>list</em>) – instances</p></li>
+<li><p><strong>i2</strong> (<em>list</em>) – instances</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Instance is parameterized as per <code class="xref py py-func docutils literal notranslate"><span class="pre">gen_caveman_inst()</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.solve_with_DDs">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">solve_with_DDs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intmode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'toA'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#solve_with_DDs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.solve_with_DDs" title="Permalink to this definition"></a></dt>
+<dd><p>Solves the jUFLP cavemen instance with DDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>intmode</strong> (<em>str</em>) – intersection mode, ‘toA’ or ‘VS’</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Instance is parameterized as per <code class="xref py py-func docutils literal notranslate"><span class="pre">gen_caveman_inst()</span></code>,
+The diagrams are built with <code class="xref py py-class docutils literal notranslate"><span class="pre">darkcloud.DDSolver</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.solve_with_MIP">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">solve_with_MIP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caves</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#solve_with_MIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.solve_with_MIP" title="Permalink to this definition"></a></dt>
+<dd><p>Generates and solves a MIP for the supplied jUFL cavemen instance.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The instance is parameterized as per <code class="xref py py-func docutils literal notranslate"><span class="pre">gen_caveman_inst()</span></code>.
+Most of the code is adapted form <code class="xref py py-func docutils literal notranslate"><span class="pre">darkcloud.solve_with_MIP()</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.test_cm_jUFL_DDvsMIP">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">test_cm_jUFL_DDvsMIP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#test_cm_jUFL_DDvsMIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.test_cm_jUFL_DDvsMIP" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.test_jUFL_DDs">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">test_jUFL_DDs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#test_jUFL_DDs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.test_jUFL_DDs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jUFLP_cavemen.test_load_save">
+<span class="sig-prename descclassname"><span class="pre">jUFLP_cavemen.</span></span><span class="sig-name descname"><span class="pre">test_load_save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_cavemen.html#test_load_save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_cavemen.test_load_save" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

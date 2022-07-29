@@ -31,6 +31,7 @@ Implements functions (outside the classes above):
    show_rnd_naming
    show_swap_sift
    show_swapping_2
+   test_alignto
    test_intersect
    test_load_save
    test_random_swapping
@@ -71,6 +72,7 @@ Functions
 .. autofunction:: show_rnd_naming
 .. autofunction:: show_swap_sift
 .. autofunction:: show_swapping_2
+.. autofunction:: test_alignto
 .. autofunction:: test_intersect
 .. autofunction:: test_load_save
 .. autofunction:: test_random_swapping

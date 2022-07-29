@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>experiments.sumofproducts &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Align-BDD
+          </a>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#raw-data-formats">Raw data formats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html#code-organization">Code organization</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Align-BDD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>experiments.sumofproducts</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for experiments.sumofproducts</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Performs the sum-of-products linearize/solve exercise.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">comb</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">import</span> <span class="nn">gurobipy</span> <span class="k">as</span> <span class="nn">gp</span>
+<span class="kn">from</span> <span class="nn">gurobipy</span> <span class="kn">import</span> <span class="n">GRB</span>
+<span class="kn">import</span> <span class="nn">argparse</span> <span class="k">as</span> <span class="nn">ap</span>
+
+<div class="viewcode-block" id="gen_instance"><a class="viewcode-back" href="../../_autosummary/experiments.sumofproducts.html#experiments.sumofproducts.gen_instance">[docs]</a><span class="k">def</span> <span class="nf">gen_instance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">jmax</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">Cmax</span><span class="o">=</span><span class="mf">10.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates an instance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n (int): number of variables</span>
+<span class="sd">        M (int): number of terms in the sum</span>
+<span class="sd">        jmax (int): number of vars in a term, at most</span>
+<span class="sd">        Cmax (float): cost coefficient will be -Cmax..Cmax</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        I (list): list of lists of indices</span>
+<span class="sd">        c (list): list of costs (per sum term)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+    <span class="n">terms</span> <span class="o">=</span> <span class="p">{()}</span>
+    <span class="k">assert</span> <span class="n">comb</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">jmax</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">M</span>
+
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+        <span class="n">cand</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="k">while</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cand</span><span class="p">)</span> <span class="ow">in</span> <span class="n">terms</span><span class="p">:</span>
+            <span class="n">cand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">jmax</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span>
+                                            <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="n">I</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">cand</span><span class="p">))</span>
+        <span class="n">terms</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">cand</span><span class="p">))</span>
+
+
+    <span class="n">c</span> <span class="o">=</span> <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">()</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span><span class="o">*</span><span class="n">Cmax</span><span class="o">*</span><span class="mi">2</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">I</span><span class="p">))]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Instance generated:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;min &quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">I</span><span class="p">)):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">c</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">:</span><span class="s2">+.2f</span><span class="si">}</span><span class="s2">·&quot;</span><span class="o">+</span><span class="s2">&quot;·&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;x</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">I</span><span class="p">[</span><span class="n">j</span><span class="p">]]),</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">I</span><span class="p">,</span> <span class="n">c</span></div>
+
+
+<div class="viewcode-block" id="make_MIP"><a class="viewcode-back" href="../../_autosummary/experiments.sumofproducts.html#experiments.sumofproducts.make_MIP">[docs]</a><span class="k">def</span> <span class="nf">make_MIP</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Makes a MIP model for the problem, with Gurobi.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        I (list): list of indices per sum term.</span>
+<span class="sd">        c (list): corresponding cost coefficients.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        m, x, y: the resulting model and variables.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">I</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">modelSense</span> <span class="o">=</span> <span class="n">GRB</span><span class="o">.</span><span class="n">MINIMIZE</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="p">{</span><span class="n">j</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;x_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="p">[]))}</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">{</span><span class="n">j</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;y_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">I</span><span class="p">))</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">I</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">}</span>
+
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">LinExpr</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">term</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">I</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">term</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">addConstrs</span><span class="p">((</span><span class="n">y</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">term</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;term_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">term</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">term</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">obj</span> <span class="o">+=</span> <span class="n">c</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">+=</span> <span class="n">c</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">term</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+    <span class="n">m</span><span class="o">.</span><span class="n">setObjective</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">setParam</span><span class="p">(</span><span class="s2">&quot;OutputFlag&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">m</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div>
+
+<span class="c1"># main run (if module is started by itself) ###################################</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">ap</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;&#39;&#39;Sum-of-products&#39;&#39; instance generator. (c) A. Bochkarev, 2022&quot;</span><span class="p">,</span>
+                               <span class="n">formatter_class</span><span class="o">=</span><span class="n">ap</span><span class="o">.</span><span class="n">ArgumentDefaultsHelpFormatter</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;number of vars&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;number of terms&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;J&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;number of vars per term (max)&quot;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">I</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">gen_instance</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">N</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">M</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">J</span><span class="p">))</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_MIP</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+
+    <span class="k">assert</span> <span class="n">m</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">GRB</span><span class="o">.</span><span class="n">OPTIMAL</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Objective is: </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">objVal</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Decisions are: x=</span><span class="si">{</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span><span class="si">}</span><span class="s2">, y=</span><span class="si">{</span><span class="p">[</span><span class="n">y</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">y</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Finished in </span><span class="si">{</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span><span class="si">}</span><span class="s2"> sec.&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

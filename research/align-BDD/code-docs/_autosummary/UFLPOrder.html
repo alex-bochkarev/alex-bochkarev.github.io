@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UFLPOrder &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="jUFLP_cavemen" href="jUFLP_cavemen.html" />
+    <link rel="prev" title="UFLP_fullDD" href="UFLP_fullDD.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          </a>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../overview.html#code-organization">Code organization</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#producing-figures">Producing figures</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BDD.html">BDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="varseq.html">varseq</a></li>
+<li class="toctree-l3"><a class="reference internal" href="heuristics.html">heuristics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BB_search.html">BB_search</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UFLP_fullDD.html">UFLP_fullDD</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">UFLPOrder</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-summary">Module summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#n2rlist">N2RList</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="jUFLP_cavemen.html">jUFLP_cavemen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jUFLP_utils.html">jUFLP_utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#testing-framework">Testing framework</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
+      <li>UFLPOrder</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/UFLPOrder.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <span class="target" id="module-UFLPOrder"></span><section id="uflporder">
+<h1>UFLPOrder<a class="headerlink" href="#uflporder" title="Permalink to this heading"></a></h1>
+<section id="module-summary">
+<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this heading"></a></h2>
+<p>Implements an algorithm to find  a var order for BDD representing an UFLP.</p>
+<p>Assuming overlap costs and instance parameterization with S, f, c.</p>
+<p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
+<p class="centered">
+<strong>❖❖❖</strong></p><section id="implements-classes">
+<h3>Implements classes:<a class="headerlink" href="#implements-classes" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#UFLPOrder.N2RList" title="UFLPOrder.N2RList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">N2RList</span></code></a>(S[, directSort])</p></td>
+<td><p>Implements a heap of N2-neighborhoods keyed by size.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="implements-functions-outside-the-classes-above">
+<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#UFLPOrder.UFLP_greedy_order" title="UFLPOrder.UFLP_greedy_order"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UFLP_greedy_order</span></code></a>(S[, directSort])</p></td>
+<td><p>Finds a good order for BDD representing UFLP.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#UFLPOrder.test_greedy_order_simple" title="UFLPOrder.test_greedy_order_simple"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_greedy_order_simple</span></code></a>()</p></td>
+<td><p>Testing over a toy instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#UFLPOrder.test_greedy_order_toy2" title="UFLPOrder.test_greedy_order_toy2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_greedy_order_toy2</span></code></a>()</p></td>
+<td><p>Another toy-instance test.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="centered">
+<strong>❖❖❖</strong></p><p class="centered">
+<strong>Implementation details</strong></p><p class="centered">
+<strong>❖❖❖</strong></p></section>
+</section>
+<section id="n2rlist">
+<h2>N2RList<a class="headerlink" href="#n2rlist" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="UFLPOrder.N2RList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">UFLPOrder.</span></span><span class="sig-name descname"><span class="pre">N2RList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directSort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLPOrder.html#N2RList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLPOrder.N2RList" title="Permalink to this definition"></a></dt>
+<dd><p>Implements a heap of N2-neighborhoods keyed by size.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Based on implementation suggested in <code class="docutils literal notranslate"><span class="pre">heapq</span></code>,
+see <a class="reference external" href="https://docs.python.org/3/library/heapq.html">heapq docs</a>
+for more info.</p>
+</div>
+<div class="autoclasstoc docutils container">
+<p class="rubric">Public Methods:</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code>(S[, directSort])</p></td>
+<td><p>Initializes the prio que structure.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#UFLPOrder.N2RList.pop" title="UFLPOrder.N2RList.pop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code></a>()</p></td>
+<td><p>Pops a smallest-2-neighborhood point (adjusting the heap).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__len__</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="autoclasstoc docutils container">
+<p class="rubric">Private Methods:</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#UFLPOrder.N2RList._remove" title="UFLPOrder.N2RList._remove"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_remove</span></code></a>(N2)</p></td>
+<td><p>Removes points <code class="docutils literal notranslate"><span class="pre">N2</span></code> from the heap (adjusting it as necessary).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<dl class="py method">
+<dt class="sig sig-object py" id="UFLPOrder.N2RList._remove">
+<span class="sig-name descname"><span class="pre">_remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLPOrder.html#N2RList._remove"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLPOrder.N2RList._remove" title="Permalink to this definition"></a></dt>
+<dd><p>Removes points <code class="docutils literal notranslate"><span class="pre">N2</span></code> from the heap (adjusting it as necessary).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="UFLPOrder.N2RList.pop">
+<span class="sig-name descname"><span class="pre">pop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLPOrder.html#N2RList.pop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLPOrder.N2RList.pop" title="Permalink to this definition"></a></dt>
+<dd><p>Pops a smallest-2-neighborhood point (adjusting the heap).</p>
+</dd></dl>
+
+</dd></dl>
+
+<p class="centered">
+<strong>❖❖❖</strong></p></section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="UFLPOrder.UFLP_greedy_order">
+<span class="sig-prename descclassname"><span class="pre">UFLPOrder.</span></span><span class="sig-name descname"><span class="pre">UFLP_greedy_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directSort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLPOrder.html#UFLP_greedy_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLPOrder.UFLP_greedy_order" title="Permalink to this definition"></a></dt>
+<dd><p>Finds a good order for BDD representing UFLP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>S</strong> (<em>list</em>) – adjacencies,</p></li>
+<li><p><strong>f</strong> (<em>list</em>) – overlap costs,</p></li>
+<li><p><strong>c</strong> (<em>list</em>) – location costs.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As usual, point  numbers are 1-based. Uses a simple
+greedy algorithm that adds fewest possible points
+to ‘forget’ the next distance-two neighborhood.
+(See Example 5 in Appendix H.)</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A list of nodes to add to a BDD (according to a greedy algo).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="UFLPOrder.test_greedy_order_simple">
+<span class="sig-prename descclassname"><span class="pre">UFLPOrder.</span></span><span class="sig-name descname"><span class="pre">test_greedy_order_simple</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLPOrder.html#test_greedy_order_simple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLPOrder.test_greedy_order_simple" title="Permalink to this definition"></a></dt>
+<dd><p>Testing over a toy instance.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="UFLPOrder.test_greedy_order_toy2">
+<span class="sig-prename descclassname"><span class="pre">UFLPOrder.</span></span><span class="sig-name descname"><span class="pre">test_greedy_order_toy2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLPOrder.html#test_greedy_order_toy2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLPOrder.test_greedy_order_toy2" title="Permalink to this definition"></a></dt>
+<dd><p>Another toy-instance test.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

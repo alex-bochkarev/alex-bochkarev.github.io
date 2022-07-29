@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UFLP_2_cav &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          </a>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#code-organization">Code organization</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>UFLP_2_cav</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for UFLP_2_cav</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Generates and solves the special class j-UFLP instances.</span>
+
+<span class="sd">Instances and the experiment as discussed in the paper, in Section 4.2 and</span>
+<span class="sd">Appendix F.2. Instances are generated using</span>
+<span class="sd">:py:func:`UFLP_2_cav.gen_special_jUFLP`, which is a wrapper for function</span>
+<span class="sd">:py:func:`darkcloud.gen_caveman_inst` for this class of instances. The</span>
+<span class="sd">experiment is implemented in :py:func:`UFLP_2_cav.main`.</span>
+
+<span class="sd">The rest of the code implemented alternative experiments (left out from the</span>
+<span class="sd">second revision of the paper).</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+
+<span class="kn">from</span> <span class="nn">experiments.softcover</span> <span class="kn">import</span> <span class="n">generate_overlaps</span>
+<span class="kn">from</span> <span class="nn">jUFLP_cavemen</span> <span class="kn">import</span> <span class="n">solve_cm_jUFLP_MIP</span><span class="p">,</span> <span class="n">solve_cm_jUFLP_CPPMIP_fullDDs</span>
+<span class="kn">from</span> <span class="nn">jUFLP_cavemen</span> <span class="kn">import</span> <span class="n">solve_cm_jUFLP_fullDDs</span>
+<span class="kn">from</span> <span class="nn">darkcloud</span> <span class="kn">import</span> <span class="n">gen_caveman_inst</span>
+<span class="kn">from</span> <span class="nn">jUFLP_utils</span> <span class="kn">import</span> <span class="n">save_inst</span>
+
+
+<span class="c1"># UFLP instance description structure</span>
+<span class="c1"># UFLP_inst = (S, f, c, caves)</span>
+<span class="n">COL_S</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">COL_f</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">COL_c</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">COL_caves</span> <span class="o">=</span> <span class="mi">3</span>
+
+
+<div class="viewcode-block" id="gen_nlinks_cavemen_inst"><a class="viewcode-back" href="../_autosummary/UFLP_2_cav.html#UFLP_2_cav.gen_nlinks_cavemen_inst">[docs]</a><span class="k">def</span> <span class="nf">gen_nlinks_cavemen_inst</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates an instance with the related metadata (info on caves).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      n (int): number of clusters,</span>
+<span class="sd">      M (int): number of points in a cluster,</span>
+<span class="sd">      L (float): edge sparsity parameter (share of missing edges)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      S, f, c, caves: instance (S,f,c) and caves description.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">      The parameter ``L`` assumed to be:</span>
+
+<span class="sd">      .. math::</span>
+<span class="sd">          L = 1 - 2\\frac{\\textrm{Number of existing arcs}}{N(N-1)}</span>
+
+<span class="sd">      (See, e.g., Sefair and Smith 2016 on DSPI for a similar approach.)</span>
+
+<span class="sd">      Caves description in this edition is just a list of lists of points</span>
+<span class="sd">      (which are within each cluster).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="p">[[</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">((</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">M</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">M</span><span class="p">)]</span>  <span class="c1"># creating the nodes first</span>
+    <span class="n">caves</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">lastcave</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="p">(</span><span class="n">M</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">n_edges</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># create the necessary number of connected nodes</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">lastcave</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">M</span><span class="p">:</span>
+            <span class="n">connect_to</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">lastcave</span><span class="p">)</span>
+            <span class="n">lastcave</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lastcave</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">S</span><span class="p">[</span><span class="n">lastcave</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">connect_to</span><span class="p">)</span>
+            <span class="n">S</span><span class="p">[</span><span class="n">connect_to</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lastcave</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">n_edges</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># add edges to ensure the required sparsity</span>
+        <span class="k">while</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">n_edges</span> <span class="o">/</span> <span class="p">(</span><span class="n">M</span><span class="o">*</span><span class="p">(</span><span class="n">M</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="n">L</span><span class="p">:</span>
+            <span class="n">n1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">lastcave</span><span class="p">)</span>
+            <span class="n">n2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">lastcave</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">n1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">n2</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">S</span><span class="p">[</span><span class="n">n2</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
+                <span class="n">S</span><span class="p">[</span><span class="n">n1</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span>
+                <span class="n">n_edges</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">caves</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">caves</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">lastcave</span><span class="p">)</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">k</span><span class="o">*</span><span class="p">(</span><span class="n">M</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">S</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+            <span class="n">S</span><span class="p">[</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">S</span><span class="p">[</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+            <span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+        <span class="n">caves</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="p">(</span><span class="n">lastcave</span><span class="p">))</span>
+
+    <span class="c1"># creating costs info (location and overlap costs)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">generate_overlaps</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="n">C0</span> <span class="o">=</span> <span class="mf">200.0</span>
+    <span class="n">Cw</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="n">C0</span> <span class="o">+</span> <span class="n">Cw</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">()</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">))]</span>
+    <span class="k">return</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span></div>
+
+
+<div class="viewcode-block" id="gen_special_jUFLP"><a class="viewcode-back" href="../_autosummary/UFLP_2_cav.html#UFLP_2_cav.gen_special_jUFLP">[docs]</a><span class="k">def</span> <span class="nf">gen_special_jUFLP</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">linking</span><span class="o">=</span><span class="s2">&quot;consecutive&quot;</span><span class="p">,</span> <span class="n">inst_type</span><span class="o">=</span><span class="s2">&quot;cavemen&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate a special instance of jUFLP.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n, M, L: instance parameters (see :py:func:`gen_nlinks_cavemen_inst`.)</span>
+<span class="sd">        linking (str): linking constraints type, one of:</span>
+
+<span class="sd">            - &quot;uniform&quot;: link randomly, regardless of clusters,</span>
+<span class="sd">            - &quot;consecutive&quot;: link randomly within consecutive clusters</span>
+<span class="sd">              (&#39;ladder linking&#39;)</span>
+<span class="sd">            - &quot;by-cluster&quot;: link randomly, but cluster-to-cluster.</span>
+<span class="sd">            - &quot;cluster-reverse&quot;: consecutive clusters, in reverse order</span>
+<span class="sd">              within each pair of clusters.</span>
+<span class="sd">            - &quot;literal&quot;: trivial linking, 1-to-1.</span>
+
+<span class="sd">        inst_type (str): instance topology, one of:</span>
+<span class="sd">            - &quot;1-link&quot;: ... (cluster) - (node) -(cluster) ...</span>
+<span class="sd">            - &quot;cavemen&quot;: ... (cluster) - (cluster) ...</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      i1, i2, link: two instances (S,f,c, caves) and linking dict.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">inst_type</span> <span class="o">==</span> <span class="s2">&quot;1-link&quot;</span><span class="p">:</span>
+        <span class="n">i1</span> <span class="o">=</span> <span class="n">gen_nlinks_cavemen_inst</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+        <span class="n">i2</span> <span class="o">=</span> <span class="n">gen_nlinks_cavemen_inst</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">inst_type</span> <span class="o">==</span> <span class="s2">&quot;cavemen&quot;</span><span class="p">:</span>
+        <span class="n">i1</span> <span class="o">=</span> <span class="n">gen_caveman_inst</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+        <span class="n">i2</span> <span class="o">=</span> <span class="n">gen_caveman_inst</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+        <span class="n">caves1</span> <span class="o">=</span> <span class="p">[</span><span class="n">ca</span><span class="o">.</span><span class="n">S</span> <span class="k">for</span> <span class="n">ca</span> <span class="ow">in</span> <span class="n">i1</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span>
+        <span class="n">caves2</span> <span class="o">=</span> <span class="p">[</span><span class="n">ca</span><span class="o">.</span><span class="n">S</span> <span class="k">for</span> <span class="n">ca</span> <span class="ow">in</span> <span class="n">i2</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span>
+        <span class="n">i1</span> <span class="o">=</span> <span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">i1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">caves1</span><span class="p">]</span>
+        <span class="n">i2</span> <span class="o">=</span> <span class="p">[</span><span class="n">i2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">i2</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">caves2</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrong value of `inst_type`(</span><span class="si">{</span><span class="n">inst_type</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="o">+</span>
+                         <span class="s2">&quot;expected: &#39;1-link&#39; or &#39;cavemen&#39;&quot;</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">COL_S</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">i2</span><span class="p">[</span><span class="n">COL_S</span><span class="p">])</span>  <span class="c1"># must be the same no. of nodes.</span>
+
+    <span class="k">if</span> <span class="n">linking</span> <span class="o">==</span> <span class="s2">&quot;uniform&quot;</span><span class="p">:</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">COL_S</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)],</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span>
+                            <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">i2</span><span class="p">[</span><span class="n">COL_S</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)])))</span>
+    <span class="k">elif</span> <span class="n">linking</span> <span class="o">==</span> <span class="s2">&quot;consecutive&quot;</span><span class="p">:</span>
+        <span class="n">ca1</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">i1</span><span class="p">[</span><span class="n">COL_caves</span><span class="p">]]</span>
+        <span class="n">ca2</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">i2</span><span class="p">[</span><span class="n">COL_caves</span><span class="p">]]</span>
+
+        <span class="n">link</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca1</span><span class="p">)):</span>
+            <span class="n">link</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ca1</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">ca2</span><span class="p">[</span><span class="n">k</span><span class="p">]))))</span>
+
+        <span class="n">in_clusters1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="nb">sum</span><span class="p">([],</span> <span class="n">ca1</span><span class="p">))</span>
+        <span class="n">in_clusters2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="nb">sum</span><span class="p">([],</span> <span class="n">ca2</span><span class="p">))</span>
+
+        <span class="n">origins</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                   <span class="k">if</span> <span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">in_clusters1</span><span class="p">]</span>
+
+        <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">i2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                   <span class="k">if</span> <span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">in_clusters2</span><span class="p">]</span>
+
+        <span class="n">link</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">origins</span><span class="p">,</span> <span class="n">targets</span><span class="p">)))</span>
+    <span class="k">elif</span> <span class="n">linking</span> <span class="o">==</span> <span class="s2">&quot;by-cluster&quot;</span><span class="p">:</span>
+        <span class="n">ca1</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">i1</span><span class="p">[</span><span class="n">COL_caves</span><span class="p">]]</span>
+        <span class="n">ca2</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">i2</span><span class="p">[</span><span class="n">COL_caves</span><span class="p">]]</span>
+
+        <span class="n">link</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">clusters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca2</span><span class="p">))])</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca1</span><span class="p">)):</span>
+            <span class="n">link</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ca1</span><span class="p">[</span><span class="n">k</span><span class="p">],</span>
+                                 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">ca2</span><span class="p">[</span><span class="n">clusters</span><span class="p">[</span><span class="n">k</span><span class="p">]]))))</span>
+
+        <span class="n">in_clusters1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="nb">sum</span><span class="p">([],</span> <span class="n">ca1</span><span class="p">))</span>
+        <span class="n">in_clusters2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="nb">sum</span><span class="p">([],</span> <span class="n">ca2</span><span class="p">))</span>
+
+        <span class="n">origins</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                   <span class="k">if</span> <span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">in_clusters1</span><span class="p">]</span>
+
+        <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">i2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                   <span class="k">if</span> <span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">in_clusters2</span><span class="p">]</span>
+
+        <span class="n">link</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">origins</span><span class="p">,</span> <span class="n">targets</span><span class="p">)))</span>
+    <span class="k">elif</span> <span class="n">linking</span> <span class="o">==</span> <span class="s2">&quot;cluster-reverse&quot;</span><span class="p">:</span>
+        <span class="n">ca1</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">i1</span><span class="p">[</span><span class="n">COL_caves</span><span class="p">]]</span>
+        <span class="n">ca2</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">i2</span><span class="p">[</span><span class="n">COL_caves</span><span class="p">]]</span>
+
+        <span class="n">link</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="c1"># clusters = [k for k in np.random.permutation(range(len(ca2)))]</span>
+        <span class="c1"># clusters = [k for k in reversed(range(len(ca2)))]</span>
+        <span class="n">clusters</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca2</span><span class="p">))]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca1</span><span class="p">)):</span>
+            <span class="c1"># link.update(dict(zip(ca1[k],</span>
+            <span class="c1">#                      np.random.permutation(ca2[clusters[k]]))))</span>
+            <span class="n">link</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ca1</span><span class="p">[</span><span class="n">k</span><span class="p">],</span>
+                                 <span class="nb">reversed</span><span class="p">(</span><span class="n">ca2</span><span class="p">[</span><span class="n">clusters</span><span class="p">[</span><span class="n">k</span><span class="p">]]))))</span>
+
+        <span class="n">in_clusters1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="nb">sum</span><span class="p">([],</span> <span class="n">ca1</span><span class="p">))</span>
+        <span class="n">in_clusters2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="nb">sum</span><span class="p">([],</span> <span class="n">ca2</span><span class="p">))</span>
+
+        <span class="n">origins</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                   <span class="k">if</span> <span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">in_clusters1</span><span class="p">]</span>
+
+        <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">i2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                   <span class="k">if</span> <span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">in_clusters2</span><span class="p">]</span>
+
+        <span class="n">link</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">origins</span><span class="p">,</span> <span class="n">targets</span><span class="p">)))</span>
+    <span class="k">elif</span> <span class="n">linking</span> <span class="o">==</span> <span class="s2">&quot;literal&quot;</span><span class="p">:</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)],</span>
+                        <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">i2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrong value of `linking`(</span><span class="si">{</span><span class="n">linking</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="o">+</span>
+                         <span class="s2">&quot;expected &#39;uniform,&#39; &#39;by-cluster,&#39; or &#39;consecutive&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">link</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../_autosummary/UFLP_2_cav.html#UFLP_2_cav.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Implements the j-UFLP experiment discussed in Section 4.2.&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, tDD_toA, int_VS, int_VS_toA&quot;</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="mf">0.35</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">linking</span> <span class="o">=</span> <span class="s2">&quot;cluster-reverse&quot;</span>
+    <span class="n">inst_type</span> <span class="o">=</span> <span class="s2">&quot;cavemen&quot;</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">]:</span>
+            <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jm</span> <span class="o">=</span> <span class="n">gen_special_jUFLP</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">linking</span><span class="p">,</span> <span class="n">inst_type</span><span class="p">)</span>
+            <span class="n">save_inst</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jm</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;instances/jUFLP_cm/inst_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">)</span>
+            <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+            <span class="n">objMIP</span> <span class="o">=</span> <span class="n">solve_cm_jUFLP_MIP</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jm</span><span class="p">)</span>
+            <span class="n">tMIP</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ MIP in </span><span class="si">{</span><span class="n">tMIP</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> sec&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># solve with CPP MIP</span>
+            <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+            <span class="n">objMIP_CPP</span> <span class="o">=</span> <span class="n">solve_cm_jUFLP_CPPMIP_fullDDs</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jm</span><span class="p">)</span>
+            <span class="n">tMIP_CPP</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ CPP MIP in </span><span class="si">{</span><span class="n">tMIP_CPP</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> sec&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+            <span class="n">objDD_VS</span><span class="p">,</span> <span class="n">int_VS</span> <span class="o">=</span> <span class="n">solve_cm_jUFLP_fullDDs</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jm</span><span class="p">,</span> <span class="s2">&quot;VS&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="n">tDD_VS</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ Full DDs VS in </span><span class="si">{</span><span class="n">tDD_VS</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> sec&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+            <span class="n">objDD_toA</span><span class="p">,</span> <span class="n">int_VS_toA</span> <span class="o">=</span> <span class="n">solve_cm_jUFLP_fullDDs</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jm</span><span class="p">,</span> <span class="s2">&quot;toA&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="n">tDD_toA</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ Full DDs toA in </span><span class="si">{</span><span class="n">tDD_toA</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> sec&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">objMIP</span> <span class="o">-</span> <span class="n">objMIP_CPP</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;objMIP = </span><span class="si">{</span><span class="n">objMIP</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, objMIP_CPP=</span><span class="si">{</span><span class="n">objMIP_CPP</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">objMIP</span> <span class="o">-</span> <span class="n">objDD_VS</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;objMIP = </span><span class="si">{</span><span class="n">objMIP</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, objDD_VS=</span><span class="si">{</span><span class="n">objDD_VS</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">objMIP</span> <span class="o">-</span> <span class="n">objDD_toA</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;objMIP = </span><span class="si">{</span><span class="n">objMIP</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, objDD_toA=</span><span class="si">{</span><span class="n">objDD_toA</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="n">A</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">i1</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="nb">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">i2</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span><span class="o">/</span><span class="mi">2</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">M</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">i2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">A</span><span class="si">}</span><span class="s2">, &quot;</span> <span class="o">+</span>
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">inst_type</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">linking</span><span class="si">}</span><span class="s2">, &quot;</span> <span class="o">+</span>
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tMIP</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">tMIP_CPP</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">tDD_VS</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">tDD_toA</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">int_VS</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">int_VS_toA</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                  <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
