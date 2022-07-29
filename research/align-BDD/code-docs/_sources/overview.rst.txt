@@ -131,7 +131,7 @@ The computations are summarized in the following table (scrollable right):
 +                +                                             +                                                                   +                                   +        +                             +                                    +
 | Figure 22      | ``heuristic_simscore_vs_AB_simscore. eps``  |                                                                   |                                   |        |                             |                                    |
 +----------------+---------------------------------------------+-------------------------------------------------------------------+-----------------------------------+--------+-----------------------------+------------------------------------+
-| Figure 9b      | ``tMIP_tMIPCPP_tDD.eps``                    | :py:mod:`UFLP_2_cav`  :py:func:`darkcloud.gen_cavemen_inst`       | ``jUFLP.tar.gz``                  | json   | ``2022-07-19_jUFLP.csv``    | ``fig_DDvsMIP.R``                  |
+| Figure 9b      | ``tMIP_tMIPCPP_tDD.eps``                    | :py:mod:`UFLP_2_cav`  :py:func:`darkcloud.gen_caveman_inst`       | ``jUFLP.tar.gz``                  | json   | ``2022-07-19_jUFLP.csv``    | ``fig_DDvsMIP.R``                  |
 +                +                                             +                                                                   +                                   +        +                             +                                    +
 | Figure 10a     | ``intDD_VS_vs_toA.eps``                     | :py:mod:`jUFLP_cavemen`  :py:mod:`jUFLP_utils`                    |                                   |        |                             |                                    |
 +                +                                             +                                                                   +                                   +        +                             +                                    +
@@ -287,7 +287,7 @@ experiments``
    solve_inst
    experiments
    UFLP_2_cav
-
+   darkcloud
 
 Testing framework
 ^^^^^^^^^^^^^^^^^

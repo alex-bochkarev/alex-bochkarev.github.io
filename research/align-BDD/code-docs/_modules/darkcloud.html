@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>darkcloud &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Align-BDD
+          </a>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#code-organization">Code organization</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Align-BDD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>darkcloud</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for darkcloud</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Contains the j-UFLP instance generation code (along with some legacy experiments).</span>
+
+<span class="sd">Implements the &#39;cloud&#39; algorithm that builds a BDD for a UFLP (using separate MIPs)</span>
+<span class="sd">over a relaxed cavemen graph. Generates the &#39;points-cluster&#39; sturcutred instances.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">import</span> <span class="nn">gurobipy</span> <span class="k">as</span> <span class="nn">gp</span>
+<span class="kn">from</span> <span class="nn">experiments.softcover</span> <span class="kn">import</span> <span class="n">generate_overlaps</span><span class="p">,</span> <span class="n">assert_instance</span>
+<span class="kn">from</span> <span class="nn">BDD</span> <span class="kn">import</span> <span class="n">BDD</span><span class="p">,</span> <span class="n">NTRUE</span><span class="p">,</span> <span class="n">NFALSE</span><span class="p">,</span> <span class="n">NROOT</span><span class="p">,</span> <span class="n">intersect</span>
+<span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+<span class="kn">import</span> <span class="nn">varseq</span> <span class="k">as</span> <span class="nn">vs</span>
+<span class="kn">import</span> <span class="nn">BB_search</span> <span class="k">as</span> <span class="nn">bb</span>
+
+
+<div class="viewcode-block" id="ptscloud"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.ptscloud">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ptscloud</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Keeps current &#39;cloud&#39; of points (modeling a &#39;cave&#39;).</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        e1, e2 (tuple): the 4 endpoints of the 2 edges emanating from the cave,</span>
+<span class="sd">        S (list[int]): a list of points within the cave.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">e1</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">e2</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">S</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="gen_caveman_inst"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.gen_caveman_inst">[docs]</a><span class="k">def</span> <span class="nf">gen_caveman_inst</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates an instance with the related metadata (info on caves).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      n (int): number of caves,</span>
+<span class="sd">      M (int): number of points in a cave,</span>
+<span class="sd">      L (float): edge sparsity parameter (share of missing edges)</span>
+<span class="sd">      verbose (Bool): print debug info</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      S, f, c, caves: instance (S,f,c) and caves description.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">      The parameter ``L`` is assumed to be:</span>
+
+<span class="sd">      .. math::</span>
+<span class="sd">          L = 1 - 2\\frac{\\textrm{Number of existing arcs}}{N(N-1)}</span>
+
+<span class="sd">      (See, e.g., Sefair and Smith 2016 on DSPI for a similar approach.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># creating the graph topology first</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="p">[[</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">M</span><span class="p">)]</span>  <span class="c1"># creating the nodes first</span>
+    <span class="n">entry_point</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">caves</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">lastcave</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">M</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">caves</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">caves</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">e2</span> <span class="o">=</span> <span class="n">entry_point</span>
+            <span class="n">S</span><span class="p">[</span><span class="n">entry_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry_point</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">S</span><span class="p">[</span><span class="n">entry_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry_point</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">n_edges</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># create the necessary number of connected nodes</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">lastcave</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">M</span><span class="p">:</span>
+            <span class="n">connect_to</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">lastcave</span><span class="p">)</span>
+            <span class="n">lastcave</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lastcave</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">S</span><span class="p">[</span><span class="n">lastcave</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">connect_to</span><span class="p">)</span>
+            <span class="n">S</span><span class="p">[</span><span class="n">connect_to</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lastcave</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">n_edges</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># add edges to ensure the required sparsity</span>
+        <span class="k">while</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">n_edges</span> <span class="o">/</span> <span class="p">(</span><span class="n">M</span><span class="o">*</span><span class="p">(</span><span class="n">M</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="n">L</span><span class="p">:</span>
+            <span class="n">n1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">lastcave</span><span class="p">)</span>
+            <span class="n">n2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">lastcave</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">n1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">n2</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">S</span><span class="p">[</span><span class="n">n2</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
+                <span class="n">S</span><span class="p">[</span><span class="n">n1</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span>
+                <span class="n">n_edges</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">caves</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ptscloud</span><span class="p">(</span><span class="n">entry_point</span><span class="p">,</span>
+                              <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                              <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="n">M</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">M</span><span class="o">+</span><span class="mi">1</span><span class="p">)]))</span>
+
+        <span class="n">entry_point</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">lastcave</span><span class="p">),</span> <span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">M</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># creating costs info (location and overlap costs)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">generate_overlaps</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="n">C0</span> <span class="o">=</span> <span class="mf">5.0</span>
+    <span class="n">Cw</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="n">C0</span> <span class="o">+</span> <span class="n">Cw</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">()</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">))]</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;S=</span><span class="si">{</span><span class="n">S</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">f=</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="se">\n</span><span class="s2">;c=</span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span></div>
+
+
+<div class="viewcode-block" id="gen_typed_cavemen_inst"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.gen_typed_cavemen_inst">[docs]</a><span class="k">def</span> <span class="nf">gen_typed_cavemen_inst</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">kb_max</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates an instance with types.</span>
+
+<span class="sd">    First parameters are that of :py:func:`gen_caveman_inst`. The other ones</span>
+<span class="sd">    are ``K``, number of types, and ``kb_max`` -- max type budget.</span>
+
+<span class="sd">    Relies on :py:func:`darkcloud.gen_caveman_inst` for graph generation.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        S (adjacencies), f (overlap costs), c (location costs),</span>
+<span class="sd">        caves (list of ptscloud), k (point types), kbar (type budgets)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">gen_caveman_inst</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+    <span class="n">join_pts</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">e1</span> <span class="o">+</span> <span class="n">c</span><span class="o">.</span><span class="n">e2</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">caves</span><span class="p">],</span> <span class="p">[])</span>
+    <span class="n">join_pts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">join_pts</span> <span class="k">if</span> <span class="n">j</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]))</span>
+    <span class="k">assert</span> <span class="n">K</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">join_pts</span><span class="p">),</span> <span class="s2">&quot;More classes than cave joining points!&quot;</span> <span class="o">+</span><span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">K</span><span class="si">}</span><span class="s2">&gt;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">join_pts</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+        <span class="n">pt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">join_pts</span><span class="p">)</span>
+        <span class="n">k</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">pt</span><span class="p">:</span> <span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">})</span>
+        <span class="n">join_pts</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">join_pts</span><span class="p">:</span>
+        <span class="n">k</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">pt</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">K</span><span class="o">+</span><span class="mi">1</span><span class="p">)})</span>
+
+    <span class="n">kbar</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">kb_max</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kbar</span></div>
+
+
+<div class="viewcode-block" id="dump_instance"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.dump_instance">[docs]</a><span class="k">def</span> <span class="nf">dump_instance</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;tmp/S.dot&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Dumps a graph implied by S into a `.dot` file. &quot;&quot;&quot;</span>
+    <span class="n">added</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;graph G {</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="p">((</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">j</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(((</span><span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="ow">in</span> <span class="n">added</span><span class="p">)</span>
+                                         <span class="ow">or</span> <span class="p">((</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="ow">in</span> <span class="n">added</span><span class="p">)):</span>
+                    <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> -- n</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">added</span><span class="o">.</span><span class="n">add</span><span class="p">(((</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">j</span><span class="p">))</span>
+
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="save_typed_instance"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.save_typed_instance">[docs]</a><span class="k">def</span> <span class="nf">save_typed_instance</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">caves</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kbar</span><span class="p">,</span> <span class="n">more_info</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                        <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;tmp/inst.dot&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Draws a ``dot`` for the given instance.&quot;&quot;&quot;</span>
+    <span class="n">cnum</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;graph G {</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    label=</span><span class="se">\&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">kbar</span><span class="p">)</span><span class="si">}</span><span class="s2"> types,&quot;</span> <span class="o">+</span>
+                   <span class="sa">f</span><span class="s2">&quot; budget=</span><span class="si">{</span><span class="n">kbar</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">more_info</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;    labelloc=top; labeljust=center;fontsize=100;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">caves</span><span class="p">:</span>
+            <span class="n">cnum</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    subgraph cluster_</span><span class="si">{</span><span class="n">cnum</span><span class="si">}</span><span class="s2">&quot;</span> <span class="s2">&quot;{</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">S</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+                    <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;        n</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">[label=</span><span class="si">{</span><span class="n">k</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2"> fontsize=50];</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;        n</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">+</span>
+                               <span class="s2">&quot;[shape=point height=0.2 width=0.2 color=red];</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;    }</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">Si</span> <span class="ow">in</span> <span class="n">S</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">Si</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="k">if</span> <span class="p">((</span><span class="n">Si</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">j</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="n">j</span><span class="p">,</span> <span class="n">Si</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">):</span>
+                    <span class="n">edges</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">Si</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">j</span><span class="p">))</span>
+                    <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    n</span><span class="si">{</span><span class="n">Si</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> -- n</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="prepare_inst"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.prepare_inst">[docs]</a><span class="k">def</span> <span class="nf">prepare_inst</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;tmp/instance.gv&quot;</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="mf">0.45</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">kb_max</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kbar</span> <span class="o">=</span> <span class="n">gen_typed_cavemen_inst</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">kb_max</span><span class="p">)</span>
+
+    <span class="c1"># solve the unconstrained (untyped) version</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">DDSolver</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">)</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">build_cover_DD</span><span class="p">()</span>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">()</span>
+    <span class="n">objU</span> <span class="o">=</span> <span class="n">sp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">tUDD</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">solve_with_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    <span class="n">tUMIP</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+
+    <span class="c1"># solve the constrained (typed) version</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">DDTypedSolver</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kbar</span><span class="p">)</span>
+    <span class="n">objC</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">solve_with_DDs</span><span class="p">()</span>
+    <span class="n">tCDD</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">solve_typed_with_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kbar</span><span class="p">)</span>
+    <span class="n">tCMIP</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+
+    <span class="n">save_typed_instance</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">caves</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kbar</span><span class="p">,</span>
+                        <span class="n">more_info</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">, M=</span><span class="si">{</span><span class="n">M</span><span class="si">}</span><span class="s2">, L=</span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">+</span>
+                        <span class="sa">f</span><span class="s2">&quot;objective: typed </span><span class="si">{</span><span class="n">objC</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, untyped </span><span class="si">{</span><span class="n">objU</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                        <span class="sa">f</span><span class="s2">&quot;MIP time: typed </span><span class="si">{</span><span class="n">tCMIP</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, untyped </span><span class="si">{</span><span class="n">tUMIP</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> sec.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">+</span>
+                        <span class="sa">f</span><span class="s2">&quot;DD  time: typed </span><span class="si">{</span><span class="n">tCDD</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, untyped </span><span class="si">{</span><span class="n">tUDD</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> sec.&quot;</span><span class="p">,</span>
+                        <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="prepare_inst_gallery"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.prepare_inst_gallery">[docs]</a><span class="k">def</span> <span class="nf">prepare_inst_gallery</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">prepare_inst</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;reports/2022-05-10_Darkcloud/instances/inst</span><span class="si">{</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.gv&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="gen_simple_cavemen_inst0"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.gen_simple_cavemen_inst0">[docs]</a><span class="k">def</span> <span class="nf">gen_simple_cavemen_inst0</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Generates a simple instance with metadata.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      S, f, c, caves</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">15</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">13</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">14</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="mi">14</span><span class="p">]]</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="n">generate_overlaps</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">5.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">))]</span>
+    <span class="n">caves</span> <span class="o">=</span> <span class="p">[</span><span class="n">ptscloud</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">]),</span>
+             <span class="n">ptscloud</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">]),</span>
+             <span class="n">ptscloud</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">16</span><span class="p">])]</span>
+
+    <span class="k">return</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span></div>
+
+
+<div class="viewcode-block" id="gen_simple_cavemen_inst1"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.gen_simple_cavemen_inst1">[docs]</a><span class="k">def</span> <span class="nf">gen_simple_cavemen_inst1</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Generates (another) simple instance with metadata.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      S, f, c, caves</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">7</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">9</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span><span class="mi">11</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">12</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span><span class="mi">13</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">13</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">15</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span><span class="mi">15</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">18</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="mi">18</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span><span class="mi">16</span><span class="p">,</span><span class="mi">17</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">19</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span><span class="mi">22</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span><span class="mi">21</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">21</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span><span class="mi">22</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">22</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span><span class="mi">21</span><span class="p">,</span><span class="mi">23</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">23</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">26</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">24</span><span class="p">,</span> <span class="mi">26</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">26</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">26</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span><span class="mi">25</span><span class="p">]]</span>
+
+    <span class="n">caves</span> <span class="o">=</span> <span class="p">[</span><span class="n">ptscloud</span><span class="p">((</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]),</span>
+             <span class="n">ptscloud</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">]),</span>
+             <span class="n">ptscloud</span><span class="p">((</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">13</span><span class="p">),</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">12</span><span class="p">]),</span>
+             <span class="n">ptscloud</span><span class="p">((</span><span class="mi">12</span><span class="p">,</span><span class="mi">13</span><span class="p">),</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">18</span><span class="p">),</span> <span class="p">[</span><span class="mi">13</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">15</span><span class="p">]),</span>
+             <span class="n">ptscloud</span><span class="p">((</span><span class="mi">15</span><span class="p">,</span><span class="mi">18</span><span class="p">),</span> <span class="p">(</span><span class="mi">17</span><span class="p">,</span><span class="mi">20</span><span class="p">),</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">18</span><span class="p">]),</span>
+             <span class="n">ptscloud</span><span class="p">((</span><span class="mi">17</span><span class="p">,</span><span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">22</span><span class="p">,</span><span class="mi">23</span><span class="p">),</span> <span class="p">[</span><span class="mi">19</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">21</span><span class="p">,</span><span class="mi">22</span><span class="p">]),</span>
+             <span class="n">ptscloud</span><span class="p">((</span><span class="mi">22</span><span class="p">,</span><span class="mi">23</span><span class="p">),</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="p">[</span><span class="mi">23</span><span class="p">,</span><span class="mi">24</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">26</span><span class="p">])]</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="n">generate_overlaps</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">5.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">))]</span>
+
+    <span class="k">return</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span></div>
+
+
+<div class="viewcode-block" id="DDSolver"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.DDSolver">[docs]</a><span class="k">class</span> <span class="nc">DDSolver</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Implements a DD-based solver for the j-UFLP over &#39;cavemen&#39;-instances.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">S</span> <span class="o">=</span> <span class="n">S</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">f</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">c</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caves</span> <span class="o">=</span> <span class="n">caves</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="DDSolver._add_interim_point"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.DDSolver._add_interim_point">[docs]</a>    <span class="k">def</span> <span class="nf">_add_interim_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">current_state</span><span class="p">,</span> <span class="n">new_state</span><span class="p">,</span>  <span class="n">current_layer</span><span class="p">,</span>
+                           <span class="n">add_costs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds variable after the current layer.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">new_state</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Last var, </span><span class="si">{</span><span class="n">new_state</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">, is not </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">next_layer</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">state_pos</span> <span class="o">=</span> <span class="p">{</span><span class="n">var</span><span class="p">:</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">current_state</span><span class="p">)}</span>
+        <span class="n">state_pos</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">state_pos</span><span class="p">)})</span>
+
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">current_layer</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">xval</span><span class="p">,</span> <span class="n">arc</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[(</span><span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">),</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]:</span>
+                <span class="n">astate</span> <span class="o">=</span> <span class="n">state</span> <span class="o">+</span> <span class="p">(</span><span class="n">xval</span><span class="p">,)</span>
+                <span class="n">newstate</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">astate</span><span class="p">[</span><span class="n">state_pos</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">new_state</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">add_costs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">fnodes</span> <span class="o">=</span> <span class="p">{</span><span class="n">current_state</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">astate</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                              <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">current_state</span><span class="p">))}</span>
+                    <span class="n">fnodes</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">x</span><span class="p">:</span> <span class="n">astate</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]})</span>
+                    <span class="n">cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_cave</span><span class="p">(</span><span class="n">add_costs</span><span class="p">,</span> <span class="n">fixed_nodes</span><span class="o">=</span><span class="n">fnodes</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">newstate</span> <span class="ow">in</span> <span class="n">next_layer</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">current_layer</span><span class="p">[</span><span class="n">state</span><span class="p">],</span> <span class="n">next_layer</span><span class="p">[</span><span class="n">newstate</span><span class="p">],</span>
+                                 <span class="n">arc</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">newnode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">current_layer</span><span class="p">[</span><span class="n">state</span><span class="p">],</span> <span class="n">arc</span><span class="p">,</span>
+                                             <span class="n">edge_weight</span><span class="o">=</span><span class="n">cost</span><span class="p">)</span>
+                    <span class="n">next_layer</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">newstate</span><span class="p">:</span> <span class="n">newnode</span><span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">next_layer</span></div>
+
+<div class="viewcode-block" id="DDSolver._calc_cave"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.DDSolver._calc_cave">[docs]</a>    <span class="k">def</span> <span class="nf">_calc_cave</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cave</span><span class="p">,</span> <span class="n">fixed_nodes</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates part of the objective due to the given cave.&quot;&quot;&quot;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">modelSense</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">MINIMIZE</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="n">endpoints</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cave</span><span class="o">.</span><span class="n">e1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cave</span><span class="o">.</span><span class="n">e2</span><span class="p">]</span>
+        <span class="n">endpoints</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">endpoints</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+
+        <span class="n">V</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">cave</span><span class="o">.</span><span class="n">S</span><span class="p">]</span> <span class="o">+</span> <span class="n">endpoints</span><span class="p">))</span>
+
+        <span class="c1"># variables</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">V</span><span class="p">:</span>
+            <span class="c1"># decision (location) variables</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cave</span><span class="o">.</span><span class="n">S</span><span class="p">:</span>
+                <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;x</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="c1"># overlap (aux) variables</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">y</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span>
+                                         <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;y_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                         <span class="n">obj</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;x</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                <span class="n">obj</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="c1"># constraints</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">V</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cave</span><span class="o">.</span><span class="n">S</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span>
+                        <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">y</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span>
+                                    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])):</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">y</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="o">&gt;=</span> <span class="n">y</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+
+        <span class="c1"># fixing variables</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Calc: S=</span><span class="si">{</span><span class="n">cave</span><span class="o">.</span><span class="n">S</span><span class="si">}</span><span class="s2">, fixed=</span><span class="si">{</span><span class="n">fixed_nodes</span><span class="si">}</span><span class="s2">, e1=</span><span class="si">{</span><span class="n">cave</span><span class="o">.</span><span class="n">e1</span><span class="si">}</span><span class="s2">, e2=</span><span class="si">{</span><span class="n">cave</span><span class="o">.</span><span class="n">e2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">fixed_nodes</span><span class="p">:</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">==</span> <span class="n">fixed_nodes</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">*</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">m</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">m</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">OPTIMAL</span>
+
+        <span class="n">fterm</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">cave</span><span class="o">.</span><span class="n">S</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">objVal</span> <span class="o">+</span> <span class="n">fterm</span></div>
+
+<div class="viewcode-block" id="DDSolver.build_cover_DD"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.DDSolver.build_cover_DD">[docs]</a>    <span class="k">def</span> <span class="nf">build_cover_DD</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Builds a cover/overlap DD for the instance.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">caves</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+
+        <span class="n">vars_to_add</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([[</span><span class="n">c</span><span class="o">.</span><span class="n">e1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">.</span><span class="n">e1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">.</span><span class="n">e2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">.</span><span class="n">e2</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+                          <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">caves</span><span class="p">],</span> <span class="p">[])</span>
+        <span class="n">vars_to_add</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">([</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vars_to_add</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">=</span> <span class="n">BDD</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">vars_to_add</span><span class="p">),</span> <span class="n">weighted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">varnames</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">current_layer</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">():</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">parent_node</span><span class="o">=</span><span class="kc">None</span><span class="p">)}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">curr_state</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">cavenum</span><span class="p">,</span> <span class="n">cave</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">caves</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">new_points</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">drop_points</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="n">new_points</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="p">(</span><span class="n">cave</span><span class="o">.</span><span class="n">e1</span> <span class="o">+</span> <span class="n">cave</span><span class="o">.</span><span class="n">e2</span><span class="p">)</span>
+                                         <span class="k">if</span> <span class="p">(</span><span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_state</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                                                 <span class="n">j</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)]))</span>
+            <span class="n">drop_points</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">cave</span><span class="o">.</span><span class="n">e1</span> <span class="k">if</span> <span class="p">(</span><span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cave</span><span class="o">.</span><span class="n">e2</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">j</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)]</span>
+
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">new_points</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">current_layer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_interim_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_state</span><span class="p">,</span>
+                                                        <span class="bp">self</span><span class="o">.</span><span class="n">curr_state</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span><span class="p">],</span>
+                                                        <span class="n">current_layer</span><span class="p">)</span>
+                <span class="n">varnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">curr_state</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span><span class="p">]</span>
+
+            <span class="n">x</span> <span class="o">=</span> <span class="n">new_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">cavenum</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">caves</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span>
+                <span class="c1"># processing the last point</span>
+                <span class="n">newstate</span> <span class="o">=</span> <span class="p">[</span><span class="n">y</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">curr_state</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span><span class="p">])</span>
+                            <span class="k">if</span> <span class="n">y</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">drop_points</span><span class="p">]</span>
+                <span class="n">current_layer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_interim_point</span><span class="p">(</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_state</span><span class="p">,</span> <span class="n">newstate</span><span class="p">,</span>
+                    <span class="n">current_layer</span><span class="p">,</span>
+                    <span class="n">add_costs</span><span class="o">=</span><span class="n">cave</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># that&#39;s the last point of the pre-last cloud</span>
+                <span class="c1"># connecting everything to T and F nodes</span>
+                <span class="c1"># (no new nodes needed, just calculate costs)</span>
+                <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">current_layer</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="n">xval</span><span class="p">,</span> <span class="n">arc</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[(</span><span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">),</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)]:</span>
+                        <span class="n">fixed_vals</span> <span class="o">=</span> <span class="p">{</span>
+                            <span class="n">pt</span><span class="p">:</span> <span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">curr_state</span><span class="p">)}</span>
+
+                        <span class="n">fixed_vals</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">new_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span> <span class="n">xval</span><span class="p">})</span>
+
+                        <span class="n">fvals2</span> <span class="o">=</span> <span class="p">{</span><span class="n">var</span><span class="p">:</span> <span class="n">fixed_vals</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">fixed_vals</span>
+                                  <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">caves</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">S</span> <span class="o">+</span>
+                                             <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">caves</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">e1</span><span class="p">)</span> <span class="o">+</span>
+                                             <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">caves</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">e2</span><span class="p">))}</span>
+                        <span class="n">cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_cave</span><span class="p">(</span><span class="n">cave</span><span class="p">,</span>
+                                               <span class="n">fixed_vals</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_cave</span><span class="p">(</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">caves</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">fvals2</span><span class="p">)</span>
+
+                        <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">current_layer</span><span class="p">[</span><span class="n">state</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">NTRUE</span><span class="p">,</span> <span class="n">arc</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
+
+            <span class="n">varnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">curr_state</span> <span class="o">=</span> <span class="n">newstate</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">rename_vars</span><span class="p">({</span><span class="n">i</span><span class="p">:</span> <span class="n">varnames</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">vars</span><span class="p">})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span></div></div>
+
+
+<div class="viewcode-block" id="DDTypedSolver"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.DDTypedSolver">[docs]</a><span class="k">class</span> <span class="nc">DDTypedSolver</span> <span class="p">(</span><span class="n">DDSolver</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kbar</span><span class="p">):</span>
+        <span class="n">DDSolver</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kbar</span> <span class="o">=</span> <span class="n">kbar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="DDTypedSolver.build_type_DD"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.DDTypedSolver.build_type_DD">[docs]</a>    <span class="k">def</span> <span class="nf">build_type_DD</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Builds a BDD encoding location-level constraints.</span>
+
+<span class="sd">        Deals with no. locations per type and location costs.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            f (dict): location costs,</span>
+<span class="sd">            types (dict): type codes per facility</span>
+<span class="sd">            k_bar (np.array): max. number of locations per type.</span>
+<span class="sd">            preferred_order (list): order of nodes to align to, as possible</span>
+<span class="sd">                                    (e.g., of the already built cover DD)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            D (class BDD): resulting diagram.</span>
+<span class="sd">            nl (dict): string node labels (&quot;states&quot;), `id` -&gt; `label` (string).</span>
+
+<span class="sd">            Implementation based on :py:func:`tUFLP.build_type_DD`.</span>
+
+<span class="sd">            FIXME: revise this doc</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">=</span> <span class="n">BDD</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">),</span>
+                     <span class="nb">vars</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;stub</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)],</span>
+                     <span class="n">weighted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># a *state* is the number of located facilities</span>
+        <span class="c1"># for the *current* type (a single number)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># (original) nodes counter</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+
+        <span class="n">node_labels</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">({</span><span class="n">NROOT</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+        <span class="n">next_layer</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="kc">None</span><span class="p">)}</span>
+        <span class="n">trash_pipe</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">customers</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)}</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">vars</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">:</span>
+                <span class="n">customers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+
+        <span class="n">types</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">([(</span><span class="n">c</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                                            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kbar</span><span class="p">))]))</span>
+
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">customer</span> <span class="ow">in</span> <span class="n">customers</span><span class="p">[</span><span class="n">c</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="n">N</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="n">current_layer</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">next_layer</span><span class="p">)</span>
+                <span class="n">next_layer</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">trash_pipe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># create a new &quot;false&quot; running node.</span>
+                    <span class="n">new_tp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">trash_pipe</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">trash_pipe</span><span class="p">,</span> <span class="n">new_tp</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+                    <span class="n">trash_pipe</span> <span class="o">=</span> <span class="n">new_tp</span>
+                    <span class="n">node_labels</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">trash_pipe</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="s2">&quot;💀&quot;</span><span class="p">})</span>
+
+                <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">current_layer</span><span class="p">:</span>
+                    <span class="n">node</span> <span class="o">=</span> <span class="n">current_layer</span><span class="p">[</span><span class="n">state</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">next_layer</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">next_layer</span><span class="p">[</span><span class="n">state</span><span class="p">],</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">newnode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                        <span class="n">next_layer</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">state</span><span class="p">:</span> <span class="n">newnode</span><span class="p">})</span>
+                        <span class="n">node_labels</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">newnode</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">state</span><span class="p">)})</span>
+
+                    <span class="k">if</span> <span class="p">(</span><span class="n">state</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="ow">in</span> <span class="n">next_layer</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">next_layer</span><span class="p">[</span><span class="n">state</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span>
+                                     <span class="n">edge_weight</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">state</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">kbar</span><span class="p">[</span><span class="n">c</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                            <span class="k">if</span> <span class="n">trash_pipe</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="n">trash_pipe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+                                <span class="n">node_labels</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">trash_pipe</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="s2">&quot;💀&quot;</span><span class="p">})</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">trash_pipe</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">newnode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+                            <span class="n">next_layer</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">state</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span> <span class="n">newnode</span><span class="p">})</span>
+                            <span class="n">node_labels</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">newnode</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">state</span><span class="o">+</span><span class="mi">1</span><span class="p">)})</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">rename_vars</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;stub</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">customer</span><span class="p">})</span>
+                <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1"># Processing the last customer separately</span>
+            <span class="c1"># (within a type)</span>
+
+            <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">:</span>
+                <span class="n">current_layer</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">next_layer</span><span class="p">)</span>
+                <span class="n">next_layer</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">trash_pipe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># create a new &quot;false&quot; running node.</span>
+                    <span class="n">new_tp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">trash_pipe</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">trash_pipe</span><span class="p">,</span> <span class="n">new_tp</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+                    <span class="n">trash_pipe</span> <span class="o">=</span> <span class="n">new_tp</span>
+                    <span class="n">node_labels</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">trash_pipe</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="s2">&quot;💀&quot;</span><span class="p">})</span>
+
+                <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">current_layer</span><span class="p">:</span>
+                    <span class="n">node</span> <span class="o">=</span> <span class="n">current_layer</span><span class="p">[</span><span class="n">state</span><span class="p">]</span>
+                    <span class="n">new_state</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># we &#39;reset&#39; the type counter</span>
+                    <span class="k">if</span> <span class="n">new_state</span> <span class="ow">in</span> <span class="n">next_layer</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">next_layer</span><span class="p">[</span><span class="n">new_state</span><span class="p">],</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">newnode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+                        <span class="n">next_layer</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">new_state</span><span class="p">:</span> <span class="n">newnode</span><span class="p">})</span>
+                        <span class="n">node_labels</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">newnode</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">new_state</span><span class="p">)})</span>
+
+                    <span class="k">if</span> <span class="p">(</span><span class="n">state</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">kbar</span><span class="p">[</span><span class="n">c</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">trash_pipe</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">trash_pipe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">addnode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+                            <span class="n">node_labels</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">trash_pipe</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="s2">&quot;💀&quot;</span><span class="p">})</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">trash_pipe</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">llink</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">next_layer</span><span class="p">[</span><span class="n">new_state</span><span class="p">],</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">customers</span><span class="p">[</span><span class="n">c</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Empty customers[</span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s2">]&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">rename_vars</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;stub</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">customers</span><span class="p">[</span><span class="n">c</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]})</span>
+                <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># the last layer of the DD</span>
+                <span class="k">if</span> <span class="n">trash_pipe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">trash_pipe</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">NFALSE</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">trash_pipe</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">NFALSE</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">next_layer</span><span class="p">:</span>
+                    <span class="n">node_id</span> <span class="o">=</span> <span class="n">next_layer</span><span class="p">[</span><span class="n">state</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
+                    <span class="k">if</span> <span class="n">state</span><span class="o">+</span><span class="mi">1</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">kbar</span><span class="p">[</span><span class="n">c</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">y_target</span> <span class="o">=</span> <span class="n">NFALSE</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">y_target</span> <span class="o">=</span> <span class="n">NTRUE</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">y_target</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">NTRUE</span><span class="p">,</span> <span class="s2">&quot;lo&quot;</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">rename_vars</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;stub</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">customers</span><span class="p">[</span><span class="n">c</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="p">,</span> <span class="n">node_labels</span></div>
+
+<div class="viewcode-block" id="DDTypedSolver.solve_with_DDs"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.DDTypedSolver.solve_with_DDs">[docs]</a>    <span class="k">def</span> <span class="nf">solve_with_DDs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Solves the problem using the DD-based approach.&quot;&quot;&quot;</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_cover_DD</span><span class="p">()</span>
+        <span class="n">T</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_type_DD</span><span class="p">()</span>
+        <span class="n">vs_C</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">C</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">C</span><span class="o">.</span><span class="n">layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="n">vs_T</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">VarSeq</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">T</span><span class="o">.</span><span class="n">layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">vs_C</span><span class="o">.</span><span class="n">layer_var</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">vs_T</span><span class="o">.</span><span class="n">layer_var</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;T:</span><span class="si">{</span><span class="n">vs_T</span><span class="o">.</span><span class="n">layer_var</span><span class="si">}</span><span class="s2">, C:</span><span class="si">{</span><span class="n">vs_C</span><span class="o">.</span><span class="n">layer_var</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">b</span> <span class="o">=</span> <span class="n">bb</span><span class="o">.</span><span class="n">BBSearch</span><span class="p">(</span><span class="n">vs_C</span><span class="p">,</span> <span class="n">vs_T</span><span class="p">)</span>
+
+        <span class="c1"># bb.TIMEOUT_ITERATIONS=10000</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;optimal&quot;</span> <span class="ow">or</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;timeout&quot;</span>
+
+        <span class="n">Cp</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">Tp</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">Ap_cand</span><span class="o">.</span><span class="n">layer_var</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">int_DD</span> <span class="o">=</span> <span class="n">intersect</span><span class="p">(</span><span class="n">Cp</span><span class="p">,</span> <span class="n">Tp</span><span class="p">)</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="n">int_DD</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">sp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="DDTypedSolver.solve_with_DDs_noVS"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.DDTypedSolver.solve_with_DDs_noVS">[docs]</a>    <span class="k">def</span> <span class="nf">solve_with_DDs_noVS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">TtoC</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Solves the problem using the DD-based approach.&quot;&quot;&quot;</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_cover_DD</span><span class="p">()</span>
+        <span class="n">T</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_type_DD</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">TtoC</span><span class="p">:</span>
+            <span class="n">T</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">C</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">C</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">int_DD</span> <span class="o">=</span> <span class="n">intersect</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="n">int_DD</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">sp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div></div>
+
+<span class="c1"># Testing code ######################################################</span>
+<span class="c1"># First: test that instances are correct</span>
+
+
+<div class="viewcode-block" id="test_inst_gen"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.test_inst_gen">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">30</span><span class="p">)])</span>
+<span class="k">def</span> <span class="nf">test_inst_gen</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tests that instance generator works correctly.&quot;&quot;&quot;</span>
+    <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">gen_simple_cavemen_inst0</span><span class="p">()</span>
+    <span class="n">assert_instance</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">gen_simple_cavemen_inst1</span><span class="p">()</span>
+    <span class="n">assert_instance</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">)</span>
+    <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">gen_caveman_inst</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+    <span class="n">assert_instance</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="solve_with_MIP"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.solve_with_MIP">[docs]</a><span class="k">def</span> <span class="nf">solve_with_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates a MIP model (for gurobi) from an instance specs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        S (list): list of adjacency lists,</span>
+<span class="sd">        f (list): overlap cost function, f[j][a],</span>
+<span class="sd">        c (list): location costs per point.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        model, objective, x, y</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">modelSense</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">MINIMIZE</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">setParam</span><span class="p">(</span><span class="s2">&quot;OutputFlag&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># create variables</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;x_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">obj</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">y</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;y_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                 <span class="n">obj</span><span class="o">=</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">a</span><span class="p">]</span><span class="o">-</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># create constraints</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span>
+                    <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">y</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])):</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">y</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="o">&gt;=</span> <span class="n">y</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+
+    <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">m</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">OPTIMAL</span>
+    <span class="k">return</span> <span class="n">m</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">objVal</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">fs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">fs</span> <span class="ow">in</span> <span class="n">f</span><span class="p">)),</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div>
+
+
+<div class="viewcode-block" id="solve_typed_with_MIP"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.solve_typed_with_MIP">[docs]</a><span class="k">def</span> <span class="nf">solve_typed_with_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kbar</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates a MIP model (for gurobi) from an instance specs.</span>
+
+<span class="sd">    (Typed version.)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        S (list): list of adjacency lists,</span>
+<span class="sd">        f (list): overlap cost function, f[j][a],</span>
+<span class="sd">        c (list): location costs per point.</span>
+<span class="sd">        k (dict): point types,</span>
+<span class="sd">        kbar (list): budget types.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        model, objective value, x, and y</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">modelSense</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">MINIMIZE</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">setParam</span><span class="p">(</span><span class="s2">&quot;OutputFlag&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># create variables</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;x_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">obj</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">y</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVar</span><span class="p">(</span><span class="n">vtype</span><span class="o">=</span><span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;y_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                 <span class="n">obj</span><span class="o">=</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">a</span><span class="p">]</span><span class="o">-</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># create constraints</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span>
+                    <span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">y</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])):</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">y</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="o">&gt;=</span> <span class="n">y</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+
+    <span class="c1"># add type constraints</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">kbar</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="n">gp</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">k</span>
+                                <span class="k">if</span> <span class="n">k</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">t</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">kbar</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">m</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">gp</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">OPTIMAL</span>
+    <span class="k">return</span> <span class="n">m</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">objVal</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">fs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">fs</span> <span class="ow">in</span> <span class="n">f</span><span class="p">)),</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div>
+
+
+<div class="viewcode-block" id="test_BDD_vs_MIP_simple"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.test_BDD_vs_MIP_simple">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)])</span>
+<span class="k">def</span> <span class="nf">test_BDD_vs_MIP_simple</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tests BDD vs MIP over a single topology (random costs).&quot;&quot;&quot;</span>
+    <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">gen_simple_cavemen_inst1</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">compare_BDD_vs_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_BDD_vs_MIP_random"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.test_BDD_vs_MIP_random">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)])</span>
+<span class="k">def</span> <span class="nf">test_BDD_vs_MIP_random</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">)</span>
+    <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">gen_caveman_inst</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">compare_BDD_vs_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="compare_BDD_vs_MIP"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.compare_BDD_vs_MIP">[docs]</a><span class="k">def</span> <span class="nf">compare_BDD_vs_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">):</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">DDSolver</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">)</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">build_cover_DD</span><span class="p">()</span>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">()</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">solve_with_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;obj=</span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2">, sp=</span><span class="si">{</span><span class="n">sp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">obj</span> <span class="o">-</span> <span class="n">sp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">1e-3</span></div>
+
+
+<div class="viewcode-block" id="test_DD_full"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.test_DD_full">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)])</span>
+<span class="k">def</span> <span class="nf">test_DD_full</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tests the DD-based approach against a MiP.&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating instance and solving a MiP (twice)...&quot;</span><span class="p">)</span>
+    <span class="n">generated</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">generated</span><span class="p">:</span>
+        <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kbar</span> <span class="o">=</span> <span class="n">gen_typed_cavemen_inst</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">objMIP</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">solve_typed_with_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kbar</span><span class="p">)</span>
+        <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">objUC</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">solve_with_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>  <span class="c1"># for UnConstrained</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">objMIP</span> <span class="o">-</span> <span class="n">objUC</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">generated</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Done, solved with MIP in </span><span class="si">{</span><span class="n">t1</span> <span class="o">-</span> <span class="n">t0</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> sec. Solving with DDs...&quot;</span><span class="p">)</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">DDTypedSolver</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kbar</span><span class="p">)</span>
+    <span class="n">objDD</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">solve_with_DDs</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Done after </span><span class="si">{</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> sec.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MIP: </span><span class="si">{</span><span class="n">objMIP</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">DDs: </span><span class="si">{</span><span class="n">objDD</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">objMIP</span> <span class="o">-</span> <span class="n">objDD</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span></div>
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../_autosummary/darkcloud.html#darkcloud.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Main experiment: runtimes DD vs MIP.&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Experiment, total_nodes, n, M, L, t_gen, t_BDD_, t_MIP, t_MIPvsDD&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">250</span><span class="p">):</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="mf">0.25</span>
+        <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">gen_caveman_inst</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+        <span class="n">t_gen</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">sol</span> <span class="o">=</span> <span class="n">DDSolver</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span><span class="p">)</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">build_cover_DD</span><span class="p">()</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">()</span>
+        <span class="n">obj_BDD</span> <span class="o">=</span> <span class="n">sp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">t_BDD</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">obj_MIP</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">solve_with_MIP</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+        <span class="n">t_MIP</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">n</span><span class="o">*</span><span class="n">M</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">M</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">L</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">t_gen</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">t_BDD</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">t_MIP</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">t_MIP</span><span class="o">/</span><span class="n">t_BDD</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+              <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">obj_MIP</span> <span class="o">-</span> <span class="n">obj_BDD</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-2</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
