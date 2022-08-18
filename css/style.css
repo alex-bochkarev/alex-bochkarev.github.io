@@ -147,7 +147,7 @@ a[href^="mailto:"]:not(.nav-link):after {
     white-space: nowrap;
 }
 
-a:not([href^='#']):not([href^='/']):not([href*="github.com"]):not([href*="wikipedia.org"]):not(.nav-link):not(.sticker):not([href^="mailto:"])::after {
+a:not([href^='#']):not([href^='/']):not([href^='./']):not([href*="github.com"]):not([href*="wikipedia.org"]):not(.nav-link):not(.sticker):not([href^="mailto:"])::after {
     content: url('/outside.svg');
     vertical-align: 15%;
     padding: 5px;
