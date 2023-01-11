@@ -1,12 +1,12 @@
-﻿.. module:: UFLP_2_cav
-.. currentmodule:: UFLP_2_cav
+.. module:: experiments.jUFLP_simscores_M
+.. currentmodule:: experiments.jUFLP_simscores_M
 
-UFLP\_2\_cav
-============
+experiments.jUFLP\_simscores\_M
+===============================
 
 Module summary
 ---------------
-.. automodule:: UFLP_2_cav
+.. automodule:: experiments.jUFLP_simscores_M
    :no-members:
    :noindex:
 
@@ -21,10 +21,7 @@ Implements functions (outside the classes above):
 .. autosummary::
 
 
-   gen_nlinks_cavemen_inst
-   gen_special_jUFLP
    main
-   make_cluster_reverse_custom_matching
 
 
 
@@ -47,10 +44,7 @@ Functions
 ---------
 
 
-.. autofunction:: gen_nlinks_cavemen_inst
-.. autofunction:: gen_special_jUFLP
 .. autofunction:: main
-.. autofunction:: make_cluster_reverse_custom_matching
 
 
 

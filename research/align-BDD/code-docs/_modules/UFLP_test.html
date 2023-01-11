@@ -73,8 +73,10 @@
 <span class="kn">import</span> <span class="nn">pytest</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">gurobipy</span> <span class="kn">import</span> <span class="n">GRB</span>
+<span class="kn">from</span> <span class="nn">BDD</span> <span class="kn">import</span> <span class="n">simscore</span>
 
 <span class="kn">import</span> <span class="nn">UFL</span>
+<span class="kn">from</span> <span class="nn">UFLP_2_cav</span> <span class="kn">import</span> <span class="n">gen_special_jUFLP</span>
 
 
 <div class="viewcode-block" id="gen_UFL_instance"><a class="viewcode-back" href="../_autosummary/UFLP_test.html#UFLP_test.gen_UFL_instance">[docs]</a><span class="k">def</span> <span class="nf">gen_UFL_instance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
@@ -173,6 +175,22 @@
 
     <span class="k">assert</span> <span class="n">model</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">GRB</span><span class="o">.</span><span class="n">OPTIMAL</span>
     <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">objVal</span> <span class="o">-</span> <span class="n">plain_MIP_obj</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-3</span></div>
+
+
+<div class="viewcode-block" id="test_cluster_reverse_custom"><a class="viewcode-back" href="../_autosummary/UFLP_test.html#UFLP_test.test_cluster_reverse_custom">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;param&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span>
+                                   <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)])</span>
+<span class="k">def</span> <span class="nf">test_cluster_reverse_custom</span><span class="p">(</span><span class="n">param</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tests the jUFLP-instance-generation procedure</span>
+<span class="sd">    (for the given number of inversions).&quot;&quot;&quot;</span>
+    <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">jm</span> <span class="o">=</span> <span class="n">gen_special_jUFLP</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">,</span> <span class="s2">&quot;cluster-reverse-custom&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;cavemen&quot;</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ca1</span> <span class="o">=</span> <span class="n">i1</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ca2</span> <span class="o">=</span> <span class="n">i2</span>
+
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca1</span><span class="p">)):</span>
+        <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">simscore</span><span class="p">(</span><span class="n">ca1</span><span class="p">[</span><span class="n">c</span><span class="p">],</span>
+                            <span class="p">[</span><span class="n">jm</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                              <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">ca1</span><span class="p">[</span><span class="n">c</span><span class="p">]])</span> <span class="o">-</span> <span class="n">param</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.025</span></div>
 </pre></div>
 
            </div>

@@ -24,6 +24,7 @@ Implements functions (outside the classes above):
    gen_UFL_instance
    test_DPs
    test_MIPs
+   test_cluster_reverse_custom
 
 
 
@@ -49,6 +50,7 @@ Functions
 .. autofunction:: gen_UFL_instance
 .. autofunction:: test_DPs
 .. autofunction:: test_MIPs
+.. autofunction:: test_cluster_reverse_custom
 
 
 

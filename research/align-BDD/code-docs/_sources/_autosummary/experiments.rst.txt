@@ -54,10 +54,12 @@ Module summary
    experiments.gen_lsizes_stats
    experiments.greedy_UFLP_sizes
    experiments.heu_sol_struct
+   experiments.jUFLP_simscores_M
    experiments.jUFLP_specins
    experiments.jUFLP_specins_smaller
    experiments.jUFLP_vsMIPs
    experiments.jUFLP_wCPPMIP
+   experiments.jUFLP_w_simscores
    experiments.jUFLPcm
    experiments.jUFL_hist_sizes
    experiments.misc

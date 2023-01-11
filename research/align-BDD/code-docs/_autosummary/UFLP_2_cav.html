@@ -111,11 +111,14 @@ second revision of the paper).</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#UFLP_2_cav.gen_nlinks_cavemen_inst" title="UFLP_2_cav.gen_nlinks_cavemen_inst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen_nlinks_cavemen_inst</span></code></a>([n, M, L])</p></td>
 <td><p>Generates an instance with the related metadata (info on caves).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#UFLP_2_cav.gen_special_jUFLP" title="UFLP_2_cav.gen_special_jUFLP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen_special_jUFLP</span></code></a>(n, M, L[, linking, inst_type])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#UFLP_2_cav.gen_special_jUFLP" title="UFLP_2_cav.gen_special_jUFLP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen_special_jUFLP</span></code></a>(n, M, L[, linking, ...])</p></td>
 <td><p>Generate a special instance of jUFLP.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#UFLP_2_cav.main" title="UFLP_2_cav.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a>()</p></td>
 <td><p>Implements the j-UFLP experiment discussed in Section 4.2.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#UFLP_2_cav.make_cluster_reverse_custom_matching" title="UFLP_2_cav.make_cluster_reverse_custom_matching"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_cluster_reverse_custom_matching</span></code></a>(ca1, ...)</p></td>
+<td><p>Makes clusters matching given simscore parameter <cite>ss</cite>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -158,7 +161,7 @@ second revision of the paper).</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="UFLP_2_cav.gen_special_jUFLP">
-<span class="sig-prename descclassname"><span class="pre">UFLP_2_cav.</span></span><span class="sig-name descname"><span class="pre">gen_special_jUFLP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'consecutive'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inst_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cavemen'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLP_2_cav.html#gen_special_jUFLP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLP_2_cav.gen_special_jUFLP" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">UFLP_2_cav.</span></span><span class="sig-name descname"><span class="pre">gen_special_jUFLP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'consecutive'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inst_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cavemen'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLP_2_cav.html#gen_special_jUFLP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLP_2_cav.gen_special_jUFLP" title="Permalink to this definition"></a></dt>
 <dd><p>Generate a special instance of jUFLP.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -166,7 +169,7 @@ second revision of the paper).</p>
 <li><p><strong>n</strong> – instance parameters (see <a class="reference internal" href="#UFLP_2_cav.gen_nlinks_cavemen_inst" title="UFLP_2_cav.gen_nlinks_cavemen_inst"><code class="xref py py-func docutils literal notranslate"><span class="pre">gen_nlinks_cavemen_inst()</span></code></a>.)</p></li>
 <li><p><strong>M</strong> – instance parameters (see <a class="reference internal" href="#UFLP_2_cav.gen_nlinks_cavemen_inst" title="UFLP_2_cav.gen_nlinks_cavemen_inst"><code class="xref py py-func docutils literal notranslate"><span class="pre">gen_nlinks_cavemen_inst()</span></code></a>.)</p></li>
 <li><p><strong>L</strong> – instance parameters (see <a class="reference internal" href="#UFLP_2_cav.gen_nlinks_cavemen_inst" title="UFLP_2_cav.gen_nlinks_cavemen_inst"><code class="xref py py-func docutils literal notranslate"><span class="pre">gen_nlinks_cavemen_inst()</span></code></a>.)</p></li>
-<li><p><strong>linking</strong> (<em>str</em>) – <p>linking constraints type, one of:</p>
+<li><p><strong>linking</strong> (<em>&quot;cluster-reverse-custom&quot;</em>) – <p>linking constraints type, one of:</p>
 <ul>
 <li><p>”uniform”: link randomly, regardless of clusters,</p></li>
 <li><p>”consecutive”: link randomly within consecutive clusters
@@ -174,12 +177,20 @@ second revision of the paper).</p>
 <li><p>”by-cluster”: link randomly, but cluster-to-cluster.</p></li>
 <li><p>”cluster-reverse”: consecutive clusters, in reverse order
 within each pair of clusters.</p></li>
+<li><p>”cluster-reverse-custom”: consecutive clusters, in the orders
+with a given similarity score (up to an error caused by the
+integer number of possible inversions).</p></li>
 <li><p>”literal”: trivial linking, 1-to-1.</p></li>
 </ul>
 </p></li>
 <li><p><strong>inst_type</strong> (<em>str</em>) – instance topology, one of:
 - “1-link”: … (cluster) - (node) -(cluster) …
 - “cavemen”: … (cluster) - (cluster) …</p></li>
+<li><p><strong>param</strong> (<em>float</em>) – instance generation parameter for</p></li>
+<li><p><strong>linking</strong> – </p></li>
+<li><p><strong>number.</strong> (<em>simscore tier</em>) – </p></li>
+<li><p><strong>simscore</strong> (<em>(</em><em>1.0 corresponds to 100%</em>) – </p></li>
+<li><p><strong>0%</strong><strong>)</strong> (<em>0.0 -- to</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -195,6 +206,12 @@ within each pair of clusters.</p></li>
 <dt class="sig sig-object py" id="UFLP_2_cav.main">
 <span class="sig-prename descclassname"><span class="pre">UFLP_2_cav.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLP_2_cav.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLP_2_cav.main" title="Permalink to this definition"></a></dt>
 <dd><p>Implements the j-UFLP experiment discussed in Section 4.2.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="UFLP_2_cav.make_cluster_reverse_custom_matching">
+<span class="sig-prename descclassname"><span class="pre">UFLP_2_cav.</span></span><span class="sig-name descname"><span class="pre">make_cluster_reverse_custom_matching</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ca1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ca2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ss</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFLP_2_cav.html#make_cluster_reverse_custom_matching"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFLP_2_cav.make_cluster_reverse_custom_matching" title="Permalink to this definition"></a></dt>
+<dd><p>Makes clusters matching given simscore parameter <cite>ss</cite>.</p>
 </dd></dl>
 
 </section>

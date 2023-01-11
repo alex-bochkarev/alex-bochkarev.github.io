@@ -87,6 +87,7 @@
 <span class="kn">from</span> <span class="nn">darkcloud</span> <span class="kn">import</span> <span class="n">gen_caveman_inst</span>
 <span class="kn">from</span> <span class="nn">jUFLP_utils</span> <span class="kn">import</span> <span class="n">save_inst</span>
 
+<span class="kn">from</span> <span class="nn">BDD</span> <span class="kn">import</span> <span class="n">simscore</span>
 
 <span class="c1"># UFLP instance description structure</span>
 <span class="c1"># UFLP_inst = (S, f, c, caves)</span>
@@ -161,7 +162,37 @@
     <span class="k">return</span> <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span></div>
 
 
-<div class="viewcode-block" id="gen_special_jUFLP"><a class="viewcode-back" href="../_autosummary/UFLP_2_cav.html#UFLP_2_cav.gen_special_jUFLP">[docs]</a><span class="k">def</span> <span class="nf">gen_special_jUFLP</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">linking</span><span class="o">=</span><span class="s2">&quot;consecutive&quot;</span><span class="p">,</span> <span class="n">inst_type</span><span class="o">=</span><span class="s2">&quot;cavemen&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="make_cluster_reverse_custom_matching"><a class="viewcode-back" href="../_autosummary/UFLP_2_cav.html#UFLP_2_cav.make_cluster_reverse_custom_matching">[docs]</a><span class="k">def</span> <span class="nf">make_cluster_reverse_custom_matching</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span> <span class="n">ca2</span><span class="p">,</span> <span class="n">ss</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Makes clusters matching given simscore parameter `ss`.&quot;&quot;&quot;</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">clusters</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca2</span><span class="p">))]</span>  <span class="c1"># cluster-to-cluster matching</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca1</span><span class="p">)):</span>
+        <span class="c1"># within-cluster matching</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ca1</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ca2</span><span class="p">[</span><span class="n">clusters</span><span class="p">[</span><span class="n">k</span><span class="p">]])</span>
+
+        <span class="n">src_order</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca1</span><span class="p">[</span><span class="n">k</span><span class="p">]))]</span>
+        <span class="n">dest_order</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">src_order</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="n">simscore</span><span class="p">(</span><span class="n">src_order</span><span class="p">,</span> <span class="n">dest_order</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">ss</span><span class="p">:</span>
+            <span class="c1"># Make a random swap: introduce a single inversion</span>
+            <span class="n">swapped</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">swapped</span><span class="p">:</span>
+                <span class="n">swap_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dest_order</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">dest_order</span><span class="p">[</span><span class="n">swap_pos</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">dest_order</span><span class="p">[</span><span class="n">swap_pos</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span> <span class="o">=</span> <span class="n">dest_order</span><span class="p">[</span><span class="n">swap_pos</span><span class="p">],</span> <span class="n">dest_order</span><span class="p">[</span><span class="n">swap_pos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">dest_order</span><span class="p">[</span><span class="n">swap_pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">s2</span>
+                    <span class="n">dest_order</span><span class="p">[</span><span class="n">swap_pos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">s1</span>
+                    <span class="n">swapped</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">link</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ca1</span><span class="p">[</span><span class="n">k</span><span class="p">],</span>
+                                <span class="p">[</span><span class="n">ca2</span><span class="p">[</span><span class="n">clusters</span><span class="p">[</span><span class="n">k</span><span class="p">]][</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">dest_order</span><span class="p">])))</span>
+
+    <span class="k">return</span> <span class="n">link</span></div>
+
+
+<div class="viewcode-block" id="gen_special_jUFLP"><a class="viewcode-back" href="../_autosummary/UFLP_2_cav.html#UFLP_2_cav.gen_special_jUFLP">[docs]</a><span class="k">def</span> <span class="nf">gen_special_jUFLP</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">linking</span><span class="o">=</span><span class="s2">&quot;consecutive&quot;</span><span class="p">,</span> <span class="n">inst_type</span><span class="o">=</span><span class="s2">&quot;cavemen&quot;</span><span class="p">,</span>
+                      <span class="n">param</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Generate a special instance of jUFLP.</span>
 
 <span class="sd">    Args:</span>
@@ -174,11 +205,18 @@
 <span class="sd">            - &quot;by-cluster&quot;: link randomly, but cluster-to-cluster.</span>
 <span class="sd">            - &quot;cluster-reverse&quot;: consecutive clusters, in reverse order</span>
 <span class="sd">              within each pair of clusters.</span>
+<span class="sd">            - &quot;cluster-reverse-custom&quot;: consecutive clusters, in the orders</span>
+<span class="sd">              with a given similarity score (up to an error caused by the</span>
+<span class="sd">              integer number of possible inversions).</span>
 <span class="sd">            - &quot;literal&quot;: trivial linking, 1-to-1.</span>
 
 <span class="sd">        inst_type (str): instance topology, one of:</span>
 <span class="sd">            - &quot;1-link&quot;: ... (cluster) - (node) -(cluster) ...</span>
 <span class="sd">            - &quot;cavemen&quot;: ... (cluster) - (cluster) ...</span>
+
+<span class="sd">        param (float): instance generation parameter for</span>
+<span class="sd">        &quot;cluster-reverse-custom&quot; linking, simscore tier number.</span>
+<span class="sd">        (1.0 corresponds to 100% simscore, 0.0 -- to 0%)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">      i1, i2, link: two instances (S,f,c, caves) and linking dict.</span>
@@ -246,12 +284,8 @@
         <span class="n">ca2</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">i2</span><span class="p">[</span><span class="n">COL_caves</span><span class="p">]]</span>
 
         <span class="n">link</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="c1"># clusters = [k for k in np.random.permutation(range(len(ca2)))]</span>
-        <span class="c1"># clusters = [k for k in reversed(range(len(ca2)))]</span>
         <span class="n">clusters</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca2</span><span class="p">))]</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca1</span><span class="p">)):</span>
-            <span class="c1"># link.update(dict(zip(ca1[k],</span>
-            <span class="c1">#                      np.random.permutation(ca2[clusters[k]]))))</span>
             <span class="n">link</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ca1</span><span class="p">[</span><span class="n">k</span><span class="p">],</span>
                                  <span class="nb">reversed</span><span class="p">(</span><span class="n">ca2</span><span class="p">[</span><span class="n">clusters</span><span class="p">[</span><span class="n">k</span><span class="p">]]))))</span>
 
@@ -265,6 +299,11 @@
                    <span class="k">if</span> <span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">in_clusters2</span><span class="p">]</span>
 
         <span class="n">link</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">origins</span><span class="p">,</span> <span class="n">targets</span><span class="p">)))</span>
+    <span class="k">elif</span> <span class="n">linking</span> <span class="o">==</span> <span class="s2">&quot;cluster-reverse-custom&quot;</span><span class="p">:</span>
+        <span class="n">ca1</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">i1</span><span class="p">[</span><span class="n">COL_caves</span><span class="p">]]</span>
+        <span class="n">ca2</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">i2</span><span class="p">[</span><span class="n">COL_caves</span><span class="p">]]</span>
+
+        <span class="n">link</span> <span class="o">=</span> <span class="n">make_cluster_reverse_custom_matching</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span> <span class="n">ca2</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">linking</span> <span class="o">==</span> <span class="s2">&quot;literal&quot;</span><span class="p">:</span>
         <span class="n">link</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)],</span>
                         <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">i2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)]))</span>

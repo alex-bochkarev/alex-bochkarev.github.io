@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>experiments.heu_sol_struct &mdash; Align-BDD  documentation</title>
+  <title>experiments.jUFLP_w_simscores &mdash; Align-BDD  documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
@@ -20,8 +20,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="experiments.jUFLP_simscores_M" href="experiments.jUFLP_simscores_M.html" />
-    <link rel="prev" title="experiments.greedy_UFLP_sizes" href="experiments.greedy_UFLP_sizes.html" /> 
+    <link rel="next" title="experiments.jUFLPcm" href="experiments.jUFLPcm.html" />
+    <link rel="prev" title="experiments.jUFLP_wCPPMIP" href="experiments.jUFLP_wCPPMIP.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -75,9 +75,9 @@
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
           <li><a href="experiments.html">experiments</a> &raquo;</li>
-      <li>experiments.heu_sol_struct</li>
+      <li>experiments.jUFLP_w_simscores</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/_autosummary/experiments.heu_sol_struct.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_autosummary/experiments.jUFLP_w_simscores.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -85,13 +85,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <span class="target" id="module-experiments.heu_sol_struct"></span><section id="experiments-heu-sol-struct">
-<h1>experiments.heu_sol_struct<a class="headerlink" href="#experiments-heu-sol-struct" title="Permalink to this heading"></a></h1>
+  <span class="target" id="module-experiments.jUFLP_w_simscores"></span><section id="experiments-juflp-w-simscores">
+<h1>experiments.jUFLP_w_simscores<a class="headerlink" href="#experiments-juflp-w-simscores" title="Permalink to this heading"></a></h1>
 <section id="module-summary">
 <h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this heading"></a></h2>
-<p>Examines heuristic solutions to a random align-BDD instance.</p>
-<p>Used to look into the number of optima and <code class="docutils literal notranslate"><span class="pre">simscore</span></code> related
-experiments.</p>
+<p>Generates and solves the special class of j-UFLP instances.</p>
+<p>Instances and the experiment as discussed in the paper, in Section 4.2
+(for Figure 11): investigating the effects of different linking methods
+on the proposed heuristic efficiency (vs. the align-to-A baseline).</p>
+<p>Instances are generated using <a class="reference internal" href="UFLP_2_cav.html#UFLP_2_cav.gen_special_jUFLP" title="UFLP_2_cav.gen_special_jUFLP"><code class="xref py py-func docutils literal notranslate"><span class="pre">UFLP_2_cav.gen_special_jUFLP()</span></code></a>,
+the code for different linking methods during instance generation
+is implemented in <a class="reference internal" href="UFLP_2_cav.html#UFLP_2_cav.make_cluster_reverse_custom_matching" title="UFLP_2_cav.make_cluster_reverse_custom_matching"><code class="xref py py-func docutils literal notranslate"><span class="pre">UFLP_2_cav.make_cluster_reverse_custom_matching()</span></code></a>.</p>
+<p>The experiment itself is implemented in <a class="reference internal" href="#experiments.jUFLP_w_simscores.main" title="experiments.jUFLP_w_simscores.main"><code class="xref py py-func docutils literal notranslate"><span class="pre">experiments.jUFLP_w_simscores.main()</span></code></a>.</p>
 <p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
 <p class="centered">
 <strong>❖❖❖</strong></p><section id="implements-functions-outside-the-classes-above">
@@ -102,8 +107,8 @@ experiments.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#experiments.heu_sol_struct.run_experiment" title="experiments.heu_sol_struct.run_experiment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_experiment</span></code></a>([N, k, inst_type, logdest])</p></td>
-<td><p>Runs the experiment with diagrams of <cite>N</cite> layers.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#experiments.jUFLP_w_simscores.main" title="experiments.jUFLP_w_simscores.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a>()</p></td>
+<td><p>The j-UFLP experiment involving instances w/different simscores.</p></td>
 </tr>
 </tbody>
 </table>
@@ -115,9 +120,9 @@ experiments.</p>
 <section id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="experiments.heu_sol_struct.run_experiment">
-<span class="sig-prename descclassname"><span class="pre">experiments.heu_sol_struct.</span></span><span class="sig-name descname"><span class="pre">run_experiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inst_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rnd'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logdest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'none'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/heu_sol_struct.html#run_experiment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.heu_sol_struct.run_experiment" title="Permalink to this definition"></a></dt>
-<dd><p>Runs the experiment with diagrams of <cite>N</cite> layers.</p>
+<dt class="sig sig-object py" id="experiments.jUFLP_w_simscores.main">
+<span class="sig-prename descclassname"><span class="pre">experiments.jUFLP_w_simscores.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiments/jUFLP_w_simscores.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#experiments.jUFLP_w_simscores.main" title="Permalink to this definition"></a></dt>
+<dd><p>The j-UFLP experiment involving instances w/different simscores.</p>
 </dd></dl>
 
 </section>
