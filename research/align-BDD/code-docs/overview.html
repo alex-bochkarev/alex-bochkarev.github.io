@@ -51,6 +51,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/varseq.html">varseq</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/heuristics.html">heuristics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/BB_search.html">BB_search</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/UFL.html">UFL</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/UFLP_fullDD.html">UFLP_fullDD</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/UFLPOrder.html">UFLPOrder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/jUFLP_cavemen.html">jUFLP_cavemen</a></li>
@@ -103,14 +104,15 @@
              
   <section id="implementation-overview">
 <h1>Implementation: overview<a class="headerlink" href="#implementation-overview" title="Permalink to this heading"></a></h1>
-<p>These pages document the implementation of the numerical experiments for
-“Align-BDD” working paper by Bochkarev and Smith. The notes along with the
-accompanying <a class="reference external" href="https://github.com/alex-bochkarev/align-BDD">source code and data</a>
-are assumed to provide enough information to:</p>
+<p>These pages document the implementation of the numerical experiments for paper
+“On Aligning Non-Order-Associated Binary Decision Diagrams” by Bochkarev and
+Smith. The notes along with the accompanying <a class="reference external" href="https://github.com/alex-bochkarev/align-BDD">source code and
+data</a> are assumed to provide
+enough information to:</p>
 <ol class="arabic simple">
 <li><p>inspect the raw data,</p></li>
 <li><p>reproduce / adjust / inspect the figures from the paper (given the experiment log files) as necessary, and</p></li>
-<li><p>completely reproduce the paper results from scratch, including instance generation, with reasonable efforts.</p></li>
+<li><p>completely reproduce the paper results from scratch, including instance generation.</p></li>
 </ol>
 <p>It is our special interest to help the reader build upon our results, so please
 do not hesitate to address any technical questions to <a class="reference external" href="https://www.bochkarev.io/contact">Alexey
@@ -144,24 +146,38 @@ Note that before <code class="docutils literal notranslate"><span class="pre">pi
 and the header files as well. On my Debian distribution I needed to do
 <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">graphviz</span> <span class="pre">graphviz-dev</span></code>.</p></li>
 </ul>
-<p>Note that for the (python) environment management we used the recommended
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the (python) environment management we used the recommended
 <a class="reference external" href="https://docs.python.org/3/library/venv.html">venv-way</a>. For example, the
 virtual environment can be created and activated with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m venv .venv
-<span class="nb">source</span> .venv/bin/activate
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python3.10 -m venv .venv
+$ <span class="nb">source</span> .venv/bin/activate
 
-<span class="c1"># so that we can install the necessary packages there with:</span>
-pip install -r requirements.txt
+$ <span class="c1"># then, we can install the necessary packages there with:</span>
+
+$ pip install -r requirements.txt
 </pre></div>
 </div>
-<p>(<code class="docutils literal notranslate"><span class="pre">conda</span></code> would work just as well.)</p>
+</div></blockquote>
+<p>An equivalent for <code class="docutils literal notranslate"><span class="pre">conda</span></code>-based system would be:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ conda create --name py310 <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.10
+$ conda install --name py310 --channel conda-forge --file requirements.txt
+$ conda activate py310
+</pre></div>
+</div>
+</div></blockquote>
+<p>(However, we did not use <code class="docutils literal notranslate"><span class="pre">conda</span></code>. If you do – please, let us know if it works as well.)</p>
+</div>
 </section>
 <section id="general-reproducibility">
 <h1>General reproducibility<a class="headerlink" href="#general-reproducibility" title="Permalink to this heading"></a></h1>
 <p>Assuming the necessary software is present, one can rebuild any figure from the
 existing log file (specific experiment results) by running a <code class="docutils literal notranslate"><span class="pre">make</span></code> command
-from the root project directory (<code class="docutils literal notranslate"><span class="pre">align-BDD</span></code>). For example, theoretically this
-will work:</p>
+from the root project directory (<code class="docutils literal notranslate"><span class="pre">align-BDD</span></code>). For example, this
+must work (assuming the necessary dependencies are installed):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make figures/simpl_heuristics.eps  <span class="c1"># to rebuild Figure 6, or</span>
 make figures  <span class="c1"># to rebuild all figures for the paper</span>
 </pre></div>
@@ -179,7 +195,7 @@ and the hardware, it might take quite some time to recalculate everything. PBS
 scripts that were used to run our experiments on the computation cluster are
 kept in folder <code class="docutils literal notranslate"><span class="pre">📁</span> <span class="pre">pbs</span></code>. Certainly, they are dependent on the hardware and the
 available software, but these materials hopefully will provide a good starting
-point to reproduce the results presented in the paper.</p>
+point to reproduce the results presented in the paper using a PBS-based system.</p>
 <p>All the recipies (how to make each figure or other artifact) are described in
 the file called <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>, which is basically a list of commands and source
 files needed to build each target.</p>
@@ -242,7 +258,7 @@ files needed to build each target.</p>
 <td><p><code class="docutils literal notranslate"><span class="pre">simpl_LB.csv</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">fig_LBs.R</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>Figure 18</p></td>
+<tr class="row-even"><td><p>Figure 19</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">orig_lwidth_stats.eps</span></code></p></td>
 <td><p><a class="reference internal" href="_autosummary/gen_BDD_pair.html#module-gen_BDD_pair" title="gen_BDD_pair"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gen_BDD_pair</span></code></a> + <a class="reference internal" href="_autosummary/experiments.gen_lsizes_stats.html#module-experiments.gen_lsizes_stats" title="experiments.gen_lsizes_stats"><code class="xref py py-mod docutils literal notranslate"><span class="pre">experiments.gen_lsizes_stats</span></code></a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">orig_stats.tar.gz</span></code></p></td>
@@ -256,10 +272,10 @@ files needed to build each target.</p>
 <td><p><code class="docutils literal notranslate"><span class="pre">orig_scal.csv</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">fig_scal.R</span></code></p></td>
 </tr>
-<tr class="row-even"><td rowspan="4"><p>Figure 19</p>
-<p>Figure 20</p>
+<tr class="row-even"><td rowspan="4"><p>Figure 20</p>
 <p>Figure 21</p>
 <p>Figure 22</p>
+<p>Figure 23</p>
 </td>
 <td rowspan="4"><p><code class="docutils literal notranslate"><span class="pre">no_opts.eps</span></code></p>
 <p><code class="docutils literal notranslate"><span class="pre">opts_diam.eps</span></code></p>
@@ -303,9 +319,9 @@ files needed to build each target.</p>
 </tr>
 </tbody>
 </table>
-<p>Figure 16: sample B&amp;B tree was generated by <a class="reference internal" href="_autosummary/experiments.sample_BB_tree.html#module-experiments.sample_BB_tree" title="experiments.sample_BB_tree"><code class="xref py py-mod docutils literal notranslate"><span class="pre">experiments.sample_BB_tree</span></code></a>.</p>
-<p>(Figures 1-5, 9a, 11-15, and 23-26 do not involve any computations.)</p>
-<p>All the key parameters (instance sizes, generation parameters, etc.) are set in <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>.</p>
+<p>Figure 17: sample branch and bound tree was generated by <a class="reference internal" href="_autosummary/experiments.sample_BB_tree.html#module-experiments.sample_BB_tree" title="experiments.sample_BB_tree"><code class="xref py py-mod docutils literal notranslate"><span class="pre">experiments.sample_BB_tree</span></code></a>.</p>
+<p>Figures 1-5, 9a, 12-16, and 24-27 do not involve any computations.</p>
+<p>Key ‘global’ parameters (instance sizes, generation parameters, etc.) are set in <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>. (The rest are specified in the respective python files in <code class="docutils literal notranslate"><span class="pre">experiments</span></code> folder.)</p>
 </section>
 <section id="implementation-details">
 <h1>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this heading"></a></h1>
@@ -487,16 +503,19 @@ code):</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/UFLP_fullDD.html#module-UFLP_fullDD" title="UFLP_fullDD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UFLP_fullDD</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/UFL.html#module-UFL" title="UFL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UFL</span></code></a></p></td>
+<td><p>Implements basic functions for UFL -- Uncapacitated Facility Location.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/UFLP_fullDD.html#module-UFLP_fullDD" title="UFLP_fullDD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UFLP_fullDD</span></code></a></p></td>
 <td><p>Solves UFLP using a DD-based approach.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/UFLPOrder.html#module-UFLPOrder" title="UFLPOrder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UFLPOrder</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/UFLPOrder.html#module-UFLPOrder" title="UFLPOrder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UFLPOrder</span></code></a></p></td>
 <td><p>Implements an algorithm to find  a var order for BDD representing an UFLP.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/jUFLP_cavemen.html#module-jUFLP_cavemen" title="jUFLP_cavemen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jUFLP_cavemen</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/jUFLP_cavemen.html#module-jUFLP_cavemen" title="jUFLP_cavemen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jUFLP_cavemen</span></code></a></p></td>
 <td><p>Proof-of-concept experiment: joint UFLP over special class of instances.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/jUFLP_utils.html#module-jUFLP_utils" title="jUFLP_utils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jUFLP_utils</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/jUFLP_utils.html#module-jUFLP_utils" title="jUFLP_utils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jUFLP_utils</span></code></a></p></td>
 <td><p>Utility / helper functions for j-UFLP: used save / load / draw instances.</p></td>
 </tr>
 </tbody>
@@ -555,7 +574,7 @@ tests are in <code class="docutils literal notranslate"><span class="pre">📁</
 <td><p>Tests BB search correctness (<a class="reference internal" href="_autosummary/BB_search.html#module-BB_search" title="BB_search"><code class="xref py py-mod docutils literal notranslate"><span class="pre">BB_search</span></code></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/UFLP_test.html#module-UFLP_test" title="UFLP_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UFLP_test</span></code></a></p></td>
-<td><p>Tests the UFLP-related machinery (<code class="xref py py-mod docutils literal notranslate"><span class="pre">tUFLP</span></code>).</p></td>
+<td><p>Tests the UFLP-related machinery (<a class="reference internal" href="_autosummary/UFLP_2_cav.html#module-UFLP_2_cav" title="UFLP_2_cav"><code class="xref py py-mod docutils literal notranslate"><span class="pre">UFLP_2_cav</span></code></a> and <a class="reference internal" href="_autosummary/UFL.html#module-UFL" title="UFL"><code class="xref py py-mod docutils literal notranslate"><span class="pre">UFL</span></code></a>).</p></td>
 </tr>
 </tbody>
 </table>

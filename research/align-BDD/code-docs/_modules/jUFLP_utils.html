@@ -71,7 +71,20 @@
 
 
 <div class="viewcode-block" id="save_inst"><a class="viewcode-back" href="../_autosummary/jUFLP_utils.html#jUFLP_utils.save_inst">[docs]</a><span class="k">def</span> <span class="nf">save_inst</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">join_map</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Saves the jUFLP instance to ``.json`` file.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Saves the jUFLP instance to ``.json`` file.</span>
+
+<span class="sd">    The file contains the following objects</span>
+
+<span class="sd">    - ``inst1`` and ``inst2`` -- description of the two</span>
+<span class="sd">      sub-instances, with identical structure containing</span>
+<span class="sd">      the following records:</span>
+
+<span class="sd">       - `S`: a list of neighborhood lists,</span>
+<span class="sd">       - `f`: a list of lists of overlap costs,</span>
+<span class="sd">       - `c`: a list of facility location costs.</span>
+<span class="sd">       - `caves`: a parameter describing the points allocated to each &quot;cave&quot;</span>
+<span class="sd">         (was used in legacy experiments)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
         <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
             <span class="s1">&#39;inst1&#39;</span><span class="p">:{</span>

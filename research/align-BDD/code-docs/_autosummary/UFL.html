@@ -1,180 +1,105 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UFL &mdash; Align-BDD  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/autoclasstoc.css" type="text/css" />
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="tUFLP" href="tUFLP.html" />
-    <link rel="prev" title="solve_inst" href="solve_inst.html" /> 
+    <link rel="next" title="UFLP_fullDD" href="UFLP_fullDD.html" />
+    <link rel="prev" title="BB_search" href="BB_search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> Align-BDD
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Implementation: overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html#computational-infrastructure">Computational infrastructure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../overview.html#reproducibility">Reproducibility</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../overview.html#problem-instances-and-raw-data">Problem instances and raw data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#general-reproducibility">General reproducibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#project-repository-structure">Project repository structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#raw-data-formats">Raw data formats</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../overview.html#code-organization">Code organization</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../overview.html#producing-figures">Producing figures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="gen_BDD_pair.html">gen_BDD_pair</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solve_inst.html">solve_inst</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../overview.html#key-data-structures-and-algorithms">Key data structures and algorithms.</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BDD.html">BDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="varseq.html">varseq</a></li>
+<li class="toctree-l3"><a class="reference internal" href="heuristics.html">heuristics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BB_search.html">BB_search</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">UFL</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#module-summary">Module summary</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="tUFLP.html">tUFLP</a></li>
-<li class="toctree-l3"><a class="reference internal" href="experiments.html">experiments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UFLP_fullDD.html">UFLP_fullDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UFLPOrder.html">UFLPOrder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jUFLP_cavemen.html">jUFLP_cavemen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jUFLP_utils.html">jUFLP_utils</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#numerical-experiments">Numerical experiments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../overview.html#testing-framework">Testing framework</a></li>
 </ul>
 </li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Align-BDD</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content style-external-links">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html">Docs</a> &raquo;</li>
-        
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../overview.html">Implementation: overview</a> &raquo;</li>
-        
       <li>UFL</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="../_sources/_autosummary/UFL.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <span class="target" id="module-UFL"></span><div class="section" id="ufl">
-<h1>UFL<a class="headerlink" href="#ufl" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-summary">
-<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this headline">¶</a></h2>
+             
+  <span class="target" id="module-UFL"></span><section id="ufl">
+<h1>UFL<a class="headerlink" href="#ufl" title="Permalink to this heading"></a></h1>
+<section id="module-summary">
+<h2>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this heading"></a></h2>
 <p>Implements basic functions for UFL – Uncapacitated Facility Location.</p>
-<p>Used as a basis for <a class="reference internal" href="tUFLP.html#module-tUFLP" title="tUFLP"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tUFLP</span></code></a>.</p>
 <p>Tests coverage: <a class="reference internal" href="UFLP_test.html#module-UFLP_test" title="UFLP_test"><code class="xref py py-mod docutils literal notranslate"><span class="pre">UFLP_test</span></code></a></p>
 <p>(In the implementation details below, click on class/function names for additional documentation and links to the source code.)</p>
 <p class="centered">
-<strong>❖❖❖</strong></p><div class="section" id="implements-functions-outside-the-classes-above">
-<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
+<strong>❖❖❖</strong></p><section id="implements-functions-outside-the-classes-above">
+<h3>Implements functions (outside the classes above):<a class="headerlink" href="#implements-functions-outside-the-classes-above" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -187,7 +112,7 @@
 <td><p>Builds a BDD for the UFL problem (with x-variables only)</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#UFL.build_MIP" title="UFL.build_MIP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_MIP</span></code></a>(S, f, g)</p></td>
-<td><p>Builds ‘plain-vanilla’ MIP instance for UFL.</p></td>
+<td><p>Builds 'plain-vanilla' MIP instance for UFL.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#UFL.build_Sf" title="UFL.build_Sf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_Sf</span></code></a>(S)</p></td>
 <td><p>Returns the list of facility neighborhoods.</p></td>
@@ -196,13 +121,13 @@
 <td><p>Generates a network flow instance for diagram <cite>D</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#UFL.create_availability_BDD" title="UFL.create_availability_BDD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_availability_BDD</span></code></a>(S, f)</p></td>
-<td><p>Encodes consistency of “cover”(z) decisions.</p></td>
+<td><p>Encodes consistency of &quot;cover&quot;(z) decisions.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#UFL.create_covering_BDD" title="UFL.create_covering_BDD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_covering_BDD</span></code></a>(S, c)</p></td>
 <td><p>Create and return the diagram given the instance.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#UFL.create_covering_BDD_wg" title="UFL.create_covering_BDD_wg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_covering_BDD_wg</span></code></a>(S, g)</p></td>
-<td><p>Creates and returns “covering” BDD given an UFL instance.</p></td>
+<td><p>Creates and returns &quot;covering&quot; BDD given an UFL instance.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#UFL.draw_problem_dia" title="UFL.draw_problem_dia"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_problem_dia</span></code></a>(S, f, g[, filename])</p></td>
 <td><p>Draws the bipartite graph describing the problem.</p></td>
@@ -217,7 +142,7 @@
 <td><p>Generates a test facility location instance.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#UFL.make_simple_problem" title="UFL.make_simple_problem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_simple_problem</span></code></a>()</p></td>
-<td><p>Creates a ‘toy’ UFLP instance (for debugging).</p></td>
+<td><p>Creates a 'toy' UFLP instance (for debugging).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#UFL.show_BDD_build" title="UFL.show_BDD_build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_BDD_build</span></code></a>()</p></td>
 <td><p>Runs a simple test against a toy problem.</p></td>
@@ -248,13 +173,13 @@
 <p class="centered">
 <strong>❖❖❖</strong></p><p class="centered">
 <strong>Implementation details</strong></p><p class="centered">
-<strong>❖❖❖</strong></p></div>
-</div>
-<div class="section" id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<strong>❖❖❖</strong></p></section>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
 <dl class="py function">
-<dt id="UFL.add_BDD_to_MIP">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">add_BDD_to_MIP</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#add_BDD_to_MIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.add_BDD_to_MIP" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.add_BDD_to_MIP">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">add_BDD_to_MIP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#add_BDD_to_MIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.add_BDD_to_MIP" title="Permalink to this definition"></a></dt>
 <dd><p>Builds a MIP (network flow) from a given BDD.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -278,8 +203,8 @@ x (dict): binary variables added (one per layer), keyed by _layer_no_.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.build_DP_DD">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">build_DP_DD</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#build_DP_DD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.build_DP_DD" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.build_DP_DD">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">build_DP_DD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#build_DP_DD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.build_DP_DD" title="Permalink to this definition"></a></dt>
 <dd><p>Builds a BDD for the UFL problem (with x-variables only)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -304,8 +229,8 @@ x (dict): binary variables added (one per layer), keyed by _layer_no_.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.build_MIP">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">build_MIP</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#build_MIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.build_MIP" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.build_MIP">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">build_MIP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#build_MIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.build_MIP" title="Permalink to this definition"></a></dt>
 <dd><p>Builds ‘plain-vanilla’ MIP instance for UFL.</p>
 <p>Encodes arbitrary penalty function g(·).</p>
 <dl class="field-list simple">
@@ -324,8 +249,8 @@ for <cite>n</cite> overlaps at consumer <cite>j</cite></p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.build_Sf">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">build_Sf</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#build_Sf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.build_Sf" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.build_Sf">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">build_Sf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#build_Sf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.build_Sf" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the list of facility neighborhoods.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -335,8 +260,8 @@ for <cite>n</cite> overlaps at consumer <cite>j</cite></p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.create_NF">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">create_NF</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#create_NF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.create_NF" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.create_NF">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">create_NF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#create_NF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.create_NF" title="Permalink to this definition"></a></dt>
 <dd><p>Generates a network flow instance for diagram <cite>D</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -354,8 +279,8 @@ v(dict): variables.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.create_availability_BDD">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">create_availability_BDD</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#create_availability_BDD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.create_availability_BDD" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.create_availability_BDD">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">create_availability_BDD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#create_availability_BDD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.create_availability_BDD" title="Permalink to this definition"></a></dt>
 <dd><p>Encodes consistency of “cover”(z) decisions.</p>
 <p>Either all “yes”, or all “no” for a specific facility.</p>
 <dl class="field-list simple">
@@ -369,8 +294,8 @@ v(dict): variables.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.create_covering_BDD">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">create_covering_BDD</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#create_covering_BDD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.create_covering_BDD" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.create_covering_BDD">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">create_covering_BDD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#create_covering_BDD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.create_covering_BDD" title="Permalink to this definition"></a></dt>
 <dd><p>Create and return the diagram given the instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -396,8 +321,8 @@ v(dict): variables.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.create_covering_BDD_wg">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">create_covering_BDD_wg</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#create_covering_BDD_wg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.create_covering_BDD_wg" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.create_covering_BDD_wg">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">create_covering_BDD_wg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#create_covering_BDD_wg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.create_covering_BDD_wg" title="Permalink to this definition"></a></dt>
 <dd><p>Creates and returns “covering” BDD given an UFL instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -417,14 +342,14 @@ overlaps for consumer <cite>k</cite>)</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.draw_problem_dia">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">draw_problem_dia</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'run_logs/problem_dia.gv'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#draw_problem_dia"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.draw_problem_dia" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.draw_problem_dia">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">draw_problem_dia</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'run_logs/problem_dia.gv'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#draw_problem_dia"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.draw_problem_dia" title="Permalink to this definition"></a></dt>
 <dd><p>Draws the bipartite graph describing the problem.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.generate_dense_instance">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">generate_dense_instance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#generate_dense_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.generate_dense_instance" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.generate_dense_instance">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">generate_dense_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#generate_dense_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.generate_dense_instance" title="Permalink to this definition"></a></dt>
 <dd><p>Generates a dense test facility location instance.</p>
 <p>In the sense that every customer can be covered by (almost)
 every facility.</p>
@@ -452,14 +377,14 @@ every facility.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.generate_test_figures">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">generate_test_figures</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#generate_test_figures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.generate_test_figures" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.generate_test_figures">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">generate_test_figures</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#generate_test_figures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.generate_test_figures" title="Permalink to this definition"></a></dt>
 <dd><p>Generates a simple test instance and creates PDFs.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.generate_test_instance">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">generate_test_instance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#generate_test_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.generate_test_instance" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.generate_test_instance">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">generate_test_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#generate_test_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.generate_test_instance" title="Permalink to this definition"></a></dt>
 <dd><p>Generates a test facility location instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -484,38 +409,38 @@ every facility.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.make_simple_problem">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">make_simple_problem</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#make_simple_problem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.make_simple_problem" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.make_simple_problem">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">make_simple_problem</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#make_simple_problem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.make_simple_problem" title="Permalink to this definition"></a></dt>
 <dd><p>Creates a ‘toy’ UFLP instance (for debugging).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.show_BDD_build">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">show_BDD_build</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#show_BDD_build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.show_BDD_build" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.show_BDD_build">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">show_BDD_build</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#show_BDD_build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.show_BDD_build" title="Permalink to this definition"></a></dt>
 <dd><p>Runs a simple test against a toy problem.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.show_BDD_to_MIP">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">show_BDD_to_MIP</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#show_BDD_to_MIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.show_BDD_to_MIP" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.show_BDD_to_MIP">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">show_BDD_to_MIP</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#show_BDD_to_MIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.show_BDD_to_MIP" title="Permalink to this definition"></a></dt>
 <dd><p>Tests making a MIP from a single BDD.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.show_BDD_to_MIP_wg">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">show_BDD_to_MIP_wg</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#show_BDD_to_MIP_wg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.show_BDD_to_MIP_wg" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.show_BDD_to_MIP_wg">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">show_BDD_to_MIP_wg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#show_BDD_to_MIP_wg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.show_BDD_to_MIP_wg" title="Permalink to this definition"></a></dt>
 <dd><p>Runs a simple test against a toy problem.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.show_build_MIP">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">show_build_MIP</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#show_build_MIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.show_build_MIP" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.show_build_MIP">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">show_build_MIP</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#show_build_MIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.show_build_MIP" title="Permalink to this definition"></a></dt>
 <dd><p>Tests a simple MIP building function.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.solve_with_intBDD">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">solve_with_intBDD</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#solve_with_intBDD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.solve_with_intBDD" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.solve_with_intBDD">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">solve_with_intBDD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#solve_with_intBDD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.solve_with_intBDD" title="Permalink to this definition"></a></dt>
 <dd><p>Solves the UFL instance by aligning two BDDs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -532,8 +457,8 @@ every facility.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.test_BDD_and_plain_MIPs">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">test_BDD_and_plain_MIPs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TOL</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#test_BDD_and_plain_MIPs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.test_BDD_and_plain_MIPs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.test_BDD_and_plain_MIPs">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">test_BDD_and_plain_MIPs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TOL</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#test_BDD_and_plain_MIPs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.test_BDD_and_plain_MIPs" title="Permalink to this definition"></a></dt>
 <dd><p>Tests that objectives for the two MIPs coincide.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -551,14 +476,14 @@ every facility.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.test_DD_creation">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">test_DD_creation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#test_DD_creation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.test_DD_creation" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.test_DD_creation">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">test_DD_creation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#test_DD_creation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.test_DD_creation" title="Permalink to this definition"></a></dt>
 <dd><p>Testing unit: BDD generation.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="UFL.test_MIPs_protocol">
-<code class="sig-prename descclassname"><span class="pre">UFL.</span></code><code class="sig-name descname"><span class="pre">test_MIPs_protocol</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#test_MIPs_protocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.test_MIPs_protocol" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="UFL.test_MIPs_protocol">
+<span class="sig-prename descclassname"><span class="pre">UFL.</span></span><span class="sig-name descname"><span class="pre">test_MIPs_protocol</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/UFL.html#test_MIPs_protocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#UFL.test_MIPs_protocol" title="Permalink to this definition"></a></dt>
 <dd><p>Runs a series of cross-checks.</p>
 <p>Uses <a class="reference internal" href="#UFL.generate_test_instance" title="UFL.generate_test_instance"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_test_instance()</span></code></a>.</p>
 <dl class="simple">
@@ -572,47 +497,35 @@ every facility.</p>
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2021, Alexey Bochkarev, Clemson University
-
-    </p>
+    <p>&#169; Copyright 2019--2022, Alexey Bochkarev, Clemson University.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

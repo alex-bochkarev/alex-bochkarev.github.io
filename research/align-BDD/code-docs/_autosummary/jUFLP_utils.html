@@ -142,6 +142,22 @@
 <dt class="sig sig-object py" id="jUFLP_utils.save_inst">
 <span class="sig-prename descclassname"><span class="pre">jUFLP_utils.</span></span><span class="sig-name descname"><span class="pre">save_inst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jUFLP_utils.html#save_inst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jUFLP_utils.save_inst" title="Permalink to this definition"></a></dt>
 <dd><p>Saves the jUFLP instance to <code class="docutils literal notranslate"><span class="pre">.json</span></code> file.</p>
+<p>The file contains the following objects</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">inst1</span></code> and <code class="docutils literal notranslate"><span class="pre">inst2</span></code> – description of the two
+sub-instances, with identical structure containing
+the following records:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>S</cite>: a list of neighborhood lists,</p></li>
+<li><p><cite>f</cite>: a list of lists of overlap costs,</p></li>
+<li><p><cite>c</cite>: a list of facility location costs.</p></li>
+<li><p><cite>caves</cite>: a parameter describing the points allocated to each “cave”
+(was used in legacy experiments)</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
 </dd></dl>
 
 </section>

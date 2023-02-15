@@ -1,14 +1,15 @@
 Implementation: overview
 ------------------------
 
-These pages document the implementation of the numerical experiments for
-"Align-BDD" working paper by Bochkarev and Smith. The notes along with the
-accompanying `source code and data <https://github.com/alex-bochkarev/align-BDD>`_
-are assumed to provide enough information to:
+These pages document the implementation of the numerical experiments for paper
+"On Aligning Non-Order-Associated Binary Decision Diagrams" by Bochkarev and
+Smith. The notes along with the accompanying `source code and
+data <https://github.com/alex-bochkarev/align-BDD>`_ are assumed to provide
+enough information to:
 
 (1) inspect the raw data,
 (2) reproduce / adjust / inspect the figures from the paper (given the experiment log files) as necessary, and
-(3) completely reproduce the paper results from scratch, including instance generation, with reasonable efforts.
+(3) completely reproduce the paper results from scratch, including instance generation.
 
 It is our special interest to help the reader build upon our results, so please
 do not hesitate to address any technical questions to `Alexey
@@ -43,27 +44,39 @@ following software:
   and the header files as well. On my Debian distribution I needed to do
   ``sudo apt install graphviz graphviz-dev``.
 
-Note that for the (python) environment management we used the recommended
-`venv-way <https://docs.python.org/3/library/venv.html>`_. For example, the
-virtual environment can be created and activated with:
+.. note::
 
-.. code-block:: bash
+  For the (python) environment management we used the recommended
+  `venv-way <https://docs.python.org/3/library/venv.html>`_. For example, the
+  virtual environment can be created and activated with:
 
-                python -m venv .venv
-                source .venv/bin/activate
+   .. code-block:: bash
 
-                # so that we can install the necessary packages there with:
-                pip install -r requirements.txt
+                   $ python3.10 -m venv .venv
+                   $ source .venv/bin/activate
 
-(``conda`` would work just as well.)
+                   $ # then, we can install the necessary packages there with:
+
+                   $ pip install -r requirements.txt
+
+  An equivalent for ``conda``-based system would be:
+
+   .. code-block:: bash
+
+                   $ conda create --name py310 python=3.10
+                   $ conda install --name py310 --channel conda-forge --file requirements.txt
+                   $ conda activate py310
+
+
+  (However, we did not use ``conda``. If you do -- please, let us know if it works as well.)
 
 General reproducibility
 -----------------------
 
 Assuming the necessary software is present, one can rebuild any figure from the
 existing log file (specific experiment results) by running a ``make`` command
-from the root project directory (``align-BDD``). For example, theoretically this
-will work:
+from the root project directory (``align-BDD``). For example, this
+must work (assuming the necessary dependencies are installed):
 
 .. code:: bash
 
@@ -85,7 +98,7 @@ and the hardware, it might take quite some time to recalculate everything. PBS
 scripts that were used to run our experiments on the computation cluster are
 kept in folder ``📁 pbs``. Certainly, they are dependent on the hardware and the
 available software, but these materials hopefully will provide a good starting
-point to reproduce the results presented in the paper.
+point to reproduce the results presented in the paper using a PBS-based system.
 
 All the recipies (how to make each figure or other artifact) are described in
 the file called ``Makefile``, which is basically a list of commands and source
@@ -119,17 +132,17 @@ The computations are summarized in the following table (scrollable right):
 +----------------+---------------------------------------------+-------------------------------------------------------------------+                                   +        +------------------------------------+------------------------------------+
 | Figure 17      | ``LB.eps``                                  | :py:mod:`gen_BDD_pair` + :py:mod:`experiments.compare_simpl_LBs`  |                                   |        | ``simpl_LB.csv``                   | ``fig_LBs.R``                      |
 +----------------+---------------------------------------------+-------------------------------------------------------------------+-----------------------------------+        +------------------------------------+------------------------------------+
-| Figure 18      | ``orig_lwidth_stats.eps``                   | :py:mod:`gen_BDD_pair` + :py:mod:`experiments.gen_lsizes_stats`   | ``orig_stats.tar.gz``             |        | ``lwidths.csv``                    | ``fig_summary.R``                  |
+| Figure 19      | ``orig_lwidth_stats.eps``                   | :py:mod:`gen_BDD_pair` + :py:mod:`experiments.gen_lsizes_stats`   | ``orig_stats.tar.gz``             |        | ``lwidths.csv``                    | ``fig_summary.R``                  |
 +----------------+---------------------------------------------+-------------------------------------------------------------------+-----------------------------------+        +------------------------------------+------------------------------------+
 | Figure 8       | ``orig_runtimes.eps``                       | :py:mod:`gen_BDD_pair` + :py:mod:`experiments.par_scal_test`      | ``orig_scal.tar.gz``              |        | ``orig_scal.csv``                  | ``fig_scal.R``                     |
 +----------------+---------------------------------------------+-------------------------------------------------------------------+-----------------------------------+        +------------------------------------+------------------------------------+
-| Figure 19      | ``no_opts.eps``                             | :py:mod:`gen_BDD_pair` + :py:mod:`experiments.heu_sol_struct`     | ``heu_sol_struct.tar.gz``         |        | ``simpl_sol_struct.csv``           | ``fig_simpl_opt_struct.R``         |
+| Figure 20      | ``no_opts.eps``                             | :py:mod:`gen_BDD_pair` + :py:mod:`experiments.heu_sol_struct`     | ``heu_sol_struct.tar.gz``         |        | ``simpl_sol_struct.csv``           | ``fig_simpl_opt_struct.R``         |
 +                +                                             +                                                                   +                                   +        +                                    +                                    +
-| Figure 20      | ``opts_diam.eps``                           |                                                                   |                                   |        |                                    |                                    |
+| Figure 21      | ``opts_diam.eps``                           |                                                                   |                                   |        |                                    |                                    |
 +                +                                             +                                                                   +                                   +        +                                    +                                    +
-| Figure 21      | ``heuristic_simscore.eps``                  |                                                                   |                                   |        |                                    |                                    |
+| Figure 22      | ``heuristic_simscore.eps``                  |                                                                   |                                   |        |                                    |                                    |
 +                +                                             +                                                                   +                                   +        +                                    +                                    +
-| Figure 22      | ``heuristic_simscore_vs_AB_simscore. eps``  |                                                                   |                                   |        |                                    |                                    |
+| Figure 23      | ``heuristic_simscore_vs_AB_simscore. eps``  |                                                                   |                                   |        |                                    |                                    |
 +----------------+---------------------------------------------+-------------------------------------------------------------------+-----------------------------------+--------+------------------------------------+------------------------------------+
 | Figure 9b      | ``tMIP_tMIPCPP_tDD.eps``                    | :py:mod:`UFLP_2_cav`  :py:func:`darkcloud.gen_caveman_inst`       | ``jUFLP.tar.gz``                  | json   | ``2022-07-19_jUFLP.csv``           | ``fig_DDvsMIP.R``                  |
 +                +                                             +                                                                   +                                   +        +                                    +                                    +
@@ -140,11 +153,11 @@ The computations are summarized in the following table (scrollable right):
 | Figure 11      | ``fig_jUFLP_simscores.eps``                 | :py:mod:`experiments.jUFLP_w_simscores`                           | ``jUFLP_ss.tar.gz``               | json   | ``2022-12-06_jUFLP_simscores.csv`` | ``jUFLP_simscores.R``              |
 +----------------+---------------------------------------------+-------------------------------------------------------------------+-----------------------------------+--------+------------------------------------+------------------------------------+
 
-Figure 16: sample B&B tree was generated by :py:mod:`experiments.sample_BB_tree`.
+Figure 17: sample branch and bound tree was generated by :py:mod:`experiments.sample_BB_tree`.
 
-(Figures 1-5, 9a, 11-15, and 23-26 do not involve any computations.)
+Figures 1-5, 9a, 12-16, and 24-27 do not involve any computations.
 
-All the key parameters (instance sizes, generation parameters, etc.) are set in ``Makefile``.
+Key 'global' parameters (instance sizes, generation parameters, etc.) are set in ``Makefile``. (The rest are specified in the respective python files in ``experiments`` folder.)
 
 Implementation details
 ----------------------
@@ -269,6 +282,7 @@ The code relevant to j-UFLP application (Section 4.2) is here:
    :toctree: _autosummary
    :recursive:
 
+   UFL
    UFLP_fullDD
    UFLPOrder
    jUFLP_cavemen

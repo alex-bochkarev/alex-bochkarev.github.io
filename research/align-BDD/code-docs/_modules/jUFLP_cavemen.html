@@ -336,7 +336,7 @@
 <span class="sd">      intmode (str): alignment mode, &#39;toA&#39;, &#39;toB&#39;, or &#39;VS&#39;</span>
 
 <span class="sd">    Notes:</span>
-<span class="sd">      Instance is parameterized as per :py:func:`gen_caveman_inst`,</span>
+<span class="sd">      Instance is parameterized as per :py:func:`darkcloud.gen_caveman_inst`,</span>
 <span class="sd">      The diagrams are built with :py:class:`darkcloud.DDSolver`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">i1</span>
@@ -389,7 +389,7 @@
 <span class="sd">      jmap (dict): joining dict.</span>
 
 <span class="sd">    Notes:</span>
-<span class="sd">      Instance is parameterized as per :py:func:`gen_caveman_inst`,</span>
+<span class="sd">      Instance is parameterized as per :py:func:`darkcloud.gen_caveman_inst`,</span>
 <span class="sd">      The diagrams are built with :py:class:`darkcloud.DDSolver`.</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        objective (float)</span>
@@ -423,7 +423,7 @@
 <span class="sd">      jmap (dict): joining dict.</span>
 
 <span class="sd">    Notes:</span>
-<span class="sd">      Instance is parameterized as per :py:func:`gen_caveman_inst`,</span>
+<span class="sd">      Instance is parameterized as per :py:func:`darkcloud.gen_caveman_inst`,</span>
 <span class="sd">      The diagrams are built with :py:func:`UFLP_fullDD.create_cover_DD`.</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        objective (float)</span>
@@ -454,7 +454,7 @@
 <span class="sd">      i1, i2 (list): instances</span>
 
 <span class="sd">    Notes:</span>
-<span class="sd">      Instance is parameterized as per :py:func:`gen_caveman_inst`.</span>
+<span class="sd">      Instance is parameterized as per :py:func:`darkcloud.gen_caveman_inst`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">S</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">caves</span> <span class="o">=</span> <span class="n">i1</span>
     <span class="n">S2</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">caves2</span> <span class="o">=</span> <span class="n">i2</span>
@@ -519,7 +519,7 @@
     <span class="sd">&quot;&quot;&quot;Generates and solves a MIP for the supplied jUFL cavemen instance.</span>
 
 <span class="sd">    Note:</span>
-<span class="sd">      The instance is parameterized as per :py:func:`gen_caveman_inst`.</span>
+<span class="sd">      The instance is parameterized as per :py:func:`darkcloud.gen_caveman_inst`.</span>
 <span class="sd">      Most of the code is adapted form :py:func:`darkcloud.solve_with_MIP`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
@@ -580,7 +580,7 @@
 <span class="sd">      intmode (str): intersection mode, &#39;toA&#39; or &#39;VS&#39;</span>
 
 <span class="sd">    Notes:</span>
-<span class="sd">      Instance is parameterized as per :py:func:`gen_caveman_inst`,</span>
+<span class="sd">      Instance is parameterized as per :py:func:`darkcloud.gen_caveman_inst`,</span>
 <span class="sd">      The diagrams are built with :py:class:`darkcloud.DDSolver`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Building the first DD...&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
