@@ -66,7 +66,7 @@
                 <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-key"></use></svg>
             </a>
             
-            <a class="nav-link nav-icon-link" href="https://twitter.com/a_bochka">
+            <a class="nav-link nav-icon-link" href="https://x.com/a_bochka">
                 <svg viewBox="0 0 25 25"><use xlink:href="/icons.svg#i-twitter"></use></svg>
             </a>
             
@@ -78,6 +78,22 @@
 </div>
 <br/>
 
+                
+                    <div id="table-of-contents">
+                        <h2> Index, <a href="#" class="nav-link">top</a> </h2> 
+                        <div id="text-table-of-contents" class="not-a-text-link">
+                            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#quantum-computing-for-discrete-optimization-a-highlight-of-three-technologies">Quantum computing for discrete optimization: a highlight of three technologies.</a></li>
+    <li><a href="#bayesian-optimisation-with-improved-information-sharing-for-the-variational-quantum-eigensolver">Bayesian optimisation with improved information sharing for the variational quantum eigensolver</a></li>
+    <li><a href="#an-rl-powered-heuristic-for-dynamic-shortest-path-interdiction">An RL-powered heuristic for Dynamic Shortest-Path Interdiction</a></li>
+    <li><a href="#on-collections-of-bdds-and-order-associated-diagrams">On collections of BDDs and &ldquo;order-associated&rdquo; diagrams.</a></li>
+  </ul>
+</nav>
+                        </div>
+                    </div>
+                
+            
             <div id="content">
 
 
@@ -85,7 +101,89 @@
         <h1>Current work</h1>
         <p>Here is a brief summary of my current research projects. Please feel free to
 reach out if you are interested in details.</p>
-<h3 id="1-on-collections-of-bdds-and-order-associated-diagrams">1) On collections of BDDs and &ldquo;order-associated&rdquo; diagrams.</h3>
+<h2 id="quantum-computing-for-discrete-optimization-a-highlight-of-three-technologies">Quantum computing for discrete optimization: a highlight of three technologies.</h2>
+<p><img src="./qopt-overview/img/main-pic.png#full-shadow" alt="QAOA scheme, figure with runtime and a table with qubit requirements"></p>
+<p><strong>Summary:</strong> presenting a practice-focused, OR scientist&rsquo;s perspective on
+quantum optimization by highlighting three specific quantum technologies applied
+to three classical discrete optimization problems.</p>
+<details> <summary> [ More details ]</summary>
+<p>Quantum optimization has emerged as a promising frontier of quantum computing,
+presenting a novel numerical approach to mathematical optimization problems. The
+key goal of this work is to facilitate inter-disciplinary research between the
+operations research (OR) and quantum computing communities by providing an OR
+scientist’s perspective on selected quantum-powered methods for discrete
+optimization. We consider three classical optimization problems, the Traveling
+Salesperson Problem, Weighted Maximum Cut, and Maximum Independent Set, to
+illustrate several approaches corresponding to different types of quantum
+hardware available on the market. Having a general OR audience in mind, we
+attempt to provide some intuition behind each approach along with key
+references, describe the corresponding high-level workflow, and highlight
+crucial practical considerations. In particular, we emphasize the importance of
+the problem formulations and device-specific configuration, and their effects on
+the amount of resources necessary for the computation (number of qubits and the
+related runtime). These points are illustrated using a series of experiments on
+quantum processing units of three types: an analog device from QuEra, a quantum
+annealer from D-Wave, and a gate-based device from IBM .</p>
+</details>
+<p>🖊️ <strong>Working paper:</strong>  A. Bochkarev, R. Heese, S. Jäger, P. Schiewe, A. Schöbel. &ldquo;Quantum computing for discrete optimization: a highlight of three technologies.&rdquo; (in preparation)</p>
+<p>💬 <strong>Presentations:</strong> GOR-2023 (Hamburg, DE), GOR WG &ldquo;Simulation und Optimierung komplexer
+Systeme&rdquo; 2023 (Ingolstadt, DE), MIC-2024 (Lorient, FR).</p>
+<p>💻 <strong>Software stack:</strong> Python (qiskit, D-Wave&rsquo;s Ocean, aws/bracket), R/ggplot, Gurobi solver, bash, make.</p>
+<h2 id="bayesian-optimisation-with-improved-information-sharing-for-the-variational-quantum-eigensolver">Bayesian optimisation with improved information sharing for the variational quantum eigensolver</h2>
+<p><img src="./bois.png#full-shadow" alt="Figure of deviations of the found energy values from the reference."></p>
+<p><strong>Summary:</strong> analyzing Bayesian optimization framework in the context of VQE
+with information sharing empirically. A BSc work by <a href="https://www.linkedin.com/in/milena-roehrs/">Milena Röhrs</a>. (Co-supervised)</p>
+<details> <summary> [ More details ]</summary>
+<p>This work presents a detailed empirical analysis of Bayesian optimization with
+information sharing (BOIS) for the variational quantum eigensolver (VQE). The
+method is applied to computing the potential energy surfaces (PES) of the
+hydrogen and water molecules. We performed noise-free simulations and
+investigated the algorithms’ performance under the influence of noise for the
+hydrogen molecule, using both emulated and real quantum hardware (IBMQ System
+One). Based on the noise free simulations we compared different existing
+information sharing schemes and proposed a new one, which trades
+parallelisability of the algorithm for a significant reduction in the amount of
+quantum computing resources required until convergence. In particular, our
+numerical experiments show an improvement by a factor of 1.5 as compared to the
+previously reported sharing schemes in H2 , and at least by a factor of 5 as
+compared to no sharing in H2O. Other algorithmic aspects of the Bayesian
+optimisation, namely, the acquisition weight decrease rate and kernel, are shown
+to have an influence on the quantum computation (QC) demand of the same order of
+magnitude.</p>
+</details>
+<p>🖊️ <strong>Working paper:</strong> Milena Röhrs, Alexey Bochkarev, Arcesio C. Medina, &ldquo;Bayesian optimisation with improved information sharing for the variational quantum eigensolver.&rdquo; <a href="https://arxiv.org/abs/2405.14353">arXiv:2405.14353</a></p>
+<p>💾 <strong>Code and data:</strong> <a href="https://github.com/milena-roehrs/BOIS-with-immediate-sharing">github repo</a> by Milena Röhrs.</p>
+<h2 id="an-rl-powered-heuristic-for-dynamic-shortest-path-interdiction">An RL-powered heuristic for Dynamic Shortest-Path Interdiction</h2>
+<p><img src="./dspi_tree.png#full-shadow" alt="Tree picture"></p>
+<p><strong>Summary:</strong> Designing algorithms to &ldquo;play the game&rdquo; of <a href="https://doi.org/10.1002/net.21712">Dynamic Shortest-Path
+Interdiction</a> (which is
+NP-hard). We are trying to explore the problem state space using the techniques
+involving random simulations and reinforcement learning.</p>
+<details> <summary>[ More details ]</summary>
+<p>We are considering a dynamic game between two agents,
+&ldquo;Evader&rdquo; and &ldquo;Interdictor&rdquo;, over a directed weighted graph.
+The purpose of the Evader is to traverse a graph between
+&ldquo;source&rdquo; and &ldquo;terminal&rdquo; nodes at the minimum possible cost,
+given the other player&rsquo;s actions. The &ldquo;Interdictor&rdquo; is
+seeking to maximize the Evader&rsquo;s cost by &ldquo;attacking&rdquo; certain
+number of edges of the graph (which results in the arc cost
+increasing by a pre-defined amount). The players take turns,
+where the Evader&rsquo;s turn implies traversal of an arc, and the
+Interdictor&rsquo;s turn is either an attack or a pass. This
+variant of the game is known to be NP-hard, and an exact
+algorithm boils down to enumerating all the relevant states in a
+dynamic programming fashion.</p>
+<p>While existing research discusses bounds for
+the optimal game cost, the literature on heuristics
+(algorithms that would actually play that game, or propose a
+<em>policy</em> for the players) has been generally lacking. We
+look to fill in this gap by leveraging some ideas from the
+realm of simulations and game playing research. </details></p>
+<p>🖊️ <strong>Working paper:</strong> in preparation, with Dr. J. Cole Smith.  (Currently under review)</p>
+<p>💬 <strong>Presentation:</strong> <a href="https://sites.google.com/view/inoc2022" title="International Network
+Optimization Conference 2022">INOC-2022</a> in Aachen. See also <a href="https://www.math2.rwth-aachen.de/files/inoc2022/bookofabstracts.pdf">Book of Abstracts</a>, Session 4B (Interdiction), p. 129.</p>
+<p>💻 <strong>Software stack:</strong> Julia, graphviz (dot), R/ggplot, PBS, make.</p>
+<h2 id="on-collections-of-bdds-and-order-associated-diagrams">On collections of BDDs and &ldquo;order-associated&rdquo; diagrams.</h2>
 <p><img src="./siftup.png#full-shadow" alt="Branch and Bound tree"></p>
 <p><strong>Summary:</strong> Designing a heuristic to find a &ldquo;good&rdquo; shared order
 of layers for a pair of Binary Decision Diagrams (<a href="https://en.wikipedia.org/wiki/Binary_decision_diagram">BDDs</a>) and applying
@@ -121,40 +219,10 @@ Consistent Path representation along with the proposed
 benefits (especially when we&rsquo;d need to re-solve the problem
 with different numerical data) and sensitivity information.</p>
 </details>
-<p>🖊️ <strong>Working paper:</strong> Bochkarev, Alexey, and J. Cole Smith. “On Aligning Non-Order-Associated Binary Decision Diagrams.” Under revision in <em>INFORMS Journal on Computing</em>. <a href="https://optimization-online.org/2022/08/on-aligning-non-order-associated-binary-decision-diagrams/">(preprint)</a></p>
+<p>🖊️ <strong>Paper:</strong> Alexey Bochkarev and J. Cole Smith. “On Aligning Non-Order-Associated Binary Decision Diagrams.” <em>INFORMS Journal on Computing</em>. <a href="https://pubsonline.informs.org/doi/10.1287/ijoc.2023.1293">(paper)</a>,  <a href="https://optimization-online.org/2022/08/on-aligning-non-order-associated-binary-decision-diagrams/">(preprint)</a></p>
 <p>💬 <strong>Presentation:</strong> at INFORMS Annual Meeting 2020. <a href="./2020_10_Informs_Bochkarev.pdf">(slides)</a></p>
-<p>💾 <strong>Code and data:</strong> work in progress; <a href="./align-BDD/code-docs/overview.html" title="current code docs">code docs</a>, <a href="https://github.com/alex-bochkarev/align-BDD" title="github repository">repository</a></p>
+<p>💾 <strong>Code and data:</strong> <a href="./align-BDD/code-docs/overview.html" title="current code docs">code docs</a>, <a href="https://github.com/alex-bochkarev/align-BDD" title="github repository">repository</a></p>
 <p>💻 <strong>Software stack:</strong> Python, R/ggplot, graphviz (dot), Gurobi solver, PBS, GNU parallel, bash, make, sphinx.</p>
-<h3 id="2-an-rl-powered-heuristic-for-dynamic-shortest-path-interdiction">2) An RL-powered heuristic for Dynamic Shortest-Path Interdiction</h3>
-<p><img src="./dspi_tree.png#full-shadow" alt="Tree picture"></p>
-<p><strong>Summary:</strong> Designing algorithms to &ldquo;play the game&rdquo; of <a href="https://doi.org/10.1002/net.21712">Dynamic Shortest-Path
-Interdiction</a> (which is
-NP-hard). We are trying to explore the problem state space using the techniques
-involving random simulations and reinforcement learning.</p>
-<details> <summary>[ More details ]</summary>
-<p>We are considering a dynamic game between two agents,
-&ldquo;Evader&rdquo; and &ldquo;Interdictor&rdquo;, over a directed weighted graph.
-The purpose of the Evader is to traverse a graph between
-&ldquo;source&rdquo; and &ldquo;terminal&rdquo; nodes at the minimum possible cost,
-given the other player&rsquo;s actions. The &ldquo;Interdictor&rdquo; is
-seeking to maximize the Evader&rsquo;s cost by &ldquo;attacking&rdquo; certain
-number of edges of the graph (which results in the arc cost
-increasing by a pre-defined amount). The players take turns,
-where the Evader&rsquo;s turn implies traversal of an arc, and the
-Interdictor&rsquo;s turn is either an attack or a pass. This
-variant of the game is known to be NP-hard, and an exact
-algorithm boils down to enumerating all the relevant states in a
-dynamic programming fashion.</p>
-<p>While existing research discusses bounds for
-the optimal game cost, the literature on heuristics
-(algorithms that would actually play that game, or propose a
-<em>policy</em> for the players) has been generally lacking. We
-look to fill in this gap by leveraging some ideas from the
-realm of simulations and game playing research. </details></p>
-<p>🖊️ <strong>Working paper:</strong> in preparation, with Dr. J. Cole Smith.</p>
-<p>💬 <strong>Presentation:</strong> <a href="https://sites.google.com/view/inoc2022" title="International Network
-Optimization Conference 2022">INOC-2022</a> in Aachen. See also <a href="https://www.math2.rwth-aachen.de/files/inoc2022/bookofabstracts.pdf">Book of Abstracts</a>, Session 4B (Interdiction), p. 129.</p>
-<p>💻 <strong>Software stack:</strong> Julia, graphviz (dot), R/ggplot, PBS, make (so far).</p>
 
         <br/>
         
@@ -164,7 +232,7 @@ Optimization Conference 2022">INOC-2022</a> in Aachen. See also <a href="https:/
         </div>
         <footer class="footer"><br>
 <div class="site-footer">
-    <p class="footer-text nav-link">© 2018&mdash;2023 <b><a class="nav-link" href="/">Alexey A. Bochkarev</a></b> All rights reserved
+    <p class="footer-text nav-link">© 2018&mdash;2024 <b><a class="nav-link" href="/">Alexey A. Bochkarev</a></b> All rights reserved
         ⬩ <a class="nav-link" href="/privacy">Privacy Policy</a>
         ⬩ <a class="nav-link" href="/disclaimer">Disclaimer</a>
         | Made with a <a href="https://github.com/alex-bochkarev/hugo-desk-theme">custom theme</a> for <a href="https://gohugo.io/">Hugo</a>.
