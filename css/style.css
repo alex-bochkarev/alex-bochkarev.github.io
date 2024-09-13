@@ -82,6 +82,11 @@ details p {
 }
 
 /* list stickers */
+.paperlink-sticker {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+}
+
 .sticker {
     color: inherit;
     border: 1px solid var(--main-accent);
@@ -103,7 +108,11 @@ details p {
 
 .h2-links {
     margin-top:-15px;
-    text-align: left;
+    display: flex;
+    align-items: stretch;
+    align-content: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 /* normal links */
